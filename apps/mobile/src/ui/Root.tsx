@@ -7,6 +7,7 @@ import { Button, ScrollView, View } from 'react-native';
 
 import type { AppModules } from '../wiring';
 
+import { DriveRecorderScreen } from './dev/DriveRecorderScreen';
 import { Ws1Debug } from './dev/Ws1Debug';
 import { Ws2Debug } from './dev/Ws2Debug';
 import { Ws3Debug } from './dev/Ws3Debug';
@@ -38,6 +39,8 @@ function renderRoute(route: Route, props: ScreenProps) {
       return <Ws3Debug {...props} />;
     case 'ws4':
       return <Ws4Debug {...props} />;
+    case 'recorder':
+      return <DriveRecorderScreen {...props} />;
   }
 }
 
