@@ -39,6 +39,8 @@ function harness(opts: {
   createTrip?: (req: CreateTripRequest) => Promise<CreateTripResponse>;
   road?: RoadMatch;
   onGps?: RoadEventDetector['onGps'];
+  ensureAround?: () => Promise<void>;
+  motionOnGps?: MotionDetector['onGps'];
 }) {
   const play = vi.fn(() => true);
   const debriefPlay = vi.fn(async (_url: string) => {});
@@ -47,7 +49,7 @@ function harness(opts: {
   const listeners = new Set<(e: DraftEvent) => void>();
   const motion: MotionDetector = {
     onMotion() {},
-    onGps() {},
+    onGps: opts.motionOnGps ?? (() => {}),
     reset() {},
     isPaused: () => false,
     subscribe(l) {
@@ -67,7 +69,7 @@ function harness(opts: {
     motionDetector: motion,
     phoneUse: { start() {}, stop() {}, reportTouch() {}, subscribe: () => () => {} },
     roadCache: {
-      ensureAround: async () => {},
+      ensureAround: opts.ensureAround ?? (async () => {}),
       match: () => opts.road ?? posted(),
       stopSignsNear: () => [],
       getStatus: () => ({
@@ -192,6 +194,19 @@ describe('TripSession', () => {
       alerted: false,
       limitConfidence: 'inferred',
     });
+  });
+
+  it('keeps processing fixes while the road fetch hangs', async () => {
+    const motionOnGps = vi.fn();
+    const h = harness({
+      fixes: driveThenPark(),
+      ensureAround: () => new Promise(() => {}),
+      motionOnGps,
+    });
+    await h.session.start({ passenger: false, lockEnabled: true });
+    expect(motionOnGps).toHaveBeenCalledTimes(36);
+    expect(h.session.getState().traceLength).toBe(36);
+    expect(h.session.canEnd()).toEqual({ ok: true });
   });
 
   it('queues a failed upload and retries it on the next start', async () => {

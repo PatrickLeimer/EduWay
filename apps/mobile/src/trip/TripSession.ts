@@ -91,8 +91,9 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
     const status = store.get().status;
     if (status !== 'driving' && status !== 'starting') return;
     trace.append(fix);
-    await deps.roadCache.ensureAround(fix);
-    if (store.get().status !== 'driving' && store.get().status !== 'starting') return;
+    // Fire and forget: a slow or offline Overpass fetch must not stall motion,
+    // phone use, or stop timing (§18 flag 1). The cache ignores overlapping calls.
+    void deps.roadCache.ensureAround(fix);
     const match = deps.roadCache.match(fix);
     const prev = store.get();
     const dt = prev.latestFix ? Math.max(0, (fix.t - prev.latestFix.t) / 1000) : 0;
