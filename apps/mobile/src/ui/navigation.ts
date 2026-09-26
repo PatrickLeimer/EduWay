@@ -1,15 +1,20 @@
 /**
- * Placeholder state-based navigation (no library until the UI phase).
- * The UI phase replaces this with Expo Router (see apps/mobile/AGENTS.md).
+ * State-based navigation. No navigation library: Expo Router (apps/mobile/AGENTS.md)
+ * is a new dependency and needs team approval first (root CLAUDE.md).
  */
 import type { AppModules } from '../wiring';
 
 export type Route =
   | { name: 'start' }
   | { name: 'driving' }
-  /** tripId null = the trip that just ended (from TripSession state). */
+  /** Trip just ended: upload status + "Get feedback" button. */
+  | { name: 'ended' }
+  /** Debrief. tripId null = the trip that just ended (from TripSession state). */
   | { name: 'result'; tripId: string | null }
+  | { name: 'replay'; tripId: string }
   | { name: 'list' }
+  | { name: 'progress' }
+  | { name: 'settings' }
   | { name: 'dev' }
   | { name: 'ws1' }
   | { name: 'ws2' }
@@ -17,8 +22,18 @@ export type Route =
   | { name: 'ws4' }
   | { name: 'recorder' };
 
+/** User preferences (§12 screen 6). In memory only: persisting needs storage the team hasn't picked. */
+export interface AppSettings {
+  /** Default for the driving lock toggle on the start screen (§4, on by default [Proposed]). */
+  lockByDefault: boolean;
+}
+
+export const DEFAULT_SETTINGS: AppSettings = { lockByDefault: true };
+
 /** Props every screen receives. */
 export interface ScreenProps {
   modules: AppModules;
   navigate: (route: Route) => void;
+  settings: AppSettings;
+  updateSettings: (patch: Partial<AppSettings>) => void;
 }

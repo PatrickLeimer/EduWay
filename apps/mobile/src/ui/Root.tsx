@@ -1,9 +1,10 @@
 /**
- * Placeholder app shell: state-based navigation between the placeholder
- * screens. No navigation library until the UI phase.
+ * App shell: state-based navigation between screens (see navigation.ts).
+ * Product screens draw their own full-screen layout; the dev menu and the
+ * WS1–WS4 debug screens keep the plain scrolling wrapper they were built for.
  */
 import { useCallback, useState } from 'react';
-import { Button, ScrollView, View } from 'react-native';
+import { Button, ScrollView, StyleSheet, View } from 'react-native';
 
 import type { AppModules } from '../wiring';
 
@@ -12,12 +13,17 @@ import { Ws1Debug } from './dev/Ws1Debug';
 import { Ws2Debug } from './dev/Ws2Debug';
 import { Ws3Debug } from './dev/Ws3Debug';
 import { Ws4Debug } from './dev/Ws4Debug';
-import type { Route, ScreenProps } from './navigation';
+import { DEFAULT_SETTINGS, type AppSettings, type Route, type ScreenProps } from './navigation';
 import { DevMenuScreen } from './screens/DevMenuScreen';
 import { DrivingScreen } from './screens/DrivingScreen';
+import { ProgressScreen } from './screens/ProgressScreen';
+import { ReplayScreen } from './screens/ReplayScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { StartDriveScreen } from './screens/StartDriveScreen';
+import { TripEndedScreen } from './screens/TripEndedScreen';
 import { TripListScreen } from './screens/TripListScreen';
 import { TripResultScreen } from './screens/TripResultScreen';
+import { colors, SAFE_TOP } from './theme';
 
 function renderRoute(route: Route, props: ScreenProps) {
   switch (route.name) {
@@ -25,10 +31,18 @@ function renderRoute(route: Route, props: ScreenProps) {
       return <StartDriveScreen {...props} />;
     case 'driving':
       return <DrivingScreen {...props} />;
+    case 'ended':
+      return <TripEndedScreen {...props} />;
     case 'result':
       return <TripResultScreen {...props} tripId={route.tripId} />;
+    case 'replay':
+      return <ReplayScreen {...props} tripId={route.tripId} />;
     case 'list':
       return <TripListScreen {...props} />;
+    case 'progress':
+      return <ProgressScreen {...props} />;
+    case 'settings':
+      return <SettingsScreen {...props} />;
     case 'dev':
       return <DevMenuScreen {...props} />;
     case 'ws1':
@@ -44,22 +58,34 @@ function renderRoute(route: Route, props: ScreenProps) {
   }
 }
 
-/** Screens without a Home button: never leave driving mode by navigation (§4, §16). */
-const NO_HOME: Route['name'][] = ['start', 'driving'];
+/** Developer screens: plain ScrollView + Home button, as before the UI phase. */
+const DEV_ROUTES: Route['name'][] = ['dev', 'ws1', 'ws2', 'ws3', 'ws4', 'recorder'];
 
 export function Root({ modules }: { modules: AppModules }) {
   const [route, setRoute] = useState<Route>({ name: 'start' });
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const navigate = useCallback((r: Route) => setRoute(r), []);
+  const updateSettings = useCallback(
+    (patch: Partial<AppSettings>) => setSettings((s) => ({ ...s, ...patch })),
+    [],
+  );
+  const props: ScreenProps = { modules, navigate, settings, updateSettings };
 
-  return (
-    // paddingTop only keeps content below the status bar; real layout comes in the UI phase.
-    <ScrollView contentContainerStyle={{ paddingTop: 48 }}>
-      {!NO_HOME.includes(route.name) && (
+  if (DEV_ROUTES.includes(route.name)) {
+    return (
+      <ScrollView style={styles.dev} contentContainerStyle={{ paddingTop: SAFE_TOP }}>
         <View>
           <Button title="Home" onPress={() => navigate({ name: 'start' })} />
         </View>
-      )}
-      {renderRoute(route, { modules, navigate })}
-    </ScrollView>
-  );
+        {renderRoute(route, props)}
+      </ScrollView>
+    );
+  }
+
+  return <View style={styles.root}>{renderRoute(route, props)}</View>;
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: colors.surface },
+  dev: { flex: 1, backgroundColor: colors.surface },
+});
