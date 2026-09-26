@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Linking,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -18,11 +17,12 @@ import {
 import { useMapGps } from '../../trip';
 import { Button } from '../components/Button';
 import { MapCanvas } from '../components/MapCanvas';
+import { FadeIn, PressableScale } from '../components/motion';
 import { ToggleRow } from '../components/primitives';
 import { TestDriveBadge } from '../components/TestDriveBadge';
 import { directionsUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
-import { colors, font, radius, SAFE_BOTTOM, SAFE_TOP, shadow, space } from '../theme';
+import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, shadow, space } from '../theme';
 
 export function StartDriveScreen({ modules, navigate, settings }: ScreenProps) {
   const { fix, error } = useMapGps(modules.trip);
@@ -41,25 +41,28 @@ export function StartDriveScreen({ modules, navigate, settings }: ScreenProps) {
     <View style={styles.root}>
       <MapCanvas style={StyleSheet.absoluteFill} follow={here} car={here} />
 
-      <View style={styles.topBar}>
+      <FadeIn style={styles.topBar} delay={motion.normal} fromY={-16}>
         <View style={styles.brandRow}>
           <Text style={styles.brand}>EduDriver</Text>
           {settings.demoMode ? <TestDriveBadge /> : null}
         </View>
-        <Pressable
+        <PressableScale
           accessibilityRole="button"
           onPress={() => navigate({ name: 'settings' })}
+          pressedScale={0.94}
           style={styles.chip}
+          contentStyle={styles.chipInner}
         >
           <Text style={styles.chipText}>Settings</Text>
-        </Pressable>
-      </View>
+        </PressableScale>
+      </FadeIn>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.sheetWrap}
       >
-        <View style={styles.sheet}>
+        {/* The sheet slides up over the map, Uber-style. */}
+        <FadeIn style={styles.sheet} fromY={120} duration={motion.slow}>
           <View style={styles.grabber} />
           {error ? <Text style={styles.error}>Location: {error}</Text> : null}
 
@@ -113,7 +116,7 @@ export function StartDriveScreen({ modules, navigate, settings }: ScreenProps) {
               style={styles.link}
             />
           </View>
-        </View>
+        </FadeIn>
       </KeyboardAvoidingView>
     </View>
   );
@@ -141,13 +144,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     overflow: 'hidden',
   },
-  chip: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: space.lg,
-    paddingVertical: space.sm,
-    borderRadius: radius.pill,
-    ...shadow,
-  },
+  chip: { backgroundColor: colors.surface, borderRadius: radius.pill, ...shadow },
+  chipInner: { paddingHorizontal: space.lg, paddingVertical: space.sm },
   chipText: { fontSize: font.body, fontWeight: '600', color: colors.text },
   sheetWrap: { position: 'absolute', left: 0, right: 0, bottom: 0 },
   sheet: {

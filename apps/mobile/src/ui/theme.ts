@@ -53,6 +53,19 @@ export const font = {
   driveMin: 20,
 } as const;
 
+/** Animation timings in ms (components/motion.tsx). */
+export const motion = {
+  fast: 160,
+  normal: 280,
+  /** Screen-to-screen transition. */
+  screen: 320,
+  slow: 480,
+  /** Delay between items in a list entrance. */
+  stagger: 70,
+  /** Cap so long lists don't wait forever for the last item. */
+  maxStaggerItems: 8,
+} as const;
+
 /** Minimum touch target in driving mode (glove/car friendly). */
 export const DRIVE_BUTTON_HEIGHT = 64;
 

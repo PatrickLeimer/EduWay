@@ -12,8 +12,10 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 
 import { useApiQuery } from '../../api';
 import { Button } from '../components/Button';
+import { ConnectionError } from '../components/ConnectionError';
 import { EventRow } from '../components/EventRow';
 import { MapCanvas } from '../components/MapCanvas';
+import { FadeIn, GrowBar } from '../components/motion';
 import { Muted, OsmCredit } from '../components/primitives';
 import { Screen } from '../components/Screen';
 import { clockText } from '../lib/format';
@@ -27,7 +29,7 @@ import {
   type ReplaySpeed,
 } from '../lib/replay';
 import type { ScreenProps } from '../navigation';
-import { colors, font, radius, space } from '../theme';
+import { colors, font, motion, radius, space } from '../theme';
 
 const TICK_MS = 200;
 const BARS = 48;
@@ -73,7 +75,13 @@ export function ReplayScreen({ modules, navigate, tripId }: ScreenProps & { trip
     return (
       <Screen title="Replay" onBack={back}>
         {error ? (
-          <Text style={styles.error}>{error}</Text>
+          <ConnectionError
+            error={error}
+            onRetry={() => {
+              tripQ.reload();
+              traceQ.reload();
+            }}
+          />
         ) : (
           <ActivityIndicator color={colors.black} style={styles.loading} />
         )}
@@ -109,7 +117,10 @@ export function ReplayScreen({ modules, navigate, tripId }: ScreenProps & { trip
     >
       <View style={styles.eventSlot}>
         {recent ? (
-          <EventRow event={recent.event} time={clockText(recent.offsetS)} />
+          // Keyed by time so each new event pops in.
+          <FadeIn key={recent.offsetS} fromY={8} fromScale={0.96} duration={motion.fast}>
+            <EventRow event={recent.event} time={clockText(recent.offsetS)} />
+          </FadeIn>
         ) : (
           <Muted>Events pop up here as the car reaches them.</Muted>
         )}
@@ -123,9 +134,11 @@ export function ReplayScreen({ modules, navigate, tripId }: ScreenProps & { trip
         accessibilityLabel="Replay timeline"
       >
         <View style={styles.bars}>
-          {bars.map((b) => (
-            <View
+          {/* The speed profile grows left to right when the replay opens. */}
+          {bars.map((b, i) => (
+            <GrowBar
               key={b.startS}
+              delay={i * 12}
               style={[styles.bar, { height: `${Math.max(4, (b.maxMph / maxMph) * 100)}%` }]}
             />
           ))}
@@ -175,7 +188,6 @@ export function ReplayScreen({ modules, navigate, tripId }: ScreenProps & { trip
 const styles = StyleSheet.create({
   map: { height: 320 },
   loading: { marginTop: space.xxl },
-  error: { color: colors.harsh, fontSize: font.body },
   eventSlot: { minHeight: 64, justifyContent: 'center', marginTop: space.sm },
   timeline: {
     height: 72,

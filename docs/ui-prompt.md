@@ -116,15 +116,34 @@ Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, 
 |---|---|
 | `MapCanvas.tsx` | The only map. Google Maps on Android, Apple Maps on iOS (Expo Go's iOS build has no Google key; same choice as `dev/Ws2Map.tsx`). Props: `route`, `pins`, `car`, `follow`, `fitTo`, `interactive`, `dark`, `lite`. |
 | `MapCanvas.web.tsx` | Browser version: a keyless Google Maps embed centered on the car or route; no route line or pins. |
-| `Screen.tsx` | Light-screen shell: back link, large title, optional edge-to-edge `hero` (map), scrolling body, pinned `footer`. |
-| `Button.tsx` | `primary` (black), `secondary` (gray), `danger` (red), `onDark` (driving); `large` for in-car sizes. |
+| `Screen.tsx` | Light-screen shell: `BackButton` (rounded pill with a drawn chevron, springs when pressed), large title, optional edge-to-edge `hero` (map), scrolling body, pinned `footer`. Title, hero, body and footer enter one after another. |
+| `Button.tsx` | `primary` (black), `secondary` (gray), `danger` (red), `onDark` (driving); `large` for in-car sizes. Shrinks slightly while held. |
+| `motion.tsx` | `FadeIn`, `ScreenTransition`, `PressableScale`, `GrowBar`, `staggerDelay`, `useReducedMotion` (see Motion below). |
+| `ConnectionError.tsx` | Friendly "Can't reach the server" card with the URL tried, a pointer to Developer tools, and Try again. |
 | `primitives.tsx` | `Card`, `SectionTitle`, `Muted`, `StatTile`, `ToggleRow`, `OsmCredit`, `TierDot`. |
 | `TestDriveToggle.tsx` / `TestDriveBadge.tsx` | Test drive switch (locked mid-trip) and the yellow badge. |
 | `ScoreRing.tsx` | Score badge (neutral color on purpose). |
 | `SpeedLimitSign.tsx` | US speed-limit sign; never changes color. |
 | `EventRow.tsx` | One event: tier dot, label, street, speed, limit, "voice alert played". |
 
-Helpers (`ui/lib/`, all tested): `format.ts` (labels, mph, clock, durations, dates), `geo.ts` (GeoJSON ↔ map points, fit region), `replay.ts` (position at time, event offsets, speed buckets), `links.ts` (directions URL, emergency number).
+Helpers (`ui/lib/`, all tested): `format.ts` (labels, mph, clock, durations, dates), `geo.ts` (GeoJSON ↔ map points, fit region), `replay.ts` (position at time, event offsets, speed buckets), `links.ts` (directions URL, emergency number), `transitions.ts` (which way a screen change animates).
+
+### Motion
+
+Built on React Native's `Animated` API (no library), native driver, cubic ease-out. Timings are `motion` in `theme.ts`. With the OS "Reduce motion" setting on, everything appears without movement.
+
+| Where | What moves |
+|---|---|
+| Every screen change (`Root.tsx`) | Deeper screen slides in from the right, going back slides in from the left, driving mode rises in, same-level screens cross-fade (`lib/transitions.ts`). The backdrop matches the incoming screen so nothing flashes. |
+| Every light screen | Title, then map, then content, then footer enter in sequence. |
+| Buttons, cards, back button | Shrink while held, spring back on release. |
+| Home | Sheet slides up over the map; top bar drops in. |
+| Driving | Speed panel settles in, bottom panel rises; a new street name fades in with no movement (nothing moves while driving beyond that). |
+| Drive complete | Each status (saving → ready) animates in. |
+| Past drives | Cards glide up one after another (staggered, capped at 8). |
+| Feedback | Score pops in, strengths slide in, focus cards and events stagger in. |
+| Replay | Speed bars grow left to right; each new event card pops in. |
+| Progress | Score bars grow up, skill rows stagger in. |
 
 ## 5. How to redo the frontend
 

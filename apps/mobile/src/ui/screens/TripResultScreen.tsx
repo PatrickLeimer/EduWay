@@ -11,15 +11,17 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useApiQuery } from '../../api';
 import { useTripState } from '../../trip';
 import { Button } from '../components/Button';
+import { ConnectionError } from '../components/ConnectionError';
 import { EventRow } from '../components/EventRow';
 import { MapCanvas } from '../components/MapCanvas';
+import { FadeIn, staggerDelay } from '../components/motion';
 import { Card, Muted, OsmCredit, SectionTitle, StatTile } from '../components/primitives';
 import { Screen } from '../components/Screen';
 import { ScoreRing } from '../components/ScoreRing';
 import { dateText, durationText, milesText, secondsBetween } from '../lib/format';
 import { pointFromGeo, pointsFromLine } from '../lib/geo';
 import type { ScreenProps } from '../navigation';
-import { colors, font, space } from '../theme';
+import { colors, font, motion, space } from '../theme';
 
 export function TripResultScreen({
   modules,
@@ -48,7 +50,7 @@ export function TripResultScreen({
     return (
       <Screen title="Feedback" onBack={back}>
         {loaded.error ? (
-          <Text style={styles.error}>{loaded.error}</Text>
+          <ConnectionError error={loaded.error} onRetry={loaded.reload} />
         ) : (
           <ActivityIndicator color={colors.black} style={styles.loading} />
         )}
@@ -97,7 +99,10 @@ export function TripResultScreen({
       <Muted>{dateText(trip.startedAt)}</Muted>
 
       <View style={styles.scoreRow}>
-        <ScoreRing score={trip.score} />
+        {/* Score pops in first; it's the headline of the receipt. */}
+        <FadeIn delay={motion.normal} fromY={0} fromScale={0.8} duration={motion.slow}>
+          <ScoreRing score={trip.score} />
+        </FadeIn>
         <View style={styles.scoreSide}>
           <StatTile label="Distance" value={milesText(trip.distanceMi)} />
           <StatTile
@@ -122,22 +127,24 @@ export function TripResultScreen({
           {coach.strengths.length > 0 ? (
             <>
               <SectionTitle>What went well</SectionTitle>
-              {coach.strengths.map((s) => (
-                <Text key={s} style={styles.bullet}>
-                  ✓ {s}
-                </Text>
+              {coach.strengths.map((s, i) => (
+                <FadeIn key={s} delay={staggerDelay(i, motion.slow)} fromX={-12} fromY={0}>
+                  <Text style={styles.bullet}>✓ {s}</Text>
+                </FadeIn>
               ))}
             </>
           ) : null}
           {coach.focus_areas.length > 0 ? (
             <>
               <SectionTitle>Focus next time</SectionTitle>
-              {coach.focus_areas.map((f) => (
-                <Card key={f.skill} style={styles.focus}>
-                  <Text style={styles.focusSkill}>{f.skill}</Text>
-                  <Text style={styles.focusWhy}>{f.why}</Text>
-                  <Text style={styles.focusTip}>Tip: {f.tip}</Text>
-                </Card>
+              {coach.focus_areas.map((f, i) => (
+                <FadeIn key={f.skill} delay={staggerDelay(i + 2, motion.slow)} fromY={20}>
+                  <Card style={styles.focus}>
+                    <Text style={styles.focusSkill}>{f.skill}</Text>
+                    <Text style={styles.focusWhy}>{f.why}</Text>
+                    <Text style={styles.focusTip}>Tip: {f.tip}</Text>
+                  </Card>
+                </FadeIn>
               ))}
             </>
           ) : null}
@@ -149,7 +156,9 @@ export function TripResultScreen({
       <SectionTitle>Events ({events.length})</SectionTitle>
       {events.length === 0 ? <Muted>Clean drive: no events recorded.</Muted> : null}
       {events.map((e, i) => (
-        <EventRow key={i} event={e} />
+        <FadeIn key={i} delay={staggerDelay(i, motion.slow)} fromY={10}>
+          <EventRow event={e} />
+        </FadeIn>
       ))}
       <OsmCredit />
       <Muted>Scores are a coaching tool, not a certification of safety.</Muted>
@@ -160,7 +169,6 @@ export function TripResultScreen({
 const styles = StyleSheet.create({
   map: { height: 240 },
   loading: { marginTop: space.xxl },
-  error: { color: colors.harsh, fontSize: font.body },
   scoreRow: { flexDirection: 'row', alignItems: 'center', gap: space.lg, marginTop: space.lg },
   scoreSide: { flex: 1, gap: space.sm },
   play: { marginTop: space.lg },

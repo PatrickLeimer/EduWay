@@ -17,13 +17,14 @@ import { Alert, BackHandler, Linking, StyleSheet, Text, View } from 'react-nativ
 import { useTripState } from '../../trip';
 import { Button } from '../components/Button';
 import { MapCanvas } from '../components/MapCanvas';
+import { FadeIn } from '../components/motion';
 import { OsmCredit } from '../components/primitives';
 import { SpeedLimitSign } from '../components/SpeedLimitSign';
 import { TestDriveBadge } from '../components/TestDriveBadge';
 import { clockText, speedMphText } from '../lib/format';
 import { directionsUrl, EMERGENCY_NUMBER, emergencyUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
-import { colors, font, radius, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
+import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 
 /** Re-renders once a second so the trip clock ticks. */
 function useNow(): number {
@@ -98,7 +99,7 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
           interactive={false}
         />
 
-        <View style={styles.hud}>
+        <FadeIn style={styles.hud} delay={motion.normal} fromScale={0.94} fromY={0}>
           <View style={styles.speedBox}>
             <Text style={styles.speed}>{speedMphText(fix?.speedMps)}</Text>
             <Text style={styles.unit}>mph</Text>
@@ -109,16 +110,17 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
               confidence={road?.limitConfidence ?? null}
             />
           </View>
-        </View>
+        </FadeIn>
+        {/* A new street name fades in quietly (keyed), no movement to distract. */}
         {road?.street ? (
-          <View style={styles.streetPill}>
+          <FadeIn key={road.street} style={styles.streetPill} fromY={0}>
             <Text style={styles.street} numberOfLines={1}>
               {road.street}
             </Text>
-          </View>
+          </FadeIn>
         ) : null}
 
-        <View style={styles.bottom}>
+        <FadeIn style={styles.bottom} delay={motion.normal} fromY={60} duration={motion.slow}>
           <View style={styles.stats}>
             <View style={styles.stat}>
               <Text style={styles.statValue}>{clockText(elapsedS)}</Text>
@@ -141,11 +143,11 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
             />
           )}
           <OsmCredit dark />
-        </View>
+        </FadeIn>
       </View>
 
       {/* Always available, not reported as phone use (§4, §7). */}
-      <View style={styles.safetyBar}>
+      <FadeIn style={styles.safetyBar} delay={motion.screen} fromY={-12}>
         {settings.demoMode ? (
           <TestDriveBadge />
         ) : state.options?.lockEnabled ? (
@@ -163,7 +165,7 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
             onPress={callEmergency}
           />
         </View>
-      </View>
+      </FadeIn>
     </View>
   );
 }

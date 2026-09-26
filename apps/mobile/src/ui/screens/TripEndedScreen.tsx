@@ -10,6 +10,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useTripState } from '../../trip';
 import { Button } from '../components/Button';
 import { MapCanvas } from '../components/MapCanvas';
+import { FadeIn } from '../components/motion';
 import { Muted, StatTile } from '../components/primitives';
 import { Screen } from '../components/Screen';
 import { durationText, milesText, secondsBetween } from '../lib/format';
@@ -85,7 +86,10 @@ export function TripEndedScreen({ modules, navigate }: ScreenProps) {
       }
       footer={footer}
     >
-      <View style={styles.status}>{status}</View>
+      {/* Keyed by status so each step (saving → done) animates in. */}
+      <FadeIn key={state.status} style={styles.status} fromY={10}>
+        {status}
+      </FadeIn>
       <View style={styles.tiles}>
         <StatTile label="Distance" value={milesText(state.distanceMi)} />
         <StatTile label="Time" value={timeText} />

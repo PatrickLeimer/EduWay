@@ -4,7 +4,7 @@
  * WS1–WS4 debug screens keep the plain scrolling wrapper they were built for.
  */
 import { useCallback, useState } from 'react';
-import { Button, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { getDemoModules, type AppModules } from '../wiring';
 
@@ -13,6 +13,9 @@ import { Ws1Debug } from './dev/Ws1Debug';
 import { Ws2Debug } from './dev/Ws2Debug';
 import { Ws3Debug } from './dev/Ws3Debug';
 import { Ws4Debug } from './dev/Ws4Debug';
+import { ScreenTransition } from './components/motion';
+import { BackButton } from './components/Screen';
+import { routeKey, transitionFor, type TransitionKind } from './lib/transitions';
 import { DEFAULT_SETTINGS, type AppSettings, type Route, type ScreenProps } from './navigation';
 import { DevMenuScreen } from './screens/DevMenuScreen';
 import { DrivingScreen } from './screens/DrivingScreen';
@@ -23,7 +26,7 @@ import { StartDriveScreen } from './screens/StartDriveScreen';
 import { TripEndedScreen } from './screens/TripEndedScreen';
 import { TripListScreen } from './screens/TripListScreen';
 import { TripResultScreen } from './screens/TripResultScreen';
-import { colors, SAFE_TOP } from './theme';
+import { colors, SAFE_TOP, space } from './theme';
 
 function renderRoute(route: Route, props: ScreenProps) {
   switch (route.name) {
@@ -62,9 +65,16 @@ function renderRoute(route: Route, props: ScreenProps) {
 const DEV_ROUTES: Route['name'][] = ['ws1', 'ws2', 'ws3', 'ws4', 'recorder'];
 
 export function Root({ modules }: { modules: AppModules }) {
-  const [route, setRoute] = useState<Route>({ name: 'start' });
+  const [nav, setNav] = useState<{ route: Route; kind: TransitionKind }>({
+    route: { name: 'start' },
+    kind: 'fade',
+  });
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
-  const navigate = useCallback((r: Route) => setRoute(r), []);
+  const navigate = useCallback(
+    (r: Route) => setNav((prev) => ({ route: r, kind: transitionFor(prev.route.name, r.name) })),
+    [],
+  );
+  const { route, kind } = nav;
   const updateSettings = useCallback(
     (patch: Partial<AppSettings>) => setSettings((s) => ({ ...s, ...patch })),
     [],
@@ -73,21 +83,28 @@ export function Root({ modules }: { modules: AppModules }) {
   const active = settings.demoMode ? getDemoModules() : modules;
   const props: ScreenProps = { modules: active, navigate, settings, updateSettings };
 
-  if (DEV_ROUTES.includes(route.name)) {
-    return (
-      <ScrollView style={styles.dev} contentContainerStyle={{ paddingTop: SAFE_TOP }}>
-        <View>
-          <Button title="Back to developer tools" onPress={() => navigate({ name: 'dev' })} />
-        </View>
-        {renderRoute(route, props)}
-      </ScrollView>
-    );
-  }
-
-  return <View style={styles.root}>{renderRoute(route, props)}</View>;
+  // A new key remounts the transition, so every screen change animates in.
+  // The backdrop matches the incoming screen so the fade never flashes white.
+  const dark = route.name === 'driving';
+  return (
+    <View style={[styles.backdrop, dark && styles.backdropDark]}>
+      <ScreenTransition key={routeKey(route)} kind={kind}>
+        {DEV_ROUTES.includes(route.name) ? (
+          <ScrollView style={styles.dev} contentContainerStyle={styles.devContent}>
+            <BackButton label="Developer tools" onPress={() => navigate({ name: 'dev' })} />
+            {renderRoute(route, props)}
+          </ScrollView>
+        ) : (
+          renderRoute(route, props)
+        )}
+      </ScreenTransition>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.surface },
+  backdrop: { flex: 1, backgroundColor: colors.surface },
+  backdropDark: { backgroundColor: colors.driveBg },
   dev: { flex: 1, backgroundColor: colors.surface },
+  devContent: { paddingTop: SAFE_TOP, paddingHorizontal: space.sm },
 });

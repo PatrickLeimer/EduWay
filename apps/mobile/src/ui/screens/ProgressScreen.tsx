@@ -7,23 +7,27 @@ import { DEMO_USER_ID, EVENT_TYPES } from '@edudriver/shared';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
+import { ConnectionError } from '../components/ConnectionError';
 import { MapCanvas } from '../components/MapCanvas';
+import { FadeIn, GrowBar, staggerDelay } from '../components/motion';
 import { Card, Muted, OsmCredit, SectionTitle } from '../components/primitives';
 import { Screen } from '../components/Screen';
 import { EVENT_LABEL } from '../lib/format';
 import { pointFromGeo } from '../lib/geo';
 import type { ScreenProps } from '../navigation';
-import { colors, font, radius, space } from '../theme';
+import { colors, font, motion, radius, space } from '../theme';
 
 export function ProgressScreen({ modules, navigate }: ScreenProps) {
-  const { data, error } = useApiQuery('progress', () => modules.api.getProgress(DEMO_USER_ID));
+  const { data, error, reload } = useApiQuery('progress', () =>
+    modules.api.getProgress(DEMO_USER_ID),
+  );
   const home = () => navigate({ name: 'start' });
 
   if (!data) {
     return (
       <Screen title="Progress" onBack={home} backLabel="Home">
         {error ? (
-          <Text style={styles.error}>{error}</Text>
+          <ConnectionError error={error} onRetry={reload} />
         ) : (
           <ActivityIndicator color={colors.black} style={styles.loading} />
         )}
@@ -58,26 +62,29 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
         <Muted>Scores show up after your first scored drive.</Muted>
       ) : (
         <View style={styles.chart}>
-          {scored.map((s) => (
+          {scored.map((s, i) => (
             <View key={s.tripId} style={styles.col}>
               <Text style={styles.colValue}>{Math.round(s.score ?? 0)}</Text>
-              <View style={[styles.colBar, { height: `${Math.max(4, s.score ?? 0)}%` }]} />
+              <GrowBar
+                delay={staggerDelay(i, motion.normal)}
+                style={[styles.colBar, { height: `${Math.max(4, s.score ?? 0)}%` }]}
+              />
             </View>
           ))}
         </View>
       )}
 
       <SectionTitle>Skills</SectionTitle>
-      {EVENT_TYPES.map((type) => {
+      {EVENT_TYPES.map((type, i) => {
         const skill = data.skills[type];
         if (!skill) return null;
         return (
-          <View key={type} style={styles.skillRow}>
+          <FadeIn key={type} delay={staggerDelay(i, motion.slow)} style={styles.skillRow}>
             <Text style={styles.skillName}>{EVENT_LABEL[type]}</Text>
             <Text style={styles.skillValue}>
               {skill.count} total · {skill.per10Mi.toFixed(1)} per 10 mi
             </Text>
-          </View>
+          </FadeIn>
         );
       })}
 
@@ -101,7 +108,6 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
 
 const styles = StyleSheet.create({
   loading: { marginTop: space.xxl },
-  error: { color: colors.harsh, fontSize: font.body },
   readiness: { marginTop: space.md },
   readyTitle: {
     fontSize: font.title,
