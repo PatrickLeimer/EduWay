@@ -23,7 +23,8 @@ Turns 50 Hz DeviceMotion samples and 1 Hz GPS fixes into discrete driving events
 | `vector.ts` | Done: vector helpers + EMA |
 | `emitter.ts` | Done: listener registry |
 | `MotionDetector.ts` | STUB: §6 Level 1 math, §7 state machines |
-| `expoMotionSource.ts` | STUB: DeviceMotion adapter (rotationRate deg/s → rad/s) |
+| `expoMotionSource.ts` | Done: DeviceMotion adapter (permissions, 20 ms interval, subscription) |
+| `deviceMotion.ts` | Done: pure reading → MotionSample (deg/s → rad/s, per-platform rotation axes) |
 | `PhoneUseMonitor.ts` | STUB: AppState + touches |
 | `mocks/` | Synthetic samples; fixture event replay |
 
