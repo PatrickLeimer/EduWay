@@ -1,8 +1,17 @@
 # Branch protection for `main` (repo admin)
 
-The CI workflow exposes a required status check named **`ci`**. A repo **admin** (for example the owner `PatrickLeimer`) should apply these settings after [PR #1](https://github.com/PatrickLeimer/ShellHacks/pull/1) has a green CI run.
+The CI workflow exposes a required status check named **`ci`**. A repo **admin** (for example the owner `PatrickLeimer`) should apply these settings after CI has run successfully at least once on `main`.
 
-## GitHub web UI
+### Rulesets JSON (recommended)
+
+Full protection catalog: [`.github/rulesets/edudriver-safety.json`](rulesets/edudriver-safety.json)
+
+1. Open **Settings → Rules → Rulesets → New ruleset → Import a ruleset**.
+2. For each entry in the file's `rulesets` array, save that object as its own JSON file (or copy the object) and import it.
+3. Start with **EduDriver — Protect default branch**, then add push and tag rulesets as needed.
+4. The **Conventional commits** ruleset is shipped with `"enforcement": "disabled"`; enable it when you want commit-message enforcement.
+
+## GitHub web UI (legacy branch rule)
 
 1. Open **Settings → Branches → Add branch protection rule** (or **Rules → Rulesets**).
 2. Branch name pattern: `main`.

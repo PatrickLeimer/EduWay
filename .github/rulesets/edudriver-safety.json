@@ -1,0 +1,191 @@
+{
+  "schemaVersion": "1.0.0",
+  "repository": "PatrickLeimer/ShellHacks",
+  "description": "Repository rulesets for EduDriver / ShellHacks. Each object in rulesets matches GitHub's import format (Settings → Rules → Rulesets → Import a ruleset). Import them one at a time, or POST each object with the REST API: POST /repos/{owner}/{repo}/rulesets (omit schemaVersion, repository, description, and rulesets wrapper). The Conventional Commits ruleset uses enforcement disabled until you explicitly enable it in the UI.",
+  "rulesets": [
+    {
+      "name": "EduDriver — Protect default branch",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["~DEFAULT_BRANCH"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "pull_request",
+          "parameters": {
+            "allowed_merge_methods": ["squash", "merge"],
+            "require_code_owner_review": false,
+            "require_last_push_approval": true,
+            "dismiss_stale_reviews_on_push": true,
+            "required_approving_review_count": 1,
+            "required_review_thread_resolution": true
+          }
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "do_not_enforce_on_create": false,
+            "strict_required_status_checks_policy": true,
+            "required_status_checks": [
+              {
+                "context": "ci"
+              }
+            ]
+          }
+        },
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "update",
+          "parameters": {
+            "update_allows_fetch_and_merge": true
+          }
+        }
+      ],
+      "bypass_actors": []
+    },
+    {
+      "name": "EduDriver — Feature branch hygiene",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": [
+            "refs/heads/feature/**",
+            "refs/heads/fix/**",
+            "refs/heads/chore/**",
+            "refs/heads/setup/**"
+          ],
+          "exclude": ["~DEFAULT_BRANCH"]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "branch_name_pattern",
+          "parameters": {
+            "name": "Feature branch prefix",
+            "negate": false,
+            "operator": "regex",
+            "pattern": "^(feature|fix|chore|setup)/[a-z0-9][a-z0-9._/-]*$"
+          }
+        }
+      ],
+      "bypass_actors": []
+    },
+    {
+      "name": "EduDriver — Push safety (secrets and CI)",
+      "target": "push",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["~ALL"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "file_path_restriction",
+          "parameters": {
+            "restricted_file_paths": [
+              ".env",
+              ".env.local",
+              ".env.production",
+              ".env.development",
+              "**/.env.local",
+              "**/.env.production",
+              "**/credentials.json",
+              "**/secrets.json",
+              "**/*-credentials.json"
+            ]
+          }
+        },
+        {
+          "type": "file_extension_restriction",
+          "parameters": {
+            "restricted_file_extensions": [
+              "*.pem",
+              "*.p12",
+              "*.pfx",
+              "*.jks",
+              "*.keystore",
+              "*.mobileprovision"
+            ]
+          }
+        },
+        {
+          "type": "max_file_size",
+          "parameters": {
+            "max_file_size": 25
+          }
+        }
+      ],
+      "bypass_actors": []
+    },
+    {
+      "name": "EduDriver — Protect version tags",
+      "target": "tag",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["refs/tags/v*"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "tag_name_pattern",
+          "parameters": {
+            "name": "Semantic version tags",
+            "negate": false,
+            "operator": "regex",
+            "pattern": "^v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+          }
+        }
+      ],
+      "bypass_actors": []
+    },
+    {
+      "name": "EduDriver — Conventional commits on main",
+      "target": "branch",
+      "enforcement": "disabled",
+      "conditions": {
+        "ref_name": {
+          "include": ["~DEFAULT_BRANCH"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "commit_message_pattern",
+          "parameters": {
+            "name": "Conventional Commits",
+            "negate": false,
+            "operator": "regex",
+            "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\([\\w\\-.]+\\))?!?: .+"
+          }
+        }
+      ],
+      "bypass_actors": []
+    }
+  ]
+}
