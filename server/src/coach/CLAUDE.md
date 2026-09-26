@@ -20,7 +20,7 @@ Builds the compact trip summary (master doc §10 "Input"), asks Gemini for struc
 |---|---|
 | `service.ts` | Done: Gemini → ElevenLabs with graceful fallbacks |
 | `promptContext.ts` | Done: thresholds rendered for the prompt |
-| `summary.ts` | STUB: must reproduce `fixtures/trip-summary.json` from the fixture trip |
+| `summary.ts` | Done: reproduces `fixtures/trip-summary.json` from the fixture trip (tested) |
 | `prompt.ts` | STUB: guidelines listed as TODOs |
 | `gemini.ts` | STUB: `@google/genai` JSON mode |
 | `elevenlabs.ts` | STUB: TTS + audio hosting (open decision) |
