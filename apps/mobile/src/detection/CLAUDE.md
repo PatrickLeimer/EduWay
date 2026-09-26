@@ -29,7 +29,8 @@ Turns 50 Hz DeviceMotion samples and 1 Hz GPS fixes into discrete driving events
 | `signals.ts` | Done: §7 steps 2–3 EMA filter + junk check |
 | `hysteresis.ts` | Done: §7 step 4 start/release/min-duration machine, coach + harsh tiers |
 | `swerve.ts` | Done: §7 swerve rule (opposite lateral lobes within window, small net heading) |
-| `PhoneUseMonitor.ts` | STUB: AppState + touches |
+| `PhoneUseMonitor.ts` | Done: AppState wrapper |
+| `phoneUse.ts` | Done: pure phone use rules (touch merge, lock off background episodes with time away) |
 | `mocks/` | Synthetic samples; fixture event replay |
 
 ## Done means (master doc §14)

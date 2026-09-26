@@ -1,31 +1,41 @@
 /**
- * Real PhoneUseMonitor (WS1). STUB. Master doc §7 "Phone use detection", §18 flag 2.
+ * Real PhoneUseMonitor (WS1). Master doc §7 "Phone use detection", §18 flag 2.
  *
- * Will use React Native `AppState`; keep any pure decision logic (is this
- * phone use? how long?) in a separate pure file so it can be unit tested.
+ * Thin wrapper over React Native `AppState`; the rules live in phoneUse.ts.
  */
 import type { DraftEvent, GpsFix } from '@edudriver/shared';
+import { AppState } from 'react-native';
 
 import type { PhoneUseMonitor } from '../contracts';
 
 import { createEmitter } from './emitter';
+import { createPhoneUseTracker, type PhoneUseTracker } from './phoneUse';
 
 export function createPhoneUseMonitor(): PhoneUseMonitor {
   const events = createEmitter<DraftEvent>();
+  let tracker: PhoneUseTracker | null = null;
+  let subscription: { remove(): void } | null = null;
+
+  const emit = (e: DraftEvent | null) => {
+    if (e) events.emit(e);
+  };
 
   return {
-    start(_opts: { lockEnabled: boolean; getLatestFix: () => GpsFix | null }) {
-      // TODO(WS1): keep opts (lockEnabled decides touch vs AppState rules; getLatestFix gives speed).
-      // TODO(WS1): AppState.addEventListener('change'): background while moving
-      //   (speed > PHONE_USE.minSpeedMps) starts an episode; returning to active ends it
-      //   and emits one phone_use event with durationS = time away.
+    start(opts: { lockEnabled: boolean; getLatestFix: () => GpsFix | null }) {
+      subscription?.remove();
+      tracker = createPhoneUseTracker(opts);
+      subscription = AppState.addEventListener('change', (state) => {
+        emit(tracker?.onAppState(state, Date.now()) ?? null);
+      });
     },
     stop() {
-      // TODO(WS1): remove the AppState listener; close any open episode.
+      subscription?.remove();
+      subscription = null;
+      emit(tracker?.close(Date.now()) ?? null);
+      tracker = null;
     },
     reportTouch() {
-      // TODO(WS1): if moving, emit (or extend) a phone_use episode. With the lock on,
-      //   the lock screen only calls this for non-emergency/navigation touches.
+      emit(tracker?.onTouch(Date.now()) ?? null);
     },
     subscribe: (listener) => events.subscribe(listener),
   };
