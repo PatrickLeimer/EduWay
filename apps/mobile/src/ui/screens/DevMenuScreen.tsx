@@ -29,6 +29,8 @@ const MODULE_ROWS: { key: keyof ModuleFlags; label: string; real: string; mock: 
   { key: 'trip', label: 'Trip session', real: 'real', mock: 'mock' },
 ];
 
+const CHECK_TIMEOUT_MS = 8000;
+
 type Check =
   | { state: 'idle' }
   | { state: 'checking' }
@@ -52,13 +54,28 @@ export function DevMenuScreen({ modules, navigate, settings, updateSettings }: S
   const testServer = async () => {
     setCheck({ state: 'checking' });
     const started = Date.now();
+    // The API client has no timeout yet (WS3 TODO); a blocked network can hang for minutes.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(
+        () =>
+          reject(
+            new Error(
+              `No answer after ${CHECK_TIMEOUT_MS / 1000} s. The server is unreachable from this phone (e.g. eduroam blocks phone-to-laptop traffic). Use a tunnel or a hotspot.`,
+            ),
+          ),
+        CHECK_TIMEOUT_MS,
+      );
+    });
     try {
-      const { trips } = await modules.api.listTrips(DEMO_USER_ID);
+      const { trips } = await Promise.race([modules.api.listTrips(DEMO_USER_ID), timeout]);
+      clearTimeout(timer);
       setCheck({
         state: 'ok',
         text: `Connected in ${Date.now() - started} ms · ${trips.length} trips`,
       });
     } catch (e) {
+      clearTimeout(timer);
       setCheck({ state: 'fail', text: e instanceof Error ? e.message : String(e) });
     }
   };
