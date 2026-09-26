@@ -61,7 +61,8 @@ export function createGpsTracker(): GpsTracker {
   let last: GpsKinematics | null = null;
   return {
     update(fix) {
-      if (fix.speedMps === null) return false;
+      // iOS reports −1 when speed is unknown.
+      if (fix.speedMps === null || fix.speedMps < 0) return false;
       if (fix.accuracyM !== null && fix.accuracyM > PIPELINE.maxGpsAccuracyM) return false;
       const dt = last ? (fix.t - last.t) / 1000 : 0;
       if (last && dt <= 0) return false;

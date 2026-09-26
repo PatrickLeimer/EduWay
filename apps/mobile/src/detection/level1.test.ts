@@ -81,6 +81,13 @@ describe('createGpsTracker', () => {
     expect(gps.latest()?.dvdt).toBeCloseTo(2);
   });
 
+  it('ignores the −1 speed iOS reports when speed is unknown', () => {
+    const gps = createGpsTracker();
+    gps.update(fix(0, 10));
+    expect(gps.update(fix(1000, -1))).toBe(false);
+    expect(gps.latest()?.speedMps).toBe(10);
+  });
+
   it('uses fixes with unknown accuracy', () => {
     const gps = createGpsTracker();
     expect(gps.update(fix(0, 10, null))).toBe(true);
