@@ -1,0 +1,17 @@
+{
+  "$comment": "Live alert clips (master doc section 7). Ids must match apps/mobile/src/voice/clips.ts. Output: apps/mobile/assets/alerts/<id>.mp3",
+  "clips": [
+    { "id": "hard_brake", "text": "Easy on the brakes." },
+    { "id": "rough_turn", "text": "Smooth that turn." },
+    { "id": "swerve", "text": "Keep it steady." },
+    { "id": "phone_use", "text": "Eyes on the road, put the phone down." },
+    { "id": "speeding", "text": "Slow down." },
+    { "id": "speeding_25", "text": "Slow down, the limit here is 25." },
+    { "id": "speeding_30", "text": "Slow down, the limit here is 30." },
+    { "id": "speeding_35", "text": "Slow down, the limit here is 35." },
+    { "id": "speeding_40", "text": "Slow down, the limit here is 40." },
+    { "id": "speeding_45", "text": "Slow down, the limit here is 45." },
+    { "id": "speeding_55", "text": "Slow down, the limit here is 55." },
+    { "id": "speeding_65", "text": "Slow down, the limit here is 65." }
+  ]
+}
