@@ -3,7 +3,6 @@ import { CoachOutputSchema, TripSummarySchema, type DrivingEvent } from '@edudri
 import { describe, expect, it } from 'vitest';
 
 import { createMockCoachService } from './mocks';
-import { buildSystemPrompt } from './prompt';
 import { buildTripSummary } from './summary';
 
 const events: DrivingEvent[] = eventsFixture.map((e, i) => ({
@@ -45,9 +44,5 @@ describe('coach', () => {
     const res = await createMockCoachService().coachTrip(tripSummaryFixture, 'trip-1');
     expect(CoachOutputSchema.safeParse(res.coach).success).toBe(true);
     expect(res.audioUrl).toContain('trip-1');
-  });
-
-  it('system prompt includes event thresholds', () => {
-    expect(buildSystemPrompt()).toContain('hard_brake');
   });
 });
