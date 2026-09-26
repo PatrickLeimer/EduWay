@@ -21,4 +21,8 @@ gh api `
   -F "allow_force_pushes=false" `
   -F "allow_deletions=false"
 
+if ($LASTEXITCODE -ne 0) {
+  throw "Branch protection update failed. Sign in with gh auth login as a repository admin."
+}
+
 Write-Host "Branch protection applied on main (required check: ci)."
