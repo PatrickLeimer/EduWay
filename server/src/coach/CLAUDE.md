@@ -22,7 +22,7 @@ Builds the compact trip summary (master doc §10 "Input"), asks Gemini for struc
 | `promptContext.ts` | Done: thresholds rendered for the prompt |
 | `summary.ts` | Done: reproduces `fixtures/trip-summary.json` from the fixture trip (tested) |
 | `prompt.ts` | Done: §10 guidelines, voice rules kept separate for tuning (tested) |
-| `gemini.ts` | STUB: `@google/genai` JSON mode |
+| `gemini.ts` | Done: JSON mode + schema from `CoachOutputSchema`, reply validated, SDK retries on 429/5xx (tested with a fake SDK) |
 | `elevenlabs.ts` | STUB: TTS + audio hosting (open decision) |
 | `mocks/` | Fixture coaching + fake audio URL |
 

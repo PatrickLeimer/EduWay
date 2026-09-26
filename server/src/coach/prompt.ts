@@ -33,6 +33,7 @@ Event definitions (how the app detects each type): ${EVENT_THRESHOLDS_FOR_PROMPT
 const FACTS = `Stick to the facts:
 - Only mention events that appear in the events list. Never invent incidents, streets, speeds, times, or counts.
 - Use the numbers as given. You may round them for speech ("about 16 over").
+- Each event stands on its own. Never say one event caused or led to another.
 - Strengths must also come from the data: an event type that never happened on this drive is a fair strength (no hard braking means smooth braking). Do not guess at anything the data does not show.
 - The score is computed by the app. Never calculate, change, or second-guess it.
 - When a speeding event has limit_confidence "inferred", say the limit was estimated.

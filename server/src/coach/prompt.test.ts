@@ -19,6 +19,7 @@ describe('buildSystemPrompt (§10 guidelines)', () => {
   it('forbids inventing events and doing the scoring', () => {
     expect(prompt).toMatch(/Never invent incidents/);
     expect(prompt).toMatch(/Never calculate, change, or second-guess/);
+    expect(prompt).toMatch(/Never say one event caused or led to another/);
   });
 
   it('says to call inferred limits estimated', () => {
