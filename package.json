@@ -5,6 +5,7 @@
   "engines": {
     "node": ">=20"
   },
+  "packageManager": "npm@11.6.1",
   "dependencies": {
     "expo": "~57.0.25",
     "expo-status-bar": "~57.0.1",
