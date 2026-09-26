@@ -3,10 +3,9 @@
  * history the debug screens can show. The alert mock applies the real
  * cooldown rule so `alerted` flags on events look like production.
  */
-import { ALERTS, type LiveAlertType } from '@edudriver/shared';
-
 import type { AlertPlayer, DebriefPlayer } from '../../contracts';
 import { clipIdFor } from '../clips';
+import { createAlertCooldown } from '../cooldown';
 
 export interface MockAlertPlayer extends AlertPlayer {
   /** Clip ids "played", oldest first. */
@@ -14,24 +13,21 @@ export interface MockAlertPlayer extends AlertPlayer {
 }
 
 export function createMockAlertPlayer(now: () => number = Date.now): MockAlertPlayer {
-  const lastPlayed = new Map<LiveAlertType, number>();
+  const cooldown = createAlertCooldown();
   const history: { clipId: string; at: number }[] = [];
   return {
     history,
     async preload() {},
     play(type, ctx) {
       const t = now();
-      const last = lastPlayed.get(type);
-      const exempt = ALERTS.cooldownExempt.includes(type);
-      if (!exempt && last !== undefined && t - last < ALERTS.cooldownS * 1000) return false;
-      lastPlayed.set(type, t);
+      if (!cooldown.tryAcquire(type, t)) return false;
       const clipId = clipIdFor(type, ctx?.limitMph);
       history.push({ clipId, at: t });
       console.log(`[voice mock] alert: ${clipId}`);
       return true;
     },
     reset() {
-      lastPlayed.clear();
+      cooldown.reset();
       history.length = 0;
     },
   };

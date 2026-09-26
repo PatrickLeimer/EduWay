@@ -1,4 +1,4 @@
-// Placeholder test: proves Vitest runs pure voice logic. WS4 adds cooldown tests here.
+// Pure clip id mapping. Cooldown tests live in cooldown.test.ts.
 import { describe, expect, it } from 'vitest';
 
 import { clipIdFor } from './clips';
