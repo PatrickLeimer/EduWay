@@ -7,6 +7,7 @@ export { createExpoLocationSource, type LocationSource } from './locationSource'
 export { createInMemoryUploadQueue } from './uploadQueue';
 export { createTraceBuffer, type TraceBuffer } from './traceBuffer';
 export { useTripState } from './useTripState';
+export { useMapGps } from './useMapGps';
 export {
   createFixtureLocationSource,
   createMockTripSession,
