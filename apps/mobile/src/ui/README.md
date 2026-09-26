@@ -14,4 +14,8 @@ The real UI is built in a **later phase by separate agents**. Until then, everyt
 - Screens: Start Drive → Driving → Trip Result; Past Trips; Dev Menu → WS1–WS4 debug screens.
 
 ## For the UI phase
-Master doc §12 lists the target screens (start, driving lock screen, debrief, map + replay with `react-native-maps`, progress, settings). Keep the same rule: screens consume `trip/` and `api/`, never detection/road/voice internals.
+Master doc §12 lists the target screens (start, driving lock screen, debrief, map + replay, progress, settings).
+
+The map is **Google Maps** via `react-native-maps`: polyline from the trip trace, pins from event locations. The labels on that map are **other road data** already on the trip and events (OpenStreetMap street, road class, speed limit, limit confidence). Show `© OpenStreetMap contributors` on any screen that displays those fields. Do not call Google Roads, Places, or another road provider from the map.
+
+Keep the same rule: screens consume `trip/` and `api/`, never detection/road/voice internals.
