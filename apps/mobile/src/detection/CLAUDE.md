@@ -22,9 +22,15 @@ Turns 50 Hz DeviceMotion samples and 1 Hz GPS fixes into discrete driving events
 |---|---|
 | `vector.ts` | Done: vector helpers + EMA |
 | `emitter.ts` | Done: listener registry |
-| `MotionDetector.ts` | STUB: §6 Level 1 math, §7 state machines |
-| `expoMotionSource.ts` | STUB: DeviceMotion adapter (rotationRate deg/s → rad/s) |
-| `PhoneUseMonitor.ts` | STUB: AppState + touches |
+| `MotionDetector.ts` | Done: Level 1 pipeline → brake / accel / turn / swerve events, merge within 3 s (tune on drives) |
+| `expoMotionSource.ts` | Done: DeviceMotion adapter (permissions, 20 ms interval, subscription) |
+| `deviceMotion.ts` | Done: pure reading → MotionSample (deg/s → rad/s, per-platform rotation axes) |
+| `level1.ts` | Done: §6 Level 1 math (ĝ, yaw, horizontal magnitude, lateral/longitudinal) + GPS speed/dv/dt tracker |
+| `signals.ts` | Done: §7 steps 2–3 EMA filter + junk check |
+| `hysteresis.ts` | Done: §7 step 4 start/release/min-duration machine, coach + harsh tiers |
+| `swerve.ts` | Done: §7 swerve rule (opposite lateral lobes within window, small net heading) |
+| `PhoneUseMonitor.ts` | Done: AppState wrapper |
+| `phoneUse.ts` | Done: pure phone use rules (touch merge, lock off background episodes with time away) |
 | `mocks/` | Synthetic samples; fixture event replay |
 
 ## Done means (master doc §14)
