@@ -25,6 +25,8 @@ export function Ws1Debug({ modules }: ScreenProps) {
     let windowStart = Date.now();
     modules.motionSource
       .start((s) => {
+        // Feed the detector too, so the junk-rejection line below is live.
+        modules.motionDetector.onMotion(s);
         count++;
         if (s.t - windowStart >= 1000) {
           setHz((count * 1000) / (s.t - windowStart));
@@ -41,7 +43,7 @@ export function Ws1Debug({ modules }: ScreenProps) {
         setRunning(false);
       });
     return () => modules.motionSource.stop();
-  }, [running, modules.motionSource]);
+  }, [running, modules.motionSource, modules.motionDetector]);
 
   const g = sample ? Math.hypot(sample.accG.x, sample.accG.y, sample.accG.z) : null;
 
