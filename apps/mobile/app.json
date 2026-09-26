@@ -20,6 +20,21 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "EduDriver uses your location during a drive to check speed limits, stop signs, and draw your route."
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "EduDriver uses motion sensors during a drive to detect hard braking, sharp turns, and swerves."
+        }
+      ],
+      "expo-audio"
+    ]
   }
 }

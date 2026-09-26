@@ -39,3 +39,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# env files with secrets (server/.env.example is committed)
+.env
+**/.env
+
+# test output
+coverage/

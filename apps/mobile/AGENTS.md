@@ -1,3 +1,5 @@
+> **Monorepo note (scaffold):** this app lives in `apps/mobile/` of an npm-workspaces monorepo; run commands from the repo root (see root `README.md`). The root `CLAUDE.md` rules take precedence. Until the UI phase, placeholder screens use simple state-based navigation in `src/ui/` (no navigation library, per the kickoff); the Expo Router rule below applies from the UI phase on.
+
 This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
 ## Expo has changed — do not trust your training data
