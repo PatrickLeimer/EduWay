@@ -19,6 +19,7 @@ import { Button } from '../components/Button';
 import { MapCanvas } from '../components/MapCanvas';
 import { OsmCredit } from '../components/primitives';
 import { SpeedLimitSign } from '../components/SpeedLimitSign';
+import { TestDriveBadge } from '../components/TestDriveBadge';
 import { clockText, speedMphText } from '../lib/format';
 import { directionsUrl, EMERGENCY_NUMBER, emergencyUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
@@ -34,7 +35,7 @@ function useNow(): number {
   return now;
 }
 
-export function DrivingScreen({ modules, navigate }: ScreenProps) {
+export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
   const trip = modules.trip;
   const state = useTripState(trip);
   const now = useNow();
@@ -145,7 +146,11 @@ export function DrivingScreen({ modules, navigate }: ScreenProps) {
 
       {/* Always available, not reported as phone use (§4, §7). */}
       <View style={styles.safetyBar}>
-        {state.options?.lockEnabled ? <Text style={styles.lock}>Driving lock on</Text> : null}
+        {settings.demoMode ? (
+          <TestDriveBadge />
+        ) : state.options?.lockEnabled ? (
+          <Text style={styles.lock}>Driving lock on</Text>
+        ) : null}
         <View style={styles.safetyButtons}>
           <Button
             title="Directions"

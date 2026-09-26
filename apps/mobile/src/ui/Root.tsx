@@ -1,12 +1,12 @@
 /**
  * App shell: state-based navigation between screens (see navigation.ts).
- * Product screens draw their own full-screen layout; the dev menu and the
+ * Product screens (and the dev menu) draw their own full-screen layout; the
  * WS1–WS4 debug screens keep the plain scrolling wrapper they were built for.
  */
 import { useCallback, useState } from 'react';
 import { Button, ScrollView, StyleSheet, View } from 'react-native';
 
-import type { AppModules } from '../wiring';
+import { getDemoModules, type AppModules } from '../wiring';
 
 import { DriveRecorderScreen } from './dev/DriveRecorderScreen';
 import { Ws1Debug } from './dev/Ws1Debug';
@@ -58,8 +58,8 @@ function renderRoute(route: Route, props: ScreenProps) {
   }
 }
 
-/** Developer screens: plain ScrollView + Home button, as before the UI phase. */
-const DEV_ROUTES: Route['name'][] = ['dev', 'ws1', 'ws2', 'ws3', 'ws4', 'recorder'];
+/** WS1–WS4 debug screens: plain ScrollView + back button, as before the UI phase. */
+const DEV_ROUTES: Route['name'][] = ['ws1', 'ws2', 'ws3', 'ws4', 'recorder'];
 
 export function Root({ modules }: { modules: AppModules }) {
   const [route, setRoute] = useState<Route>({ name: 'start' });
@@ -69,13 +69,15 @@ export function Root({ modules }: { modules: AppModules }) {
     (patch: Partial<AppSettings>) => setSettings((s) => ({ ...s, ...patch })),
     [],
   );
-  const props: ScreenProps = { modules, navigate, settings, updateSettings };
+  // Test drive swaps in the simulated modules; Settings only allows it while no trip is running.
+  const active = settings.demoMode ? getDemoModules() : modules;
+  const props: ScreenProps = { modules: active, navigate, settings, updateSettings };
 
   if (DEV_ROUTES.includes(route.name)) {
     return (
       <ScrollView style={styles.dev} contentContainerStyle={{ paddingTop: SAFE_TOP }}>
         <View>
-          <Button title="Home" onPress={() => navigate({ name: 'start' })} />
+          <Button title="Back to developer tools" onPress={() => navigate({ name: 'dev' })} />
         </View>
         {renderRoute(route, props)}
       </ScrollView>

@@ -30,11 +30,13 @@ export function ToggleRow({
   hint,
   value,
   onChange,
+  disabled = false,
 }: {
   label: string;
   hint?: string;
   value: boolean;
   onChange: (v: boolean) => void;
+  disabled?: boolean;
 }) {
   return (
     <View style={styles.toggleRow}>
@@ -45,6 +47,7 @@ export function ToggleRow({
       <Switch
         value={value}
         onValueChange={onChange}
+        disabled={disabled}
         trackColor={{ true: colors.black, false: colors.border }}
         thumbColor={colors.white}
       />

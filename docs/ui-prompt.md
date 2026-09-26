@@ -89,7 +89,26 @@ Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, 
 - Test-readiness card, score trend (plain bars, no chart library), per-skill totals and per-10-mi rates, recurring spots on a map + list. All numbers come from `GET /progress`.
 
 ### Settings: `screens/SettingsScreen.tsx` (§12.6)
-- Driving lock on by default (in memory, see gaps). About text (privacy + §16 disclaimer). **Developer tools** → dev menu.
+- Driving lock on by default (in memory, see gaps). **Test drive (simulated)** switch. About text (privacy + §16 disclaimer). **Developer tools** → dev menu.
+
+### Test drive mode (presentations)
+- Off by default: the app uses real GPS, sensors, server and voice (`wiring.ts USE_REAL`).
+- On (Settings or Developer tools): the next drive uses `wiring.ts DEMO_FLAGS`. GPS replays the recorded ~3-minute fixture drive (Miami) and detection replays its events, while road data, voice alerts and the server stay real. You get real alert clips and a real Gemini + ElevenLabs debrief with the phone sitting on a table. The fixture ends parked for 35 s, so **End drive** unlocks at the end.
+- `Root.tsx` swaps to `getDemoModules()` while the switch is on. The switch is locked while a trip is running. Home and Driving show a yellow **TEST DRIVE** badge.
+- Test drives upload to the server like real ones, so they appear in Past drives and Progress.
+
+### Developer tools: `screens/DevMenuScreen.tsx`
+- Mode: the Test drive switch + each module's current source (real / simulated; simulated shown in amber).
+- Server: the API URL in use (warns when it's `localhost` on a phone) and **Test connection** (calls `listTrips`, shows latency or the error).
+- Live trip: status, error, GPS position, speed/accuracy, OSM road match + limit confidence, event count, trace fixes, distance, stopped-for seconds.
+- Links to the drive recorder and WS1–WS4 debug screens (these return to Developer tools).
+
+### How maps work (and which Google APIs)
+- **Basemap:** `react-native-maps` `MapView`. On **Android** that is the **Google Maps SDK for Android** (a Google Maps Platform API). Expo Go ships with its own key; a development/EAS build needs our own key configured in `app.json` (follow the SDK 57 `react-native-maps` docs for the exact setting). On **iOS in Expo Go**, it's Apple Maps (no Google key in Expo Go's iOS binary); a dev build can switch to Google with an iOS key. The **browser** debug map (`dev/Ws2Map.web.tsx`) uses the **Maps JavaScript API** with `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY`.
+- **What we draw on it:** our own recorded GPS trace (route line), event locations (pins), and the car dot. No Google service computes these.
+- **Street names and speed limits:** OpenStreetMap via Overpass (WS2), not Google.
+- **Directions:** a plain Google Maps link (`google.com/maps/dir/?api=1…`) that opens the Maps app. No API key, no Directions API.
+- **Not used (banned by root `CLAUDE.md`):** Google Roads, Google Places, and other map providers.
 
 ## 4. Components (`ui/components/`)
 
@@ -100,6 +119,7 @@ Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, 
 | `Screen.tsx` | Light-screen shell: back link, large title, optional edge-to-edge `hero` (map), scrolling body, pinned `footer`. |
 | `Button.tsx` | `primary` (black), `secondary` (gray), `danger` (red), `onDark` (driving); `large` for in-car sizes. |
 | `primitives.tsx` | `Card`, `SectionTitle`, `Muted`, `StatTile`, `ToggleRow`, `OsmCredit`, `TierDot`. |
+| `TestDriveToggle.tsx` / `TestDriveBadge.tsx` | Test drive switch (locked mid-trip) and the yellow badge. |
 | `ScoreRing.tsx` | Score badge (neutral color on purpose). |
 | `SpeedLimitSign.tsx` | US speed-limit sign; never changes color. |
 | `EventRow.tsx` | One event: tier dot, label, street, speed, limit, "voice alert played". |

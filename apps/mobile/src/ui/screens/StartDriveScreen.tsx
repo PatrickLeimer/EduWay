@@ -19,6 +19,7 @@ import { useMapGps } from '../../trip';
 import { Button } from '../components/Button';
 import { MapCanvas } from '../components/MapCanvas';
 import { ToggleRow } from '../components/primitives';
+import { TestDriveBadge } from '../components/TestDriveBadge';
 import { directionsUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
 import { colors, font, radius, SAFE_BOTTOM, SAFE_TOP, shadow, space } from '../theme';
@@ -41,7 +42,10 @@ export function StartDriveScreen({ modules, navigate, settings }: ScreenProps) {
       <MapCanvas style={StyleSheet.absoluteFill} follow={here} car={here} />
 
       <View style={styles.topBar}>
-        <Text style={styles.brand}>EduDriver</Text>
+        <View style={styles.brandRow}>
+          <Text style={styles.brand}>EduDriver</Text>
+          {settings.demoMode ? <TestDriveBadge /> : null}
+        </View>
         <Pressable
           accessibilityRole="button"
           onPress={() => navigate({ name: 'settings' })}
@@ -126,6 +130,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   brand: {
     fontSize: font.title,
     fontWeight: '800',

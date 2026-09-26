@@ -26,9 +26,11 @@ export type Route =
 export interface AppSettings {
   /** Default for the driving lock toggle on the start screen (§4, on by default [Proposed]). */
   lockByDefault: boolean;
+  /** "Test drive": replay the fixture drive instead of real GPS/sensors (wiring.ts DEMO_FLAGS). */
+  demoMode: boolean;
 }
 
-export const DEFAULT_SETTINGS: AppSettings = { lockByDefault: true };
+export const DEFAULT_SETTINGS: AppSettings = { lockByDefault: true, demoMode: false };
 
 /** Props every screen receives. */
 export interface ScreenProps {
