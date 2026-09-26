@@ -23,7 +23,8 @@
     "dev:server": "npm run dev --workspace @edudriver/server",
     "dev:mobile": "npm run start --workspace @edudriver/mobile",
     "db:setup": "npm run db:setup --workspace @edudriver/server",
-    "alert-clips": "tsx scripts/alert-clips/generate.ts"
+    "alert-clips": "tsx scripts/alert-clips/generate.ts",
+    "drive-replay": "tsx scripts/drive-replay/replay.ts"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",

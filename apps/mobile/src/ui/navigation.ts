@@ -14,7 +14,8 @@ export type Route =
   | { name: 'ws1' }
   | { name: 'ws2' }
   | { name: 'ws3' }
-  | { name: 'ws4' };
+  | { name: 'ws4' }
+  | { name: 'recorder' };
 
 /** Props every screen receives. */
 export interface ScreenProps {
