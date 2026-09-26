@@ -34,7 +34,8 @@
           "motionPermission": "EduDriver uses motion sensors during a drive to detect hard braking, sharp turns, and swerves."
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "expo-sharing"
     ]
   }
 }
