@@ -1,0 +1,34 @@
+{
+  "name": "@edudriver/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json"
+  },
+  "dependencies": {
+    "@edudriver/fixtures": "*",
+    "@edudriver/shared": "*",
+    "expo": "~57.0.25",
+    "expo-audio": "~57.0.5",
+    "expo-keep-awake": "~57.0.2",
+    "expo-location": "~57.0.20",
+    "expo-sensors": "~57.0.3",
+    "expo-status-bar": "~57.0.1",
+    "pako": "^3.0.2",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~57.0.2",
+    "typescript": "~6.0.3"
+  }
+}

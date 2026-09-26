@@ -1,0 +1,19 @@
+{
+  "strengths": [
+    "Smooth, steady speed on SW 107th Ave",
+    "You came to a full stop before ending the trip"
+  ],
+  "focus_areas": [
+    {
+      "skill": "Phone down while moving",
+      "why": "You used the phone for 6 seconds at 18 mph on SW 8th St",
+      "tip": "Set music and navigation before you pull out, then leave the phone alone"
+    },
+    {
+      "skill": "Full stops at stop signs",
+      "why": "You rolled through the stop sign on SW 107th Ave at about 3 mph",
+      "tip": "Stop until the car settles back, count one-two, then go"
+    }
+  ],
+  "debrief_script": "Nice work keeping a steady speed on 107th. Two things for next time: put the phone away before you start, and come to a full stop at stop signs. The limit on 107th was estimated, but you were a bit over it too. You are making progress."
+}

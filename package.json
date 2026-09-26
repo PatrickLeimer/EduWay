@@ -1,37 +1,35 @@
 {
   "name": "edudriver",
   "version": "1.0.0",
-  "main": "index.ts",
+  "private": true,
+  "description": "Phone-only driving coach for student drivers. See docs/driving-coach-master.md.",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "packageManager": "npm@11.6.1",
-  "dependencies": {
-    "expo": "~57.0.25",
-    "expo-status-bar": "~57.0.1",
-    "react": "19.2.3",
-    "react-native": "0.86.3"
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "server",
+    "fixtures"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc --noEmit -p scripts/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "npm run lint --workspace @edudriver/mobile",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev:server": "npm run dev --workspace @edudriver/server",
+    "dev:mobile": "npm run start --workspace @edudriver/mobile",
+    "db:setup": "npm run db:setup --workspace @edudriver/server",
+    "alert-clips": "tsx scripts/alert-clips/generate.ts"
   },
   "devDependencies": {
-    "@types/jest": "29.5.14",
-    "@types/react": "~19.2.2",
-    "eslint": "^9.39.5",
-    "eslint-config-expo": "~57.0.2",
-    "jest": "~29.7.0",
-    "jest-expo": "~57.0.5",
-    "typescript": "~6.0.3"
-  },
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "expo lint",
-    "typecheck": "tsc --noEmit",
-    "test": "jest"
-  },
-  "jest": {
-    "preset": "jest-expo"
-  },
-  "private": true
+    "@types/node": "^22.19.0",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.2"
+  }
 }

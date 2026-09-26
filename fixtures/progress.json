@@ -1,0 +1,74 @@
+{
+  "scores": [
+    {
+      "tripId": "trip-fixture-002",
+      "startedAt": "2026-09-22T15:00:00.000Z",
+      "score": 58
+    },
+    {
+      "tripId": "trip-fixture-003",
+      "startedAt": "2026-09-23T15:00:00.000Z",
+      "score": 61
+    },
+    {
+      "tripId": "trip-fixture-004",
+      "startedAt": "2026-09-24T15:00:00.000Z",
+      "score": 66
+    },
+    {
+      "tripId": "trip-fixture-005",
+      "startedAt": "2026-09-25T15:00:00.000Z",
+      "score": 63
+    },
+    {
+      "tripId": "trip-fixture-001",
+      "startedAt": "2026-09-26T15:00:00.000Z",
+      "score": 64
+    }
+  ],
+  "skills": {
+    "hard_brake": {
+      "count": 9,
+      "per10Mi": 4.1
+    },
+    "hard_accel": {
+      "count": 6,
+      "per10Mi": 2.7
+    },
+    "rough_turn": {
+      "count": 5,
+      "per10Mi": 2.3
+    },
+    "swerve": {
+      "count": 3,
+      "per10Mi": 1.4
+    },
+    "speeding": {
+      "count": 8,
+      "per10Mi": 3.6
+    },
+    "rolling_stop": {
+      "count": 4,
+      "per10Mi": 1.8
+    },
+    "phone_use": {
+      "count": 2,
+      "per10Mi": 0.9
+    }
+  },
+  "recurringSpots": [
+    {
+      "type": "hard_brake",
+      "street": "SW 8th St",
+      "count": 3,
+      "location": {
+        "type": "Point",
+        "coordinates": [-80.354487, 25.7625]
+      }
+    }
+  ],
+  "testReadiness": {
+    "ready": false,
+    "notes": ["Full stops at stop signs need work", "Phone use seen in 2 of the last 5 trips"]
+  }
+}

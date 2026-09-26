@@ -18,6 +18,8 @@ jobs:
       - run: npm install -g npm@11.6.1
       - run: npm ci
       - run: npx expo-doctor
+        working-directory: apps/mobile
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm test -- --ci
+      - run: npm run format:check
+      - run: npm test
