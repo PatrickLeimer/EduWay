@@ -1,6 +1,7 @@
 /**
  * Screen-on lock for a drive (master doc §4). Thin adapter over expo-keep-awake.
- * Dynamic import so Vitest can load trip/ without pulling in Expo.
+ * Lazy require so Vitest can load trip/ without pulling in Expo (not `import()`,
+ * which Metro splits into a bundle that can fail HMR registration on native).
  *
  * Docs (SDK 57): https://docs.expo.dev/versions/v57.0.0/sdk/keep-awake/
  */
@@ -11,15 +12,18 @@ export interface KeepAwake {
   deactivate(): Promise<void>;
 }
 
+function loadKeepAwake(): typeof import('expo-keep-awake') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy, see above
+  return require('expo-keep-awake') as typeof import('expo-keep-awake');
+}
+
 export function createExpoKeepAwake(): KeepAwake {
   return {
     async activate() {
-      const { activateKeepAwakeAsync } = await import('expo-keep-awake');
-      await activateKeepAwakeAsync(TAG);
+      await loadKeepAwake().activateKeepAwakeAsync(TAG);
     },
     async deactivate() {
-      const { deactivateKeepAwake } = await import('expo-keep-awake');
-      await deactivateKeepAwake(TAG);
+      await loadKeepAwake().deactivateKeepAwake(TAG);
     },
   };
 }

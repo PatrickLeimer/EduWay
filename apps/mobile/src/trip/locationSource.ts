@@ -39,14 +39,17 @@ function toFix(loc: LocationReading): GpsFix {
 }
 
 /**
- * Real source over expo-location. The import is dynamic so this module can be
- * loaded in Node tests without initializing Expo.
+ * Real source over expo-location. The require is lazy so this module can be
+ * loaded in Node tests without initializing Expo. Not `import()`: in dev, Metro
+ * splits that into a separate bundle whose HMR registration can throw
+ * "Cannot read property 'reload' of undefined" on native.
  */
 export function createExpoLocationSource(): LocationSource {
   let sub: { remove: () => void } | null = null;
   return {
     async start(onFix) {
-      const Location = await import('expo-location');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy, see above
+      const Location = require('expo-location') as typeof import('expo-location');
       const perm = await Location.requestForegroundPermissionsAsync();
       if (!perm.granted) throw new Error('Location permission denied');
       sub = await Location.watchPositionAsync(

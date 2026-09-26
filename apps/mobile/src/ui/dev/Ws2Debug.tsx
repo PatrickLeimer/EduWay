@@ -3,6 +3,7 @@
  * route, and a heatmap of incident locations. OpenStreetMap (Overpass) supplies
  * the street, class, and speed limit printed under the map.
  */
+import { useMemo } from 'react';
 import { Platform, Text, View } from 'react-native';
 
 import type { TraceUpload } from '@edudriver/shared';
@@ -30,12 +31,20 @@ const MAP_FALLBACK = { latitude: 25.761, longitude: -80.3685 };
 export function Ws2Debug({ modules }: ScreenProps) {
   const state = useTripState(modules.trip);
   const { fix, error } = useMapGps(modules.trip);
-  const route = state.traceLength > 0 ? routeFromTrace(modules.trip.getTrace()) : [];
-  const heat: HeatPoint[] = state.events.map((event) => ({
-    latitude: event.location.coordinates[1],
-    longitude: event.location.coordinates[0],
-    weight: event.tier === 'harsh' ? 1 : 0.5,
-  }));
+  // Memoized so the map only redraws when the trace or events actually change.
+  const route = useMemo(
+    () => (state.traceLength > 0 ? routeFromTrace(modules.trip.getTrace()) : []),
+    [modules.trip, state.traceLength],
+  );
+  const heat = useMemo<HeatPoint[]>(
+    () =>
+      state.events.map((event) => ({
+        latitude: event.location.coordinates[1],
+        longitude: event.location.coordinates[0],
+        weight: event.tier === 'harsh' ? 1 : 0.5,
+      })),
+    [state.events],
+  );
   const center = fix ? { latitude: fix.lat, longitude: fix.lon } : (route[0] ?? MAP_FALLBACK);
 
   return (
@@ -47,7 +56,7 @@ export function Ws2Debug({ modules }: ScreenProps) {
           : 'Google Maps: GPS position, route, and incident heatmap.'}
       </Text>
       <Text>Road data under the map is OpenStreetMap via Overpass (street, class, limit).</Text>
-      <View style={{ height: 360, width: '100%' }}>
+      <View style={{ width: '100%' }}>
         <Ws2Map latitude={center.latitude} longitude={center.longitude} route={route} heat={heat} />
       </View>
       {!fix ? (
