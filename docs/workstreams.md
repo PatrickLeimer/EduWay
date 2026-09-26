@@ -2,9 +2,9 @@
 
 How the four developers (and the later UI phase) split the work. Rules: root `CLAUDE.md`. Product and technical decisions: `docs/driving-coach-master.md` (§ numbers below refer to it).
 
-Everything defaults to **mocks**, so every workstream can run the whole app today and swap in its real module when it is ready:
-- Mobile: flags in `apps/mobile/src/wiring.ts` (`USE_REAL.detection`, `.road`, `.trip`, `.api`, `.voice`, `.gps`).
-- Server: env flags in `server/.env` (`USE_REAL_DB`, `USE_REAL_SCORING`, `USE_REAL_COACH`).
+**Two layers, both required.** Google Maps (`react-native-maps`) draws the route and event pins (§2, §8 "Display", §12). Other road data comes from OpenStreetMap via Overpass: street, road class, posted or inferred limit, stop signs (§8). The GPS trace is the polyline; event locations are the pins; the road match is the label on that map. Credit OSM wherever those fields show. Do not swap OSM for Google Roads, Places, Mapbox, MapLibre, TomTom, HERE, or Valhalla.
+
+Flags in `apps/mobile/src/wiring.ts` choose mock vs real (`USE_REAL.detection`, `.road`, `.trip`, `.api`, `.voice`, `.gps`). WS2 has turned on `.road` and `.trip`. `.gps` stays on the fixture replay until a phone test. Detection, api, and voice stay mock until those workstreams flip their own flags. Server flags live in `server/.env` (`USE_REAL_DB`, `USE_REAL_SCORING`, `USE_REAL_COACH`).
 
 Shared contracts (need team agreement to change, own commit): `packages/shared/src/**`, `apps/mobile/src/contracts/**`, plus `server/src/coach/types.ts` (the WS3 ↔ WS4 boundary).
 
@@ -29,6 +29,8 @@ Tasks, in order:
 Depends on: WS2 feeding GPS fixes to `onGps` (real TripSession). Until then, test with fixture GPS in Vitest.
 
 ## WS2 Road data + trip session
+
+WS2 owns the non-map road layer the Google Maps trip view will label: Overpass cache, way match (street, class, limit, confidence), stop signs, speeding, and rolling stops. The 1 Hz trace from the trip session is the polyline `react-native-maps` draws. Keep OSM attribution on `Ws2Debug`.
 
 **Owns:** `apps/mobile/src/road/**`, `apps/mobile/src/trip/**`, `apps/mobile/src/wiring.ts`, `apps/mobile/src/ui/dev/Ws2Debug.tsx`
 **Implements:** `RoadCache`, `RoadEventDetector`, `TripSession`, `UploadQueueStore`
@@ -84,7 +86,7 @@ Depends on: WS3 for history and deployment (mocked by the in-memory repo). Nothi
 ## UI (later phase)
 
 **Owns:** `apps/mobile/src/ui/**` (except the debug screens, owned by each workstream)
-Screens today are placeholders (`ui/README.md`). The UI phase builds master doc §12 with Expo Router and `react-native-maps`, consuming only `trip/` and `api/`.
+Screens today are placeholders (`ui/README.md`). The UI phase builds master doc §12 with Expo Router and **Google Maps** (`react-native-maps`): route polyline and event pins from `trip/` and `api/`. Label pins with the road fields those payloads already carry (street, class, limit, confidence) and show `© OpenStreetMap contributors` next to them. Do not fetch a second road provider from the map screen.
 
 ---
 

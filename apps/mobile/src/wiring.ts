@@ -2,9 +2,8 @@
  * Composition root: picks the real or mock implementation of every module.
  * Owned by WS2; other workstreams ask before editing (root CLAUDE.md).
  *
- * Every module defaults to its mock so the app runs end to end today. Flip one
- * flag to true when that module's real implementation is ready. Flags are
- * independent: e.g. real detection + mock road + mock api is a valid combo.
+ * Flags are independent: e.g. real detection + mock road + mock api is a valid
+ * combo. WS2's road and trip flags are on; other workstreams flip their own.
  *
  * Note: the trip flag chooses between the self-contained mock drive and the
  * real TripSession. The real session pulls in whichever detection/road/voice/api
@@ -59,11 +58,16 @@ export interface ModuleFlags {
   gps: boolean;
 }
 
-/** One flag per module. false = mock (default), true = real implementation. */
+/**
+ * One flag per module. false = mock, true = real implementation.
+ * WS2 owns this file. road + trip are real. gps stays on the fixture replay so a
+ * desk demo still moves; flip `gps` on a phone. detection / api / voice stay mock
+ * until those workstreams land — do not flip them from WS2.
+ */
 export const USE_REAL: ModuleFlags = {
   detection: false,
-  road: false,
-  trip: false,
+  road: true,
+  trip: true,
   api: false,
   voice: false,
   /** Real GPS (expo-location) for the real TripSession; false replays the fixture drive. */
@@ -106,6 +110,7 @@ export function createModules(flags: ModuleFlags = USE_REAL): AppModules {
         roadCache,
         roadDetector,
         alerts,
+        debrief,
         api,
         queue: createInMemoryUploadQueue(),
       })

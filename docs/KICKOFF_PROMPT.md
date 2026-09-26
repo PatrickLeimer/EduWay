@@ -1,5 +1,7 @@
 # Kickoff prompt for Claude Code
 
+> **Claude Code only.** Cursor agents use [`KICKOFF_PROMPT_CURSOR.md`](./KICKOFF_PROMPT_CURSOR.md) and should not follow the commit-on-`scaffold` step below. Do not merge the two prompts.
+
 Setup before running: put `CLAUDE.md` at the repo root and the master doc at `docs/driving-coach-master.md`. Then paste everything below the line into Claude Code, ideally in plan mode.
 
 ---

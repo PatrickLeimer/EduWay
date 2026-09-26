@@ -15,6 +15,10 @@ export function Ws2Debug({ modules }: ScreenProps) {
   return (
     <View>
       <Text>WS2 Road + trip</Text>
+      <Text>Google Maps (react-native-maps) draws this trace and these event pins.</Text>
+      <Text>
+        Road data is OpenStreetMap via Overpass: street, road class, speed limit, stop signs.
+      </Text>
       <Text>
         Trip status: {state.status} · fixes: {state.traceLength}
       </Text>
