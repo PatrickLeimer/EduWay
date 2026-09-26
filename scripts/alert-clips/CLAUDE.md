@@ -12,4 +12,4 @@ Generates the pre-recorded ElevenLabs clips for live alerts (master doc §7) fro
 
 ## Done means (master doc §14)
 - [ ] Saturday night: all manifest clips generated, listened to, and committed.
-- [ ] Same voice as the debrief (`ELEVENLABS_VOICE_ID`).
+- [x] Same voice as the debrief (`ELEVENLABS_VOICE_ID`); same model via `textToSpeechMp3` in `server/src/coach/elevenlabs.ts`.
