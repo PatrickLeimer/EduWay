@@ -1,0 +1,124 @@
+{
+  "trip": {
+    "duration_min": 3.2,
+    "distance_mi": 1.27,
+    "score": 64
+  },
+  "events": [
+    {
+      "type": "hard_accel",
+      "tier": "coach",
+      "peak": 2.7,
+      "speed_mph": 14.3,
+      "street": "SW 107th Ave",
+      "alerted": false
+    },
+    {
+      "type": "rolling_stop",
+      "tier": "coach",
+      "speed_mph": 3.1,
+      "street": "SW 107th Ave",
+      "alerted": false,
+      "min_speed_mph": 3.1
+    },
+    {
+      "type": "speeding",
+      "tier": "coach",
+      "speed_mph": 31,
+      "street": "SW 107th Ave",
+      "alerted": false,
+      "over_mph": 6,
+      "limit_mph": 25,
+      "limit_confidence": "inferred"
+    },
+    {
+      "type": "rough_turn",
+      "tier": "coach",
+      "peak": 3.3,
+      "speed_mph": 10.1,
+      "street": "SW 107th Ave",
+      "alerted": false
+    },
+    {
+      "type": "hard_accel",
+      "tier": "harsh",
+      "peak": 3.7,
+      "speed_mph": 18.8,
+      "street": "SW 8th St",
+      "alerted": false
+    },
+    {
+      "type": "speeding",
+      "tier": "harsh",
+      "speed_mph": 55.9,
+      "street": "SW 8th St",
+      "alerted": true,
+      "over_mph": 16,
+      "limit_mph": 40,
+      "limit_confidence": "posted"
+    },
+    {
+      "type": "swerve",
+      "tier": "coach",
+      "peak": 2.3,
+      "speed_mph": 33.6,
+      "street": "SW 8th St",
+      "alerted": false
+    },
+    {
+      "type": "swerve",
+      "tier": "harsh",
+      "peak": 3.2,
+      "speed_mph": 33.6,
+      "street": "SW 8th St",
+      "alerted": true
+    },
+    {
+      "type": "hard_brake",
+      "tier": "coach",
+      "peak": 2.8,
+      "speed_mph": 25.5,
+      "street": "SW 8th St",
+      "alerted": false
+    },
+    {
+      "type": "hard_brake",
+      "tier": "harsh",
+      "peak": 3.8,
+      "speed_mph": 9.4,
+      "street": "SW 8th St",
+      "alerted": true
+    },
+    {
+      "type": "phone_use",
+      "tier": "harsh",
+      "speed_mph": 17.9,
+      "street": "SW 8th St",
+      "alerted": true,
+      "duration_s": 6
+    },
+    {
+      "type": "rough_turn",
+      "tier": "harsh",
+      "peak": 4.2,
+      "speed_mph": 17.9,
+      "street": "SW 8th St",
+      "alerted": true
+    }
+  ],
+  "stats": {
+    "events_per_10mi": 94.5,
+    "pct_time_speeding": 10.9,
+    "phone_use_seconds": 6
+  },
+  "history": {
+    "last_5_scores": [58, 61, 66, 63, 64],
+    "recurring_spots": [
+      {
+        "type": "hard_brake",
+        "street": "SW 8th St",
+        "count": 3
+      }
+    ]
+  }
+}
