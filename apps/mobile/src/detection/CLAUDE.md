@@ -25,6 +25,7 @@ Turns 50 Hz DeviceMotion samples and 1 Hz GPS fixes into discrete driving events
 | `MotionDetector.ts` | STUB: §6 Level 1 math, §7 state machines |
 | `expoMotionSource.ts` | Done: DeviceMotion adapter (permissions, 20 ms interval, subscription) |
 | `deviceMotion.ts` | Done: pure reading → MotionSample (deg/s → rad/s, per-platform rotation axes) |
+| `level1.ts` | Done: §6 Level 1 math (ĝ, yaw, horizontal magnitude, lateral/longitudinal) + GPS speed/dv/dt tracker |
 | `PhoneUseMonitor.ts` | STUB: AppState + touches |
 | `mocks/` | Synthetic samples; fixture event replay |
 
