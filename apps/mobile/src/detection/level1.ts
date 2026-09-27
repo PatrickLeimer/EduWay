@@ -33,8 +33,13 @@ export function motionFrame(s: MotionSample): MotionFrame {
 /** m/s². GPS speed (m/s) × yaw rate (rad/s). */
 export const lateralAccel = (speedMps: number, yaw: number): number => speedMps * yaw;
 
-/** m/s². + accelerating, − braking, 0 when GPS speed is flat. */
-export const longitudinalAccel = (horiz: number, dvdt: number): number => Math.sign(dvdt) * horiz;
+/**
+ * m/s². + accelerating, − braking, 0 when GPS speed is flat. |h| holds both
+ * road forces, so the lateral part is taken out first; otherwise cornering
+ * reads as braking or acceleration.
+ */
+export const longitudinalAccel = (horiz: number, lat: number, dvdt: number): number =>
+  Math.sign(dvdt) * Math.sqrt(Math.max(0, horiz * horiz - lat * lat));
 
 /** Speed and its rate of change from the last two usable GPS fixes. */
 export interface GpsKinematics {

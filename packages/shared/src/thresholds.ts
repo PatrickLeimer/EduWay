@@ -59,15 +59,15 @@ export interface HysteresisThreshold {
 }
 
 export const HARD_BRAKE = {
-  coach: { start: 2.5, release: 1.5, minDurationS: 0.4 },
-  harsh: { start: 3.5, release: 1.5, minDurationS: 0.4 },
+  coach: { start: 3.5, release: 1.5, minDurationS: 0.4 },
+  harsh: { start: 4.5, release: 1.5, minDurationS: 0.4 },
   // Must also hold: GPS speed dropping.
 } as const satisfies Record<Tier, HysteresisThreshold>;
 
 export const HARD_ACCEL = {
-  coach: { start: 2.5, release: 1.5, minDurationS: 0.4 },
+  coach: { start: 3.0, release: 1.5, minDurationS: 0.4 },
   // Harsh tier exists for scoring but is debrief only (no live alert).
-  harsh: { start: 3.5, release: 1.5, minDurationS: 0.4 },
+  harsh: { start: 4.0, release: 1.5, minDurationS: 0.4 },
   // Must also hold: GPS speed rising.
 } as const satisfies Record<Tier, HysteresisThreshold>;
 
@@ -80,8 +80,8 @@ export const ROUGH_TURN = {
 
 export const SWERVE = {
   /** Lateral must go +peak then −peak (or reverse) within windowS. */
-  coach: { peakMps2: 2.0 },
-  harsh: { peakMps2: 3.0 },
+  coach: { peakMps2: 2.5 },
+  harsh: { peakMps2: 4.0 },
   windowS: 2,
   /** Net heading change must stay under this (otherwise it was a turn). */
   maxNetHeadingChangeDeg: 15,
@@ -101,7 +101,7 @@ export const SPEEDING = {
 
 export const ROLLING_STOP = {
   /** Log a rolling stop if min speed passing the sign stays above this. */
-  maxStopSpeedMph: 2,
+  maxStopSpeedMph: 4,
   /** A stop sign is "ours" when the path passes within this distance. §8. */
   signRadiusM: 15,
   /** Heading must match the sign's `direction` tag within this, when tagged. TODO(WS2): tune. */

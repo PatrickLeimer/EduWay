@@ -101,7 +101,7 @@ describe('drive replay', () => {
     // Hard brake 11–12.5 s while GPS speed drops; gentle brake 30–31 s.
     const { samples, fixes } = drive(
       [
-        { from: 11, to: 12.5, accel: 4 },
+        { from: 11, to: 12.5, accel: 6 },
         { from: 30, to: 31, accel: 1 },
       ],
       10,
@@ -143,18 +143,19 @@ describe('drive replay', () => {
   });
 
   it('misses the brake once the threshold is raised above it', async () => {
-    const { samples, fixes } = drive([{ from: 11, to: 12.5, accel: 4 }], 10);
+    const { samples, fixes } = drive([{ from: 11, to: 12.5, accel: 6 }], 10);
     const rec = recording({ samples, fixes, markers: [[13_000, 'hard_brake']] });
-    const restore = applyOverrides(['HARD_BRAKE.coach.start=5', 'HARD_BRAKE.harsh.start=6']);
+    const original = HARD_BRAKE.coach.start;
+    const restore = applyOverrides(['HARD_BRAKE.coach.start=7', 'HARD_BRAKE.harsh.start=8']);
     try {
-      expect(HARD_BRAKE.coach.start).toBe(5);
+      expect(HARD_BRAKE.coach.start).toBe(7);
       const r = await replay(rec);
       expect(r.events.filter((e) => e.event.type === 'hard_brake')).toHaveLength(0);
       expect(score(rec, r.events).markers[0]!.passed).toBe(false);
     } finally {
       restore();
     }
-    expect(HARD_BRAKE.coach.start).toBe(2.5);
+    expect(HARD_BRAKE.coach.start).toBe(original);
   });
 
   it('scores false alarms from "normal" markers and the "App was wrong" button', () => {

@@ -58,21 +58,21 @@ const ramp = (v0: number, from: number, to: number, rate: number) => (tS: number
 
 describe('createMotionDetector', () => {
   it('detects a coach hard brake while GPS speed drops', () => {
-    const out = drive({ durationS: 8, speed: ramp(15, 2, 5, -3), horiz: between(2, 5, 3) });
+    const out = drive({ durationS: 8, speed: ramp(15, 2, 5, -4), horiz: between(2, 5, 4) });
     expect(out).toHaveLength(1);
     expect(out[0]).toMatchObject({ type: 'hard_brake', tier: 'coach' });
-    expect(out[0]!.peak).toBeCloseTo(3, 1);
+    expect(out[0]!.peak).toBeCloseTo(4, 1);
     expect(out[0]!.durationS).toBeGreaterThan(1);
     expect(out[0]!.speedMph).toBeLessThan(15 * MPS_TO_MPH);
   });
 
   it('detects a harsh brake', () => {
-    const out = drive({ durationS: 8, speed: ramp(15, 2, 5, -4), horiz: between(2, 5, 4) });
+    const out = drive({ durationS: 8, speed: ramp(15, 2, 5, -5), horiz: between(2, 5, 5) });
     expect(out.map((e) => [e.type, e.tier])).toEqual([['hard_brake', 'harsh']]);
   });
 
   it('calls the same force hard acceleration when GPS speed rises', () => {
-    const out = drive({ durationS: 8, speed: ramp(5, 2, 5, 3), horiz: between(2, 5, 3) });
+    const out = drive({ durationS: 8, speed: ramp(5, 2, 5, 3.5), horiz: between(2, 5, 3.5) });
     expect(out.map((e) => e.type)).toEqual(['hard_accel']);
   });
 
@@ -87,8 +87,8 @@ describe('createMotionDetector', () => {
       const start2 = end1 + gapS;
       return drive({
         durationS: start2 + 6,
-        speed: (tS) => ramp(20, 2, end1, -3)(tS) + ramp(0, start2, start2 + 2, -3)(tS),
-        horiz: (tS) => between(2, end1, 3)(tS) + between(start2, start2 + 2, 3)(tS),
+        speed: (tS) => ramp(20, 2, end1, -4)(tS) + ramp(0, start2, start2 + 2, -4)(tS),
+        horiz: (tS) => between(2, end1, 4)(tS) + between(start2, start2 + 2, 4)(tS),
       }).filter((e) => e.type === 'hard_brake');
     };
     expect(twoBrakes(1)).toHaveLength(1);
@@ -118,8 +118,8 @@ describe('createMotionDetector', () => {
   });
 
   it('detects a swerve: lateral flips sign with little net heading change', () => {
-    // 15 m/s: ±0.25 rad/s → ±3.75 m/s² lateral, 0.6 s each way.
-    const yaw = (tS: number) => between(1, 1.6, 0.25)(tS) + between(1.6, 2.2, -0.25)(tS);
+    // 15 m/s: ±0.3 rad/s → ±4.5 m/s² lateral, 0.6 s each way.
+    const yaw = (tS: number) => between(1, 1.6, 0.3)(tS) + between(1.6, 2.2, -0.3)(tS);
     const out = drive({ durationS: 5, speed: () => 15, yaw });
     expect(out.map((e) => [e.type, e.tier])).toEqual([['swerve', 'harsh']]);
   });
@@ -134,8 +134,8 @@ describe('createMotionDetector', () => {
   it('discards an event in progress when the phone is picked up', () => {
     const out = drive({
       durationS: 8,
-      speed: ramp(15, 2, 5, -3),
-      horiz: between(2, 5, 3),
+      speed: ramp(15, 2, 5, -4),
+      horiz: between(2, 5, 4),
       junk: (tS) => tS >= 3.5 && tS < 3.6,
     });
     // The part before the pickup is dropped; the tail after it restarts from zero.

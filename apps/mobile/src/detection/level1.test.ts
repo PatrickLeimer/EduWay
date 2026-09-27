@@ -53,9 +53,17 @@ describe('lateral and longitudinal acceleration', () => {
   });
 
   it('longitudinal takes its sign from dv/dt', () => {
-    expect(longitudinalAccel(3, -2)).toBe(-3);
-    expect(longitudinalAccel(3, 1)).toBe(3);
-    expect(longitudinalAccel(3, 0)).toBe(0);
+    expect(longitudinalAccel(3, 0, -2)).toBe(-3);
+    expect(longitudinalAccel(3, 0, 1)).toBe(3);
+    expect(longitudinalAccel(3, 0, 0)).toBe(0);
+  });
+
+  it('longitudinal leaves out the cornering force', () => {
+    expect(longitudinalAccel(5, 3, -1)).toBeCloseTo(-4);
+    expect(longitudinalAccel(5, -3, 1)).toBeCloseTo(4);
+    // A pure turn (all of |h| is lateral) is neither braking nor accelerating.
+    expect(longitudinalAccel(5.5, 5.5, -1)).toBeCloseTo(0);
+    expect(longitudinalAccel(3, 4, 1)).toBeCloseTo(0);
   });
 });
 

@@ -45,7 +45,7 @@ export function createSignalFilter(): SignalFilter {
     update(frame, gps) {
       lat = ema(lat, lateralAccel(gps?.speedMps ?? 0, frame.yaw), PIPELINE.emaAlpha);
       horiz = ema(horiz, frame.horiz, PIPELINE.emaAlpha);
-      return { lat, horiz, lon: longitudinalAccel(horiz, gps?.dvdt ?? 0) };
+      return { lat, horiz, lon: longitudinalAccel(horiz, lat, gps?.dvdt ?? 0) };
     },
     reset() {
       lat = 0;

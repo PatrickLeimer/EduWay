@@ -51,12 +51,23 @@ describe('createSignalFilter', () => {
 
   it('converges to a steady input within a second at 50 Hz', () => {
     const f = createSignalFilter();
-    // Flat phone, car turning at 0.2 rad/s at 15 m/s: |lat| = 3 m/s².
-    const frame = motionFrame(sample({ acc: vec(3, 0, 0), rot: vec(0, 0, 0.2) }));
+    // Flat phone, car turning at 0.2 rad/s at 15 m/s: |lat| = 3 m/s², |h| = 5, so 4 m/s² is braking.
+    const frame = motionFrame(sample({ acc: vec(5, 0, 0), rot: vec(0, 0, 0.2) }));
     let s = f.update(frame, braking);
     for (let i = 1; i < 50; i++) s = f.update(frame, braking);
     expect(Math.abs(s.lat)).toBeCloseTo(3, 3);
-    expect(s.lon).toBeCloseTo(-3, 3);
+    expect(s.lon).toBeCloseTo(-4, 3);
+  });
+
+  it('does not read cornering as braking or acceleration', () => {
+    for (const dvdt of [-3, 3]) {
+      const f = createSignalFilter();
+      const frame = motionFrame(sample({ acc: vec(3, 0, 0), rot: vec(0, 0, 0.2) }));
+      let s = f.update(frame, { t: 0, speedMps: 15, dvdt });
+      for (let i = 1; i < 50; i++) s = f.update(frame, { t: 0, speedMps: 15, dvdt });
+      expect(Math.abs(s.lat)).toBeCloseTo(3, 3);
+      expect(s.lon).toBeCloseTo(0, 3);
+    }
   });
 
   it('reads zero lateral and longitudinal without GPS', () => {
