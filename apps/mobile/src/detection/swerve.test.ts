@@ -26,23 +26,23 @@ const flip =
 
 describe('createSwerveDetector', () => {
   it('detects a quick left-right flip', () => {
-    const out = run(flip(2.5, 0.5), 4);
+    const out = run(flip(3, 0.5), 4);
     expect(out).toHaveLength(1);
-    expect(out[0]).toMatchObject({ tier: 'coach', peak: 2.5, startT: 1000, endT: 2000 });
+    expect(out[0]).toMatchObject({ tier: 'coach', peak: 3, startT: 1000, endT: 2000 });
   });
 
   it('is harsh only when both lobes reach the harsh peak', () => {
-    expect(run(flip(3.2, 0.5), 4)[0]?.tier).toBe('harsh');
-    const lopsided = (tS: number) => (tS >= 1 && tS < 1.5 ? 3.5 : tS >= 1.5 && tS < 2 ? -2.2 : 0);
+    expect(run(flip(4.2, 0.5), 4)[0]?.tier).toBe('harsh');
+    const lopsided = (tS: number) => (tS >= 1 && tS < 1.5 ? 4.5 : tS >= 1.5 && tS < 2 ? -2.8 : 0);
     expect(run(lopsided, 4)[0]?.tier).toBe('coach');
   });
 
   it('ignores a single lobe (a normal lane change or curve)', () => {
-    expect(run((tS) => (tS >= 1 && tS < 2 ? 2.5 : 0), 4)).toHaveLength(0);
+    expect(run((tS) => (tS >= 1 && tS < 2 ? 3 : 0), 4)).toHaveLength(0);
   });
 
   it('ignores flips whose peaks are further apart than the window', () => {
-    expect(run(flip(2.5, 0.5, SWERVE.windowS), 6)).toHaveLength(0);
+    expect(run(flip(3, 0.5, SWERVE.windowS), 6)).toHaveLength(0);
   });
 
   it('ignores flips below the coach peak', () => {
@@ -51,6 +51,6 @@ describe('createSwerveDetector', () => {
 
   it('ignores flips with a large net heading change (that was a turn)', () => {
     const turning = (tS: number) => tS * 20 * DEG_TO_RAD;
-    expect(run(flip(2.5, 0.5), 4, turning)).toHaveLength(0);
+    expect(run(flip(3, 0.5), 4, turning)).toHaveLength(0);
   });
 });
