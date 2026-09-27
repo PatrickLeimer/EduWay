@@ -96,7 +96,7 @@ export function GrowthScreen({
               ))}
             </Card>
           ) : (
-            <Muted>Passenger and very short drives don't change your rank or streaks.</Muted>
+            <Muted>{"Passenger and very short drives don't change your rank or streaks."}</Muted>
           )}
         </>
       ) : null}
