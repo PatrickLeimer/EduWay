@@ -195,7 +195,7 @@ export async function replay(rec: Recording): Promise<Replay> {
       fixes.push({ rt: fixRt, fix, match });
       detector.onGps(fix);
       tracker.update(fix);
-      for (const ev of road.onGps(fix, match)) push('road', ev);
+      for (const ev of road.onGps(fix, match).events) push('road', ev);
       lastMatch = match;
     }
   };

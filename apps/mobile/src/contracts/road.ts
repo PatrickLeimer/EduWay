@@ -54,12 +54,29 @@ export interface RoadCache {
 }
 
 /**
+ * A live alert due now, before its event completes (§7 "Live ElevenLabs alerts").
+ * Harsh speeding against a posted limit, once it has lasted
+ * SPEEDING.minDurationS; at most one per speeding episode.
+ */
+export interface RoadLiveAlert {
+  type: 'speeding';
+  limitMph: number;
+}
+
+export interface RoadDetectorOutput {
+  /** Events completed by this fix (usually empty). */
+  events: DraftEvent[];
+  /** Live alerts due at this fix (usually empty). */
+  alerts: RoadLiveAlert[];
+}
+
+/**
  * Speeding and rolling stop detectors (§7, §8). Pure logic over GPS + RoadCache.
  * Harsh speeding only against posted limits; rolling stops are coach tier
- * (debrief only).
+ * (debrief only). A speeding event completes when the episode ends, but its
+ * live alert is signalled while the car is still speeding.
  */
 export interface RoadEventDetector {
-  /** Returns events completed by this fix (usually empty). */
-  onGps(fix: GpsFix, match: RoadMatch | null): DraftEvent[];
+  onGps(fix: GpsFix, match: RoadMatch | null): RoadDetectorOutput;
   reset(): void;
 }

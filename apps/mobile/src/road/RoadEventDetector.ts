@@ -10,7 +10,14 @@ import {
   type GpsFix,
 } from '@edudriver/shared';
 
-import type { RoadCache, RoadEventDetector, RoadMatch, StopSign } from '../contracts';
+import type {
+  RoadCache,
+  RoadDetectorOutput,
+  RoadEventDetector,
+  RoadLiveAlert,
+  RoadMatch,
+  StopSign,
+} from '../contracts';
 import { headingDiffDeg } from './geo';
 import { stopHeadingDeg } from './match';
 
@@ -25,6 +32,8 @@ interface SpeedingEpisode {
   peakLon: number;
   /** Harsh only when the limit was posted and the peak cleared SPEEDING.harshOverMph. */
   harsh: boolean;
+  /** Live alert already signalled for this episode. */
+  alerted: boolean;
 }
 
 interface StopWindow {
@@ -105,8 +114,9 @@ export function createRoadEventDetector(cache: RoadCache): RoadEventDetector {
   }
 
   return {
-    onGps(fix: GpsFix, match: RoadMatch | null): DraftEvent[] {
+    onGps(fix: GpsFix, match: RoadMatch | null): RoadDetectorOutput {
       const out: DraftEvent[] = [];
+      const alerts: RoadLiveAlert[] = [];
       const over = overLimitMph(fix, match);
       const speedMps = fix.speedMps;
       const speedingNow =
@@ -138,6 +148,7 @@ export function createRoadEventDetector(cache: RoadCache): RoadEventDetector {
             peakLat: fix.lat,
             peakLon: fix.lon,
             harsh,
+            alerted: false,
           };
         } else if (over >= speeding.peakOverMph) {
           speeding.peakOverMph = over;
@@ -146,6 +157,16 @@ export function createRoadEventDetector(cache: RoadCache): RoadEventDetector {
           speeding.peakLat = fix.lat;
           speeding.peakLon = fix.lon;
           speeding.harsh = speeding.harsh || harsh;
+        }
+        // Alert while still speeding, not when the episode closes (§7 live alerts).
+        // `harsh` is only ever true against a posted limit.
+        if (
+          speeding.harsh &&
+          !speeding.alerted &&
+          (fix.t - speeding.startedAtMs) / 1000 >= SPEEDING.minDurationS
+        ) {
+          speeding.alerted = true;
+          alerts.push({ type: 'speeding', limitMph: speeding.limitMph });
         }
       } else if (speeding) {
         const ev = closeSpeeding(speeding, fix.t);
@@ -182,7 +203,7 @@ export function createRoadEventDetector(cache: RoadCache): RoadEventDetector {
         }
       }
 
-      return out;
+      return { events: out, alerts };
     },
     reset() {
       speeding = null;

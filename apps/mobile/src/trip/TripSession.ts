@@ -24,6 +24,7 @@ import type {
   PhoneUseMonitor,
   RoadCache,
   RoadEventDetector,
+  RoadLiveAlert,
   RoadMatch,
   StartTripOptions,
   TripSession,
@@ -62,8 +63,11 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
   let unsubs: Array<() => void> = [];
   let gpsChain: Promise<void> = Promise.resolve();
   let ending = false;
+  /** Whether the open speeding episode's live alert played (§7); its event arrives when the episode ends. */
+  let speedingAlerted = false;
 
-  const record = (draft: DraftEvent, match: RoadMatch | null) => {
+  /** `alerted` given: the live alert was already decided while the event was open. */
+  const record = (draft: DraftEvent, match: RoadMatch | null, alertedAlready?: boolean) => {
     const s = store.get();
     if (s.status !== 'driving' && s.status !== 'starting') return;
     const road = {
@@ -73,8 +77,9 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
       limitConfidence: match?.limitConfidence ?? ('unknown' as const),
     };
     const live = LiveAlertTypeSchema.safeParse(draft.type);
-    let alerted = false;
+    let alerted = alertedAlready ?? false;
     if (
+      alertedAlready === undefined &&
       !s.options?.passenger &&
       live.success &&
       draft.tier === 'harsh' &&
@@ -86,6 +91,21 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
   };
 
   const onDraft = (draft: DraftEvent) => record(draft, store.get().latestRoad);
+
+  /** Road events: a speeding event carries the live alert decided while it was open. */
+  const recordRoad = (ev: DraftEvent, match: RoadMatch | null) => {
+    if (ev.type !== 'speeding') return record(ev, match);
+    record(ev, match, speedingAlerted);
+    speedingAlerted = false;
+  };
+
+  /** Live alert for an episode still in progress (harsh speeding vs a posted limit). */
+  const playRoadAlert = (alert: RoadLiveAlert) => {
+    const s = store.get();
+    if (s.status !== 'driving' && s.status !== 'starting') return;
+    if (s.options?.passenger) return;
+    speedingAlerted = deps.alerts.play(alert.type, { limitMph: alert.limitMph });
+  };
 
   async function ingest(fix: GpsFix) {
     const status = store.get().status;
@@ -106,11 +126,14 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
       stoppedForS: isStopped ? prev.stoppedForS + dt : 0,
     });
     deps.motionDetector.onGps(fix);
-    const roadEvents = deps.roadDetector.onGps(fix, match);
-    for (const ev of roadEvents) {
+    const road = deps.roadDetector.onGps(fix, match);
+    // Alerts first: one that arrives with its own finished event (mock replay) is
+    // counted on it. The real detector never alerts on the fix that closes an episode.
+    for (const alert of road.alerts) playRoadAlert(alert);
+    for (const ev of road.events) {
       const [lon, lat] = ev.location.coordinates;
       const pinnedHere = lat === fix.lat && lon === fix.lon;
-      record(ev, pinnedHere ? match : prev.latestRoad);
+      recordRoad(ev, pinnedHere ? match : prev.latestRoad);
     }
   }
 
@@ -158,7 +181,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
     };
     const prevMatch = store.get().latestRoad;
     const extra = deps.roadDetector.onGps(closing, deps.roadCache.match(closing));
-    for (const ev of extra) record(ev, prevMatch);
+    for (const ev of extra.events) recordRoad(ev, prevMatch);
   }
 
   const session: TripSession = {
@@ -166,6 +189,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
       const status = store.get().status;
       if (status === 'driving' || status === 'starting' || status === 'uploading') return;
       ending = false;
+      speedingAlerted = false;
       haltSensors();
       const now = Date.now();
       trace = createTraceBuffer(now);
@@ -260,6 +284,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
     },
     reset() {
       ending = false;
+      speedingAlerted = false;
       haltSensors();
       deps.motionDetector.reset();
       deps.roadDetector.reset();

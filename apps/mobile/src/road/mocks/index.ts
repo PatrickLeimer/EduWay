@@ -5,12 +5,19 @@
  *   otherwise the road-class default → inferred. Good enough for the fixture drive,
  *   NOT a reference for the real matcher.
  * - MockRoadEventDetector: replays the fixture's speeding and rolling_stop events in
- *   step with the GPS stream.
+ *   step with the GPS stream, and signals the live alert for a harsh posted-limit
+ *   speeding event when it arrives.
  */
 import { createFixtureEventReplayer, overpassFixture } from '@edudriver/fixtures';
 import { ROAD, type GpsFix } from '@edudriver/shared';
 
-import type { RoadCache, RoadEventDetector, RoadMatch, StopSign } from '../../contracts';
+import type {
+  RoadCache,
+  RoadEventDetector,
+  RoadLiveAlert,
+  RoadMatch,
+  StopSign,
+} from '../../contracts';
 import { haversineM } from '../geo';
 import type { OverpassResponse, OverpassWay } from '../overpass';
 
@@ -105,7 +112,18 @@ export function createMockRoadCache(): RoadCache {
 export function createMockRoadEventDetector(): RoadEventDetector {
   const replayer = createFixtureEventReplayer(['speeding', 'rolling_stop']);
   return {
-    onGps: (fix) => replayer.advance(fix),
+    onGps: (fix, match) => {
+      const events = replayer.advance(fix);
+      // Fixture events arrive complete, so a harsh speeding one alerts on arrival
+      // (posted limits only, like the real detector).
+      const alerts: RoadLiveAlert[] =
+        events.some((e) => e.type === 'speeding' && e.tier === 'harsh') &&
+        match?.limitConfidence === 'posted' &&
+        match.limitMph != null
+          ? [{ type: 'speeding', limitMph: match.limitMph }]
+          : [];
+      return { events, alerts };
+    },
     reset: () => replayer.reset(),
   };
 }

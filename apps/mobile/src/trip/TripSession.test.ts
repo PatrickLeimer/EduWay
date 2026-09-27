@@ -83,7 +83,7 @@ function harness(opts: {
       }),
       clear() {},
     },
-    roadDetector: { onGps: opts.onGps ?? (() => []), reset() {} },
+    roadDetector: { onGps: opts.onGps ?? (() => ({ events: [], alerts: [] })), reset() {} },
     alerts: { preload: async () => {}, play, reset() {} },
     debrief: {
       play: debriefPlay,
@@ -139,6 +139,19 @@ const brake: DraftEvent = {
   location: { type: 'Point', coordinates: [-80.37, 25.76] },
 };
 
+function speedingAt(fix: GpsFix): DraftEvent {
+  return {
+    type: 'speeding',
+    tier: 'harsh',
+    peak: 20,
+    overMph: 20,
+    durationS: 6,
+    speedMph: 45,
+    at: new Date(fix.t).toISOString(),
+    location: { type: 'Point', coordinates: [fix.lon, fix.lat] },
+  };
+}
+
 describe('TripSession', () => {
   it('refuses End Trip until the car has been stopped for 30 s', async () => {
     const { session } = harness({ fixes: [fix(0, 10), fix(1000, 0)] });
@@ -185,18 +198,7 @@ describe('TripSession', () => {
     const h = harness({
       fixes: driveThenPark(),
       road: posted('inferred'),
-      onGps: (fix) => [
-        {
-          type: 'speeding',
-          tier: 'harsh',
-          peak: 20,
-          overMph: 20,
-          durationS: 6,
-          speedMph: 45,
-          at: new Date(fix.t).toISOString(),
-          location: { type: 'Point', coordinates: [fix.lon, fix.lat] },
-        },
-      ],
+      onGps: (fix) => ({ events: [speedingAt(fix)], alerts: [] }),
     });
     await h.session.start({ passenger: false, lockEnabled: true });
     expect(h.play).not.toHaveBeenCalled();
@@ -205,6 +207,43 @@ describe('TripSession', () => {
       alerted: false,
       limitConfidence: 'inferred',
     });
+  });
+
+  it('voices speeding while the episode is open and marks its event, without replaying', async () => {
+    const fixes = driveThenPark();
+    const h = harness({
+      fixes,
+      // Alert at the 2nd fix; the finished event arrives at the 4th.
+      onGps: (fix) => ({
+        events: fix.t === fixes[3]!.t ? [speedingAt(fix)] : [],
+        alerts: fix.t === fixes[1]!.t ? [{ type: 'speeding', limitMph: 40 }] : [],
+      }),
+    });
+    await h.session.start({ passenger: false, lockEnabled: true });
+    expect(h.play).toHaveBeenCalledOnce();
+    expect(h.play).toHaveBeenCalledWith('speeding', { limitMph: 40 });
+    expect(h.session.getState().events).toHaveLength(1);
+    expect(h.session.getState().events[0]).toMatchObject({ type: 'speeding', alerted: true });
+  });
+
+  it('marks a speeding event unalerted when no live alert played', async () => {
+    const fixes = driveThenPark();
+    const h = harness({
+      fixes,
+      onGps: (fix) => ({ events: fix.t === fixes[3]!.t ? [speedingAt(fix)] : [], alerts: [] }),
+    });
+    await h.session.start({ passenger: false, lockEnabled: true });
+    expect(h.play).not.toHaveBeenCalled();
+    expect(h.session.getState().events[0]).toMatchObject({ type: 'speeding', alerted: false });
+  });
+
+  it('does not voice live speeding on a passenger trip', async () => {
+    const h = harness({
+      fixes: driveThenPark(),
+      onGps: () => ({ events: [], alerts: [{ type: 'speeding', limitMph: 40 }] }),
+    });
+    await h.session.start({ passenger: true, lockEnabled: false });
+    expect(h.play).not.toHaveBeenCalled();
   });
 
   it('keeps processing fixes while the road fetch hangs', async () => {
