@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { EVENT_TYPES } from './types';
-import { HARD_BRAKE, ROUGH_TURN, SCORING, SPEEDING, SWERVE } from './thresholds';
+import { COACH, HARD_BRAKE, ROUGH_TURN, SCORING, SPEEDING, SWERVE } from './thresholds';
 
 describe('thresholds', () => {
   it('harsh tiers are stricter than coach tiers', () => {
@@ -16,6 +16,12 @@ describe('thresholds', () => {
     for (const t of [HARD_BRAKE.coach, HARD_BRAKE.harsh, ROUGH_TURN.coach, ROUGH_TURN.harsh]) {
       expect(t.release).toBeLessThan(t.start);
     }
+  });
+
+  it('breaks main-problem ties in an order that covers every event type once', () => {
+    expect(new Set(COACH.mainProblemTieBreak)).toEqual(new Set(EVENT_TYPES));
+    expect(COACH.mainProblemTieBreak).toHaveLength(EVENT_TYPES.length);
+    expect(COACH.mainProblemMinTrips).toBeGreaterThan(COACH.mainProblemStreetMinTrips);
   });
 
   it('has a penalty for every event type, with phone use heaviest (§7)', () => {

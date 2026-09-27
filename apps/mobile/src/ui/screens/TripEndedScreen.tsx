@@ -14,7 +14,7 @@ import { StatTile } from '../components/primitives';
 import { ScoreRing } from '../components/ScoreRing';
 import { durationText, milesText, secondsBetween } from '../lib/format';
 import type { ScreenProps } from '../navigation';
-import { colors, font, motion, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
+import { colors, font, fonts, motion, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 
 /** What the server does after upload, in order (routes/trips.ts): shown while waiting. */
 const STAGES = ['Saving your route', 'Scoring your drive', 'Your coach is reviewing your drive'];
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     paddingTop: SAFE_TOP,
     paddingHorizontal: space.lg,
   },
-  title: { fontSize: font.display, fontWeight: '800', color: colors.text },
+  title: { fontSize: font.display, fontFamily: fonts.semiBold, color: colors.text },
   body: { flex: 1, justifyContent: 'center' },
   center: { alignItems: 'center', gap: space.md },
   spinnerWrap: {
@@ -172,8 +172,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.route,
   },
   spinner: { transform: [{ scale: 1.8 }] },
-  headline: { fontSize: font.title, fontWeight: '700', color: colors.text, textAlign: 'center' },
+  headline: {
+    fontSize: font.title,
+    fontFamily: fonts.semiBold,
+    color: colors.text,
+    textAlign: 'center',
+  },
   sub: {
+    fontFamily: fonts.regular,
     fontSize: font.body,
     color: colors.textMuted,
     textAlign: 'center',

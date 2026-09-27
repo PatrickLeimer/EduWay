@@ -8,6 +8,7 @@
  * and every response it sends; the client parses every response it receives.
  */
 import { z } from 'zod';
+import { ProgressUpdateSchema, QualifyingTripSchema, UserProgressSchema } from './gamification';
 import {
   CoachOutputSchema,
   DrivingEventSchema,
@@ -66,6 +67,12 @@ export const CreateTripResponseSchema = z.object({
   coachAudioUrl: z.string().nullable(),
   /** One infraction to show in Street View (§12). Null when none qualifies or there is no imagery. */
   streetView: StreetViewCalloutSchema.nullable(),
+  /**
+   * What this trip changed in streaks, tier and readiness (gamification.ts).
+   * The server always sends it; optional only so older clients and hand-built
+   * test responses still type-check.
+   */
+  progressUpdate: ProgressUpdateSchema.optional(),
 });
 export type CreateTripResponse = z.infer<typeof CreateTripResponseSchema>;
 
@@ -117,7 +124,12 @@ export type GetTraceResponse = z.infer<typeof GetTraceResponseSchema>;
 export const GetProgressQuerySchema = z.object({ userId: UserIdSchema });
 export type GetProgressQuery = z.infer<typeof GetProgressQuerySchema>;
 
-export const GetProgressResponseSchema = ProgressSchema;
+export const GetProgressResponseSchema = ProgressSchema.extend({
+  /** Streaks, rank tier and road test readiness (gamification.ts). */
+  userProgress: UserProgressSchema,
+  /** Every qualifying trip, oldest first; the progress chart does its own bucketing. */
+  qualifyingTrips: z.array(QualifyingTripSchema),
+});
 export type GetProgressResponse = z.infer<typeof GetProgressResponseSchema>;
 
 // ---------------------------------------------------------------------------

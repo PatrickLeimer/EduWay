@@ -1,16 +1,23 @@
 /**
  * In-memory TripsRepo (WS3 mock), seeded with the fixture trip. Lets routes,
  * scoring and coach run with no database. Data is lost on restart.
+ * Progress is computed from the stored trips with the same builder as MongoDB.
  */
+import { eventsFixture, traceFixture, tripFixture, tripSummaryFixture } from '@edudriver/fixtures';
 import {
-  eventsFixture,
-  progressFixture,
-  traceFixture,
-  tripFixture,
-  tripSummaryFixture,
-} from '@edudriver/fixtures';
-import type { DrivingEvent, RecordedEvent, Trace, Trip } from '@edudriver/shared';
+  COACH,
+  type DrivingEvent,
+  type RecordedEvent,
+  type Trace,
+  type Trip,
+} from '@edudriver/shared';
 
+import {
+  buildProgress,
+  toGamificationTrip,
+  type ProgressSpot,
+  type ProgressTrip,
+} from '../../gamification';
 import type { StoredStreetView, TripsRepo } from '../repo';
 
 export function createInMemoryTripsRepo(): TripsRepo {
@@ -22,6 +29,41 @@ export function createInMemoryTripsRepo(): TripsRepo {
 
   const withIds = (list: RecordedEvent[], tripId: string, userId: string): DrivingEvent[] =>
     list.map((e, i) => ({ ...e, _id: `${tripId}-evt-${i}`, tripId, userId }));
+
+  const progressRows = (userId: string): ProgressTrip[] =>
+    [...trips.values()]
+      .filter((t) => t.userId === userId)
+      .map((t) => ({
+        id: t._id,
+        startedAt: t.startedAt,
+        endedAt: t.endedAt,
+        distanceMi: t.distanceMi,
+        passenger: t.passenger,
+        score: t.score,
+        counts: t.counts,
+        harshEvents: (events.get(t._id) ?? []).filter((e) => e.tier === 'harsh').length,
+      }));
+
+  /** Same event type on the same street on at least recurringSpotMinCount trips. */
+  const recurringSpots = (userId: string): ProgressSpot[] => {
+    const groups = new Map<string, { spot: ProgressSpot; trips: Set<string> }>();
+    for (const list of events.values()) {
+      for (const e of list) {
+        if (e.userId !== userId || !e.street) continue;
+        const key = `${e.type}|${e.street}`;
+        const g = groups.get(key) ?? {
+          spot: { type: e.type, street: e.street, count: 0, location: e.location },
+          trips: new Set<string>(),
+        };
+        g.trips.add(e.tripId);
+        groups.set(key, g);
+      }
+    }
+    return [...groups.values()]
+      .map((g) => ({ ...g.spot, count: g.trips.size }))
+      .filter((s) => s.count >= COACH.recurringSpotMinCount)
+      .sort((a, b) => b.count - a.count);
+  };
 
   // Seed with the fixture drive so GET endpoints return data on a fresh server.
   trips.set(tripFixture._id, tripFixture);
@@ -72,8 +114,11 @@ export function createInMemoryTripsRepo(): TripsRepo {
     async getHistory() {
       return tripSummaryFixture.history;
     },
-    async getProgress() {
-      return progressFixture;
+    async getProgress(userId) {
+      return buildProgress(progressRows(userId), recurringSpots(userId));
+    },
+    async listGamificationTrips(userId) {
+      return progressRows(userId).map(toGamificationTrip);
     },
   };
 }

@@ -15,7 +15,7 @@ import { Screen } from '../components/Screen';
 import { dateText, durationText, milesText, secondsBetween, totalEvents } from '../lib/format';
 import { pointsFromLine } from '../lib/geo';
 import type { ScreenProps } from '../navigation';
-import { colors, font, motion, radius, shadow, space } from '../theme';
+import { colors, edge, font, fonts, motion, radius, space } from '../theme';
 
 function TripCard({ trip, onPress }: { trip: TripListItem; onPress: () => void }) {
   const route = pointsFromLine(trip.routePreview);
@@ -56,7 +56,9 @@ export function TripListScreen({ modules, navigate }: ScreenProps) {
 
   return (
     <Screen title="Past drives" onBack={() => navigate({ name: 'start' })} backLabel="Home">
-      {loading && !data ? <ActivityIndicator color={colors.black} style={styles.loading} /> : null}
+      {loading && !data ? (
+        <ActivityIndicator color={colors.primary} style={styles.loading} />
+      ) : null}
       {error ? <ConnectionError error={error} onRetry={reload} /> : null}
       {data?.trips.length === 0 ? (
         <Muted>No drives yet. Your first one will show up here.</Muted>
@@ -76,20 +78,25 @@ export function TripListScreen({ modules, navigate }: ScreenProps) {
 
 const styles = StyleSheet.create({
   loading: { marginTop: space.xxl },
-  // Shadow on the outer view, clipping on the inner one (iOS clips shadows with overflow).
+  // Edge on the outer view, clipping on the inner one.
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     marginBottom: space.lg,
-    ...shadow,
+    ...edge,
   },
   cardInner: { borderRadius: radius.lg, overflow: 'hidden' },
   preview: { height: 130 },
   body: { flexDirection: 'row', alignItems: 'center', padding: space.lg, gap: space.md },
   info: { flex: 1 },
-  date: { fontSize: font.body, fontWeight: '700', color: colors.text },
-  meta: { fontSize: font.small, color: colors.textMuted, marginTop: space.xs },
+  date: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  meta: {
+    fontFamily: fonts.regular,
+    fontSize: font.small,
+    color: colors.textMuted,
+    marginTop: space.xs,
+  },
   score: { alignItems: 'center', minWidth: 56 },
-  scoreValue: { fontSize: font.title, fontWeight: '800', color: colors.text },
-  scoreLabel: { fontSize: font.tiny, color: colors.textMuted },
+  scoreValue: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },
+  scoreLabel: { fontFamily: fonts.regular, fontSize: font.tiny, color: colors.textMuted },
 });

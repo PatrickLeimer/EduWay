@@ -34,7 +34,17 @@ import { chatMessages, chatProgress, chatSchedule, readingDurationS } from '../l
 import { nextRoute, prevRoute } from '../lib/flow';
 import { dateText } from '../lib/format';
 import type { FlowOrigin, ScreenProps } from '../navigation';
-import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, shadow, space } from '../theme';
+import {
+  colors,
+  font,
+  fonts,
+  motion,
+  radius,
+  SAFE_BOTTOM,
+  SAFE_TOP,
+  space,
+  stroke,
+} from '../theme';
 
 /** Shown in the header; the voice is ElevenLabs "Chris" (scripts/alert-clips, server/.env). */
 const COACH_NAME = 'Coach Chris';
@@ -429,15 +439,16 @@ const styles = StyleSheet.create({
   identity: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   identityText: { gap: 2 },
   avatar: { backgroundColor: colors.route, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.white, fontWeight: '800' },
-  name: { fontSize: font.title, fontWeight: '800', color: colors.text },
+  avatarText: { color: colors.white, fontFamily: fonts.semiBold },
+  name: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  status: { fontSize: font.small, color: colors.textMuted, fontWeight: '600' },
+  status: { fontSize: font.small, color: colors.textMuted, fontFamily: fonts.semiBold },
   bars: { flexDirection: 'row', alignItems: 'center', gap: 2, height: 14 },
   bar: { width: 3, height: 14, borderRadius: 2, backgroundColor: colors.route },
   chatArea: { flex: 1, backgroundColor: colors.surfaceAlt },
   chatContent: { padding: space.lg, gap: space.sm, paddingBottom: space.xl },
   dayChip: {
+    fontFamily: fonts.regular,
     alignSelf: 'center',
     fontSize: font.small,
     color: colors.textMuted,
@@ -452,13 +463,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     paddingHorizontal: space.lg,
     paddingVertical: space.md,
-    ...shadow,
-    shadowOpacity: 0.06,
-    elevation: 1,
+    borderWidth: stroke.hairline,
+    borderColor: colors.border,
   },
   firstBubble: { marginTop: space.xs },
   retry: { alignSelf: 'flex-start', marginTop: space.sm },
-  bubbleText: { fontSize: 17, lineHeight: 24, color: colors.text },
+  bubbleText: { fontFamily: fonts.regular, fontSize: 17, lineHeight: 24, color: colors.text },
   typing: { flexDirection: 'row', gap: 6, paddingVertical: space.lg },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.textMuted },
   takeaways: {
@@ -470,7 +480,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  takeawaysTitle: { fontSize: font.title, fontWeight: '800', color: colors.text },
+  takeawaysTitle: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },
   focus: { flexDirection: 'row', gap: space.md, alignItems: 'flex-start' },
   focusNum: {
     width: 28,
@@ -480,10 +490,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  focusNumText: { color: colors.white, fontWeight: '800' },
+  focusNumText: { color: colors.white, fontFamily: fonts.semiBold },
   focusText: { flex: 1, gap: 2 },
-  focusSkill: { fontSize: font.body, fontWeight: '700', color: colors.text },
-  focusTip: { fontSize: font.body, color: colors.textMuted, lineHeight: 22 },
+  focusSkill: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  focusTip: {
+    fontFamily: fonts.regular,
+    fontSize: font.body,
+    color: colors.textMuted,
+    lineHeight: 22,
+  },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   chip: {
     backgroundColor: colors.goodSoft,
@@ -491,7 +506,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.md,
     paddingVertical: space.xs,
   },
-  chipText: { fontSize: font.small, color: colors.good, fontWeight: '600' },
+  chipText: { fontSize: font.small, color: colors.good, fontFamily: fonts.semiBold },
   controls: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -508,7 +523,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   controlPressed: { opacity: 0.6 },
-  controlText: { fontSize: font.body, fontWeight: '600', color: colors.text },
+  controlText: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
   footer: {
     paddingHorizontal: space.lg,
     paddingTop: space.md,

@@ -18,6 +18,7 @@ import { Router } from 'express';
 
 import { buildTripSummary } from '../coach';
 import { isRecurringSpot, pickStreetView, toCallout, type StreetViewChoice } from '../streetview';
+import { computeProgressUpdate } from '../gamification';
 
 import type { RouteDeps } from './deps';
 import { HttpError, parseInput, sendValid } from './http';
@@ -100,6 +101,16 @@ export function tripsRouter({ repo, scoreTrip, coach, streetView: google }: Rout
       ({ coachResult, streetView } = await coachAndSave(trip, events, history, choice));
     }
 
+    // What this trip changed in streaks, tier and readiness, for the debrief to celebrate.
+    const gamificationTrips = await repo.listGamificationTrips(body.userId);
+    const latest = gamificationTrips.find((t) => t.id === trip._id);
+    const progressUpdate = latest
+      ? computeProgressUpdate(
+          gamificationTrips.filter((t) => t.id !== trip._id),
+          latest,
+        )
+      : undefined;
+
     sendValid(
       res,
       CreateTripResponseSchema,
@@ -108,6 +119,7 @@ export function tripsRouter({ repo, scoreTrip, coach, streetView: google }: Rout
         coach: coachResult.coach,
         coachAudioUrl: coachResult.audioUrl,
         streetView,
+        progressUpdate,
       },
       201,
     );

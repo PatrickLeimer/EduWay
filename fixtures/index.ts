@@ -14,6 +14,7 @@ import {
   CoachOutputSchema,
   GetProgressResponseSchema,
   GetTripResponseSchema,
+  ProgressUpdateSchema,
   RecordedEventSchema,
   StreetViewCalloutSchema,
   TraceSchema,
@@ -30,6 +31,8 @@ import { z } from 'zod';
 import coachOutputJson from './coach-output.json';
 import eventsJson from './events.all-types.json';
 import overpassJson from './overpass.response.json';
+import progressUpdateStreakBrokenJson from './progress-update.streak-broken.json';
+import progressUpdateTierUpJson from './progress-update.tier-up.json';
 import progressJson from './progress.json';
 import streetViewCalloutJson from './streetview-callout.json';
 import traceJson from './trace.short-drive.json';
@@ -65,6 +68,13 @@ export const debriefWithoutStreetViewFixture: GetTripResponse = GetTripResponseS
   },
   streetView: null,
 });
+
+/** POST /trips progressUpdate where the phone-free streak just broke. */
+export const progressUpdateStreakBrokenFixture = ProgressUpdateSchema.parse(
+  progressUpdateStreakBrokenJson,
+);
+/** POST /trips progressUpdate where the rank tier just went up (Gold → Platinum). */
+export const progressUpdateTierUpFixture = ProgressUpdateSchema.parse(progressUpdateTierUpJson);
 
 /** Seconds from trip start (trace.startedAt) to an event's `at`. Used by mocks to replay events in time. */
 export function offsetFromTripStartS(

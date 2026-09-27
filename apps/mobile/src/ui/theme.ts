@@ -1,7 +1,9 @@
 /**
- * Design tokens for the whole UI. Style direction: Google Maps (map-first,
- * floating cards, calm dark driving mode) + Uber (black/white base, big black
- * primary button, trip cards, receipt-style debrief). See docs/ui-prompt.md.
+ * Design tokens for the whole UI. Layout: Google Maps (map-first,
+ * floating cards, calm dark driving mode) + Uber (trip cards, receipt-style
+ * debrief). Look: flat teal palette. No gradients, blur, glow or soft
+ * shadows; depth comes only from the "lip", a solid bottom border one shade
+ * darker than the surface above it.
  *
  * Change the look of the app here first; screens and components only read
  * these tokens.
@@ -9,34 +11,69 @@
 import { Platform, StatusBar } from 'react-native';
 
 export const colors = {
-  // Uber-style neutral base
+  // Brand palette: teal is the main color, used as real surfaces. Coral is
+  // rare and always means streaks or harsh events. Amber is coach-tier events.
+  teal50: '#EAF7F4',
+  teal100: '#CDEFE8',
+  teal200: '#9FDDD3',
+  teal400: '#3DB8AB',
+  teal500: '#1FA39A',
+  teal700: '#137A73',
+  teal900: '#0B3B38',
+  coral100: '#FFE6E2',
+  coral500: '#FF7A6B',
+  coral700: '#D9574A',
+  amber100: '#FFF1D6',
+  amber500: '#FFB547',
+  amber700: '#B7791F',
+
+  /** Primary actions (buttons, active states, spinners) and their darker lip. */
+  primary: '#1FA39A',
+  primaryLip: '#137A73',
+  dangerLip: '#D9574A',
+  /** Text and icons on teal / coral surfaces. */
+  onColor: '#FFFFFF',
+
+  // Pure black/white: road signs (SpeedLimitSign, StopSign) only
   black: '#000000',
   white: '#FFFFFF',
-  surface: '#FFFFFF',
-  surfaceAlt: '#F3F3F3',
-  border: '#E2E2E2',
-  text: '#000000',
-  textMuted: '#6B6B6B',
-  textOnDark: '#FFFFFF',
-  textOnDarkMuted: '#A6A6A6',
 
-  // Google Maps blue: route line and "you are here" only
-  route: '#1A73E8',
-  location: '#1A73E8',
+  bg: '#F1FAF8',
+  surface: '#FFFFFF',
+  surfaceAlt: '#EAF7F4',
+  border: '#D7E7E3',
+  text: '#16332F',
+  textMuted: '#4F6B67',
+  textOnDark: '#E8F5F2',
+  textOnDarkMuted: '#9FDDD3',
+
+  // Route line and "you are here"
+  route: '#1FA39A',
+  location: '#1FA39A',
 
   // Meaning only: event severity (tier) and success states
-  good: '#1E8E3E',
+  good: '#137A73',
   /** Background for success chips (coach strengths). */
-  goodSoft: '#E6F4EA',
-  coach: '#F9AB00',
-  harsh: '#D93025',
+  goodSoft: '#EAF7F4',
+  coach: '#FFB547',
+  harsh: '#FF7A6B',
 
   // Driving mode (always dark)
-  driveBg: '#0B0F14',
-  drivePanel: '#161B22',
-  driveBorder: '#2A313C',
+  driveBg: '#0B1F1D',
+  drivePanel: '#12302D',
+  driveBorder: '#0B3B38',
 
-  disabled: '#BDBDBD',
+  disabled: '#D7E7E3',
+} as const;
+
+/**
+ * Lexend, loaded in Root.tsx with @expo-google-fonts/lexend. Custom fonts carry
+ * their own weight, so styles set fontFamily only (fontWeight on a custom font
+ * breaks on Android).
+ */
+export const fonts = {
+  regular: 'Lexend_400Regular',
+  semiBold: 'Lexend_600SemiBold',
 } as const;
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
@@ -75,10 +112,27 @@ export const DRIVE_BUTTON_HEIGHT = 64;
 export const SAFE_TOP = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) + 8 : 54;
 export const SAFE_BOTTOM = Platform.OS === 'ios' ? 28 : 12;
 
-export const shadow = {
-  shadowColor: '#000',
-  shadowOpacity: 0.15,
-  shadowRadius: 12,
-  shadowOffset: { width: 0, height: 4 },
-  elevation: 6,
+/** The flat "lip" under chunky surfaces (buttons, hero cards). */
+export const lip = { rest: 4, pressed: 2 } as const;
+
+/** Hairline and outline widths. */
+export const stroke = { hairline: 1, outline: 2 } as const;
+
+/** Card edge: hairline outline plus the lip. Replaces the old soft shadow. */
+export const edge = {
+  borderWidth: stroke.hairline,
+  borderColor: colors.border,
+  borderBottomWidth: lip.rest,
 } as const;
+
+/** Google Maps style for driving mode (Android; iOS uses userInterfaceStyle), in the drive palette. */
+export const mapDarkStyle = [
+  { elementType: 'geometry', stylers: [{ color: colors.driveBg }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: colors.teal200 }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: colors.driveBg }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: colors.drivePanel }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: colors.teal900 }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: colors.drivePanel }] },
+  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+];

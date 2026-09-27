@@ -14,7 +14,7 @@ import { WebView } from 'react-native-webview';
 
 import { API_BASE_URL } from '../../api';
 import { absoluteUrl } from '../lib/url';
-import { colors, font, radius, SAFE_BOTTOM, SAFE_TOP, shadow, space } from '../theme';
+import { colors, edge, font, fonts, lip, radius, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 
 const UNAVAILABLE = 'Street View isn’t available right now.';
 
@@ -52,7 +52,7 @@ export function StreetViewCard({ callout }: { callout: StreetViewCallout }) {
           />
           {image === 'loading' ? (
             <View style={styles.placeholder}>
-              <ActivityIndicator color={colors.route} />
+              <ActivityIndicator color={colors.primary} />
             </View>
           ) : (
             <View style={styles.hint}>
@@ -84,7 +84,7 @@ export function StreetViewCard({ callout }: { callout: StreetViewCallout }) {
               startInLoadingState
               renderLoading={() => (
                 <View style={styles.modalMessage}>
-                  <ActivityIndicator color={colors.white} />
+                  <ActivityIndicator color={colors.textOnDark} />
                 </View>
               )}
               onError={() => setPanoFailed(true)}
@@ -121,12 +121,15 @@ const styles = StyleSheet.create({
     padding: space.lg,
     gap: space.sm,
     marginTop: space.md,
-    ...shadow,
-    shadowOpacity: 0.08,
-    elevation: 2,
+    ...edge,
   },
-  kicker: { fontSize: font.tiny, fontWeight: '800', letterSpacing: 1.5, color: colors.route },
-  street: { fontSize: font.title, fontWeight: '800', color: colors.text },
+  kicker: {
+    fontSize: font.tiny,
+    fontFamily: fonts.semiBold,
+    letterSpacing: 1.5,
+    color: colors.good,
+  },
+  street: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },
   photoWrap: {
     borderRadius: radius.lg,
     overflow: 'hidden',
@@ -147,17 +150,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: space.sm,
     bottom: space.sm,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: colors.primary,
     borderRadius: radius.pill,
+    borderBottomWidth: lip.pressed,
+    borderBottomColor: colors.primaryLip,
     paddingHorizontal: space.md,
     paddingVertical: space.xs,
   },
-  hintText: { color: colors.white, fontSize: font.small, fontWeight: '600' },
+  hintText: { color: colors.onColor, fontSize: font.small, fontFamily: fonts.semiBold },
   pressed: { opacity: 0.8 },
-  caption: { fontSize: font.body, lineHeight: 22, color: colors.text },
-  unavailable: { fontSize: font.body, color: colors.textMuted },
-  modal: { flex: 1, backgroundColor: colors.black },
-  webview: { flex: 1, backgroundColor: colors.black },
+  caption: { fontSize: font.body, lineHeight: 22, color: colors.text, fontFamily: fonts.regular },
+  unavailable: { fontSize: font.body, color: colors.textMuted, fontFamily: fonts.regular },
+  modal: { flex: 1, backgroundColor: colors.driveBg },
+  webview: { flex: 1, backgroundColor: colors.driveBg },
   modalMessage: {
     position: 'absolute',
     top: 0,
@@ -167,27 +172,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: space.xl,
-    backgroundColor: colors.black,
+    backgroundColor: colors.driveBg,
   },
-  modalMessageText: { color: colors.white, fontSize: font.body, textAlign: 'center' },
+  modalMessageText: {
+    color: colors.textOnDark,
+    fontSize: font.body,
+    fontFamily: fonts.regular,
+    textAlign: 'center',
+  },
   topBar: { position: 'absolute', top: SAFE_TOP, left: space.lg },
   close: {
     backgroundColor: colors.surface,
     borderRadius: radius.pill,
     paddingHorizontal: space.lg,
     paddingVertical: space.sm,
+    ...edge,
   },
-  closeText: { fontSize: font.body, fontWeight: '700', color: colors.text },
+  closeText: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
   bottomBar: {
     position: 'absolute',
     left: space.lg,
     right: space.lg,
     bottom: SAFE_BOTTOM + space.lg,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: colors.drivePanel,
     borderRadius: radius.lg,
+    borderBottomWidth: lip.rest,
+    borderBottomColor: colors.driveBorder,
     padding: space.md,
     gap: 2,
   },
-  modalStreet: { color: colors.white, fontSize: font.body, fontWeight: '800' },
-  modalCaption: { color: colors.white, fontSize: font.body, lineHeight: 22 },
+  modalStreet: { color: colors.textOnDark, fontSize: font.body, fontFamily: fonts.semiBold },
+  modalCaption: {
+    color: colors.textOnDark,
+    fontSize: font.body,
+    lineHeight: 22,
+    fontFamily: fonts.regular,
+  },
 });
