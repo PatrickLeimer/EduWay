@@ -179,12 +179,12 @@ Values are m/s² after the ~2 Hz filter (1 g = 9.81 m/s²). Starting values from
 
 | Event | Signal | Coach tier (debrief) | Harsh tier (live alert) | Must also hold |
 |---|---|---|---|---|
-| Hard braking | Longitudinal deceleration | ≥ 2.5 | ≥ 3.5 | ≥ 0.4 s; GPS speed dropping |
-| Hard acceleration | Longitudinal acceleration | ≥ 2.5 | ≥ 3.5 (debrief only) | ≥ 0.4 s; GPS speed rising |
+| Hard braking | Longitudinal deceleration | ≥ 3.5 | ≥ 4.5 | ≥ 0.4 s; GPS speed dropping |
+| Hard acceleration | Longitudinal acceleration | ≥ 3.0 | ≥ 4.0 (debrief only) | ≥ 0.4 s; GPS speed rising |
 | Rough turn | Lateral acceleration | ≥ 3.0 | ≥ 4.0 | ≥ 0.5 s; heading change > 30° |
-| Swerve | Lateral sign flip | ±2.0 | ±3.0 | + then − within 2 s; net heading change < 15°; speed > 25 km/h |
+| Swerve | Lateral sign flip | ±2.5 | ±4.0 | + then − within 2 s; net heading change < 15°; speed > 25 km/h |
 | Speeding | GPS speed vs limit | +5 mph | +15 mph, posted limit only | ≥ 5 s; GPS accuracy < 20 m |
-| Rolling stop | Min speed passing a stop sign | > about 2 mph | none (debrief only) | See section 8 |
+| Rolling stop | Min speed passing a stop sign | > about 4 mph | none (debrief only) | See section 8 |
 | Phone use | Touch or app leaving foreground while moving | always logged | always warned | Speed > 10 km/h |
 
 A normal lane change usually stays under 1.5 m/s² lateral, which is why the swerve rule needs ±2 and a quick sign flip.
