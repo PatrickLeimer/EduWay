@@ -1,6 +1,6 @@
 import { coachOutputFixture, tripSummaryFixture } from '@edudriver/fixtures';
 import { COACH } from '@edudriver/shared';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   COACH_RESPONSE_JSON_SCHEMA,
@@ -12,12 +12,15 @@ import {
 import { buildSystemPrompt } from './prompt';
 
 // Fake SDK: records what we send, returns whatever the test sets as `reply`,
-// and answers 503 for any model in `busy`.
+// answers 503 for any model in `busy` (and for the first `busyCalls` calls),
+// and 429 for any model in `outOfQuota`.
 const sdk = vi.hoisted(() => ({
   clientOpts: undefined as unknown,
   request: undefined as unknown,
   reply: undefined as string | undefined,
   busy: new Set<string>(),
+  outOfQuota: new Set<string>(),
+  busyCalls: 0,
   modelsTried: [] as string[],
 }));
 vi.mock('@google/genai', () => ({
@@ -29,7 +32,10 @@ vi.mock('@google/genai', () => ({
       generateContent: async (req: { model: string }) => {
         sdk.request = req;
         sdk.modelsTried.push(req.model);
-        if (sdk.busy.has(req.model)) throw Object.assign(new Error('high demand'), { status: 503 });
+        if (sdk.outOfQuota.has(req.model)) throw Object.assign(new Error('quota'), { status: 429 });
+        if (sdk.busy.has(req.model) || sdk.modelsTried.length <= sdk.busyCalls) {
+          throw Object.assign(new Error('high demand'), { status: 503 });
+        }
         return { text: sdk.reply };
       },
     };
@@ -119,9 +125,23 @@ describe('generateCoaching fallback models', () => {
   beforeEach(() => {
     sdk.reply = fixtureJson;
     sdk.busy.clear();
+    sdk.outOfQuota.clear();
+    sdk.busyCalls = 0;
     sdk.modelsTried = [];
     vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.useFakeTimers();
   });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** Runs generateCoaching, fast-forwarding the pause before the second pass. */
+  async function run(model: string) {
+    const result = generateCoaching(tripSummaryFixture, { apiKey: 'k', model });
+    result.catch(() => {}); // Observed below; avoid an unhandled rejection while timers advance.
+    await vi.advanceTimersByTimeAsync(GEMINI_HTTP.secondPassDelayMs);
+    return result;
+  }
 
   it('uses only the main model when it answers', async () => {
     await generateCoaching(tripSummaryFixture, { apiKey: 'k', model: 'main' });
@@ -135,21 +155,39 @@ describe('generateCoaching fallback models', () => {
     expect(coach.chat).toEqual(coachOutputFixture.chat);
   });
 
-  it('tries every model once, in order, then throws the last error', async () => {
+  it('tries every model in order, pauses, tries them again, then throws the last error', async () => {
     for (const m of ['main', ...GEMINI_FALLBACK_MODELS]) sdk.busy.add(m);
-    await expect(
-      generateCoaching(tripSummaryFixture, { apiKey: 'k', model: 'main' }),
-    ).rejects.toMatchObject({ status: 503 });
+    await expect(run('main')).rejects.toMatchObject({ status: 503 });
+    const pass = ['main', ...GEMINI_FALLBACK_MODELS];
+    expect(sdk.modelsTried).toEqual([...pass, ...pass]);
+  });
+
+  it('succeeds on the second pass when a busy spike passes', async () => {
+    sdk.busyCalls = 1 + GEMINI_FALLBACK_MODELS.length; // the whole first pass fails
+    const coach = await run('main');
+    expect(sdk.modelsTried).toHaveLength(2 + GEMINI_FALLBACK_MODELS.length);
+    expect(sdk.modelsTried.at(-1)).toBe('main');
+    expect(coach.chat).toEqual(coachOutputFixture.chat);
+  });
+
+  it('skips models that are out of quota on the second pass', async () => {
+    sdk.outOfQuota.add('main');
+    for (const m of GEMINI_FALLBACK_MODELS) sdk.busy.add(m);
+    await expect(run('main')).rejects.toThrow();
+    expect(sdk.modelsTried).toEqual(['main', ...GEMINI_FALLBACK_MODELS, ...GEMINI_FALLBACK_MODELS]);
+  });
+
+  it('gives up without a pause when every model is out of quota', async () => {
+    for (const m of ['main', ...GEMINI_FALLBACK_MODELS]) sdk.outOfQuota.add(m);
+    await expect(run('main')).rejects.toMatchObject({ status: 429 });
     expect(sdk.modelsTried).toEqual(['main', ...GEMINI_FALLBACK_MODELS]);
   });
 
-  it('does not try the same model twice when the main model is also a fallback', async () => {
+  it('does not try the same model twice in a pass when the main model is also a fallback', async () => {
     const main = GEMINI_FALLBACK_MODELS[0];
     for (const m of GEMINI_FALLBACK_MODELS) sdk.busy.add(m);
-    await expect(
-      generateCoaching(tripSummaryFixture, { apiKey: 'k', model: main }),
-    ).rejects.toThrow();
-    expect(sdk.modelsTried).toEqual([...GEMINI_FALLBACK_MODELS]);
+    await expect(run(main)).rejects.toThrow();
+    expect(sdk.modelsTried).toEqual([...GEMINI_FALLBACK_MODELS, ...GEMINI_FALLBACK_MODELS]);
   });
 });
 
