@@ -1,0 +1,152 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API (fixture)",
+  "osm3s": {
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+    {
+      "type": "node",
+      "id": 2001,
+      "lat": 25.759633,
+      "lon": -80.3685,
+      "tags": {
+        "highway": "stop",
+        "direction": "forward"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2002,
+      "lat": 25.759643,
+      "lon": -80.3686,
+      "tags": {
+        "highway": "stop"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2003,
+      "lat": 25.7625,
+      "lon": -80.3686,
+      "tags": {
+        "highway": "stop",
+        "direction": "backward"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1001,
+      "bounds": {
+        "minlat": 25.755,
+        "minlon": -80.3685,
+        "maxlat": 25.7625,
+        "maxlon": -80.3685
+      },
+      "geometry": [
+        {
+          "lat": 25.755,
+          "lon": -80.3685
+        },
+        {
+          "lat": 25.759643,
+          "lon": -80.3685
+        },
+        {
+          "lat": 25.7625,
+          "lon": -80.3685
+        }
+      ],
+      "tags": {
+        "highway": "residential",
+        "name": "SW 107th Ave"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1002,
+      "bounds": {
+        "minlat": 25.7625,
+        "minlon": -80.372,
+        "maxlat": 25.7625,
+        "maxlon": -80.354
+      },
+      "geometry": [
+        {
+          "lat": 25.7625,
+          "lon": -80.372
+        },
+        {
+          "lat": 25.7625,
+          "lon": -80.3685
+        },
+        {
+          "lat": 25.7625,
+          "lon": -80.36
+        },
+        {
+          "lat": 25.7625,
+          "lon": -80.354
+        }
+      ],
+      "tags": {
+        "highway": "primary",
+        "name": "SW 8th St",
+        "maxspeed": "40 mph",
+        "oneway": "no"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1003,
+      "bounds": {
+        "minlat": 25.759643,
+        "minlon": -80.372,
+        "maxlat": 25.759643,
+        "maxlon": -80.365
+      },
+      "geometry": [
+        {
+          "lat": 25.759643,
+          "lon": -80.372
+        },
+        {
+          "lat": 25.759643,
+          "lon": -80.3685
+        },
+        {
+          "lat": 25.759643,
+          "lon": -80.365
+        }
+      ],
+      "tags": {
+        "highway": "residential",
+        "name": "SW 4th St",
+        "maxspeed": "25 mph"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1004,
+      "bounds": {
+        "minlat": 25.7598,
+        "minlon": -80.3685,
+        "maxlat": 25.7598,
+        "maxlon": -80.3672
+      },
+      "geometry": [
+        {
+          "lat": 25.7598,
+          "lon": -80.3685
+        },
+        {
+          "lat": 25.7598,
+          "lon": -80.3672
+        }
+      ],
+      "tags": {
+        "highway": "service"
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+// Placeholder test: the mock API honors the shared response schemas.
+import { traceFixture, eventsFixture } from '@edudriver/fixtures';
+import {
+  CreateTripResponseSchema,
+  DEMO_USER_ID,
+  GetProgressResponseSchema,
+  ListTripsResponseSchema,
+  TraceUploadSchema,
+} from '@edudriver/shared';
+import { describe, expect, it } from 'vitest';
+
+import { encodeTrace } from '../traceCodec';
+
+import { createMockApiClient } from '.';
+
+describe('mock ApiClient', () => {
+  it('creates a trip and lists it', async () => {
+    const api = createMockApiClient(0);
+    const res = await api.createTrip({
+      userId: DEMO_USER_ID,
+      trip: {
+        startedAt: traceFixture.startedAt,
+        endedAt: traceFixture.startedAt,
+        distanceMi: 1,
+        passenger: false,
+        lockEnabled: true,
+      },
+      events: eventsFixture,
+      traceGzipB64: encodeTrace(TraceUploadSchema.parse(traceFixture)),
+    });
+    expect(CreateTripResponseSchema.safeParse(res).success).toBe(true);
+
+    const list = ListTripsResponseSchema.parse(await api.listTrips(DEMO_USER_ID));
+    expect(list.trips[0]?._id).toBe(res.trip._id);
+    expect(GetProgressResponseSchema.safeParse(await api.getProgress(DEMO_USER_ID)).success).toBe(
+      true,
+    );
+  });
+});

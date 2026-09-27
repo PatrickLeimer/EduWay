@@ -1,0 +1,9 @@
+node_modules/
+package-lock.json
+.expo/
+dist/
+apps/mobile/ios/
+apps/mobile/android/
+# Team-authored docs: keep formatting as written.
+docs/
+*.md

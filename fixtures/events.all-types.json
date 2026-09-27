@@ -1,0 +1,209 @@
+[
+  {
+    "type": "hard_accel",
+    "tier": "coach",
+    "peak": 2.7,
+    "durationS": 0.6,
+    "speedMph": 14.3,
+    "at": "2026-09-26T15:00:09.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.3685, 25.757981]
+    },
+    "street": "SW 107th Ave",
+    "roadClass": "residential",
+    "limitMph": 25,
+    "limitConfidence": "inferred",
+    "alerted": false
+  },
+  {
+    "type": "rolling_stop",
+    "tier": "coach",
+    "peak": null,
+    "durationS": 0,
+    "speedMph": 3.1,
+    "at": "2026-09-26T15:00:27.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.3685, 25.759643]
+    },
+    "street": "SW 107th Ave",
+    "roadClass": "residential",
+    "limitMph": 25,
+    "limitConfidence": "inferred",
+    "alerted": false,
+    "minSpeedMph": 3.1
+  },
+  {
+    "type": "speeding",
+    "tier": "coach",
+    "peak": 6,
+    "durationS": 12,
+    "speedMph": 31,
+    "at": "2026-09-26T15:00:40.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.3685, 25.760939]
+    },
+    "street": "SW 107th Ave",
+    "roadClass": "residential",
+    "limitMph": 25,
+    "limitConfidence": "inferred",
+    "alerted": false,
+    "overMph": 6
+  },
+  {
+    "type": "rough_turn",
+    "tier": "coach",
+    "peak": 3.3,
+    "durationS": 0.8,
+    "speedMph": 10.1,
+    "at": "2026-09-26T15:00:57.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.3685, 25.762497]
+    },
+    "street": "SW 107th Ave",
+    "roadClass": "residential",
+    "limitMph": 25,
+    "limitConfidence": "inferred",
+    "alerted": false
+  },
+  {
+    "type": "hard_accel",
+    "tier": "harsh",
+    "peak": 3.7,
+    "durationS": 0.7,
+    "speedMph": 18.8,
+    "at": "2026-09-26T15:01:02.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.368243, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": false
+  },
+  {
+    "type": "speeding",
+    "tier": "harsh",
+    "peak": 16,
+    "durationS": 9,
+    "speedMph": 55.9,
+    "at": "2026-09-26T15:01:42.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.360934, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": true,
+    "overMph": 16
+  },
+  {
+    "type": "swerve",
+    "tier": "coach",
+    "peak": 2.3,
+    "durationS": 1.4,
+    "speedMph": 33.6,
+    "at": "2026-09-26T15:01:58.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.357563, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": false
+  },
+  {
+    "type": "swerve",
+    "tier": "harsh",
+    "peak": 3.2,
+    "durationS": 1.2,
+    "speedMph": 33.6,
+    "at": "2026-09-26T15:02:06.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.356366, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": true
+  },
+  {
+    "type": "hard_brake",
+    "tier": "coach",
+    "peak": 2.8,
+    "durationS": 0.5,
+    "speedMph": 25.5,
+    "at": "2026-09-26T15:02:18.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.354607, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": false
+  },
+  {
+    "type": "hard_brake",
+    "tier": "harsh",
+    "peak": 3.8,
+    "durationS": 0.9,
+    "speedMph": 9.4,
+    "at": "2026-09-26T15:02:20.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.354487, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": true
+  },
+  {
+    "type": "phone_use",
+    "tier": "harsh",
+    "peak": null,
+    "durationS": 6,
+    "speedMph": 17.9,
+    "at": "2026-09-26T15:02:25.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.354162, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": true
+  },
+  {
+    "type": "rough_turn",
+    "tier": "harsh",
+    "peak": 4.2,
+    "durationS": 0.6,
+    "speedMph": 17.9,
+    "at": "2026-09-26T15:02:30.000Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [-80.353763, 25.7625]
+    },
+    "street": "SW 8th St",
+    "roadClass": "primary",
+    "limitMph": 40,
+    "limitConfidence": "posted",
+    "alerted": true
+  }
+]

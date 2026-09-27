@@ -39,3 +39,17 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# env files with secrets (server/.env.example is committed)
+.env
+**/.env
+
+# ElevenLabs debrief mp3s written by the server at runtime (server/src/coach/elevenlabs.ts)
+server/audio/
+
+# test output
+coverage/
+
+# Drive recordings from the dev Drive recorder (raw motion data, never committed; docs/drive-recording.md)
+/recordings/
+*.ndjson

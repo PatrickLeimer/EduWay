@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "EduDriver",
+    "slug": "edudriver",
+    "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "EduDriver uses your location during a drive to check speed limits, stop signs, and draw your route."
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "EduDriver uses motion sensors during a drive to detect hard braking, sharp turns, and swerves."
+        }
+      ],
+      "expo-audio",
+      "expo-sharing"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "afc45bc5-d4e2-48a1-b1f2-36989c0899de"
+      }
+    },
+    "owner": "julioleonardi",
+    "updates": {
+      "url": "https://u.expo.dev/afc45bc5-d4e2-48a1-b1f2-36989c0899de"
+    }
+  }
+}
