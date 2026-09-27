@@ -29,7 +29,7 @@ Each developer owns one workstream. Only edit files inside your workstream's pat
 | WS2 Road data + trip session | `apps/mobile/src/road/**`, `apps/mobile/src/trip/**`, `apps/mobile/src/wiring.ts` | Overpass cache, way matching, speed limits, speeding and rolling stop detectors, trip start/end, GPS trace recorder, offline queue, wiring modules together |
 | WS3 Backend + data | `server/src/**` (except `coach/`), `apps/mobile/src/api/**` | Express API, MongoDB collections and indexes, trace storage, scoring, deployment, mobile API client |
 | WS4 Coaching + voice | `server/src/coach/**`, `apps/mobile/src/voice/**`, `scripts/alert-clips/**` | Gemini summary and prompt, ElevenLabs debrief, pre-generated alert clips, live alert player and cooldown |
-| UI (later phase) | `apps/mobile/src/ui/**` | Placeholder screens only until the UI phase |
+| UI | `apps/mobile/src/ui/**` | Screens, design tokens (`ui/theme.ts`), shared UI components (`ui/components/`), post-trip flow |
 
 If you do not know which workstream the current task belongs to, ask before editing anything.
 
@@ -48,13 +48,22 @@ Do not edit them unless the task explicitly says to. If your work needs a contra
 - Every module has a mock implementation in its `mocks/` folder. Use the other modules' mocks while they are unfinished. Switch between real and mock in `apps/mobile/src/wiring.ts` (WS2 owns it; other workstreams ask before editing).
 - Never import from another workstream's folder except its public `index.ts`.
 
-## UI rules (until the UI phase)
+## UI rules
 
-- No styling, design, animations, icons, or UI libraries.
-- Screens are plain React Native `View`, `Text`, `Button`, and `ScrollView` only.
-- No logic in `ui/`. Screens call hooks or functions exported from `trip/` and `api/` and render the results as plain text or JSON.
+The app keeps its existing screen structure: Start drive → Driving → Trip concluded, then the post-trip flow (Replay → Infractions → Driving growth → Coaching chat, with Back/Next between pages, `ui/lib/flow.ts`), plus Past drives, Progress, Settings and the Dev menu. Do not restructure screens or navigation; restyle only through tokens and shared components.
+
+**Look (teal design system on the existing structure)**
+- `apps/mobile/src/ui/theme.ts` is the single source of truth for color, spacing, radius, type sizes and the lip. No raw hex values outside `theme.ts`.
+- Teal is the main color (primary buttons, active states, route line, hero surfaces). Coral is rare and always means harsh-tier events or danger. Amber means coach-tier events. Pure `black`/`white` are only for road signs (`SpeedLimitSign`, `StopSign`).
+- No gradients, glassmorphism, blur, glow, or soft drop shadows. Depth comes only from the "lip": a solid bottom border one shade darker (`lip`, `edge` in `theme.ts`).
+- Buttons are `components/Button.tsx` (chunky face on a lip that presses down). Cards are `Card` in `components/primitives.tsx` (white, hairline border, `lip` for the one hero card on a screen).
+- Driving mode: dark theme (`drive*` colors), text at least 20, touch targets at least 64, and nothing the driver should read while moving.
+- Show `© OpenStreetMap contributors` (`OsmCredit`) wherever OSM street names or limits appear.
+
+**Boundaries**
+- No logic in `ui/`. Screens call hooks or functions exported from `trip/` and `api/`. If a screen needs data that does not exist, stop and ask.
 - Logic modules never import from `ui/`.
-- Each workstream may edit only its own debug screen: `apps/mobile/src/ui/dev/Ws1Debug.tsx` through `Ws4Debug.tsx`. Do not touch other screens.
+- Each workstream may edit only its own debug screen: `apps/mobile/src/ui/dev/Ws1Debug.tsx` through `Ws4Debug.tsx`.
 
 ## Out of scope (do not build, do not add hooks for)
 
