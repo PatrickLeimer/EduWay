@@ -15,6 +15,6 @@ Computes the trip score (0-100), per-type counts and stats in code (master doc �
 - Consumes: `RecordedEvent`, `TraceUpload`, `TripCounts`, `TripStats`, `SCORING`, `COUNT_KEY_BY_EVENT`.
 
 ## Done means (master doc §14)
-- [ ] Saturday afternoon: real `scoreTrip` with Vitest cases (no events → 100, phone use dominates, short-trip normalization).
-- [ ] `pctTimeSpeeding` from speeding durations over trip time.
+- [x] Saturday afternoon: real `scoreTrip` with Vitest cases (no events → 100, phone use dominates, short-trip normalization).
+- [x] `pctTimeSpeeding` from speeding durations over trip time.
 - [ ] `USE_REAL_SCORING=true` in the deployed server.
