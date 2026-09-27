@@ -13,7 +13,7 @@ master doc disagree, the master doc wins.
 
 - Only `apps/mobile/src/ui/**` changes. No edits to contracts, `wiring.ts`, or other workstreams.
 - **No new dependencies.** Everything is React Native core + `react-native-maps` (approved) + `expo-status-bar` (already installed). Expo Router, a bottom-sheet library, an icon set, SVG and custom fonts all need team approval first (root `CLAUDE.md`).
-- Screens get data only from `trip/` (`useTripState`, `useMapGps`, `TripSession` methods), `api/` (`useApiQuery`, `ApiClient`), and the `DebriefPlayer` contract on `modules.debrief` (voice playback on the debrief screen, §12 screen 3).
+- Screens get data only from `trip/` (`useTripState`, `useMapGps`, `TripSession` methods), `api/` (`useApiQuery`, `ApiClient`), and the `DebriefPlayer` contract on `modules.debrief` (voice playback and progress on the coach screen, §12 screen 3).
 - Pure display helpers (formatting, map math, replay math, link builders) live in `ui/lib/` with Vitest tests. No detection, scoring or threshold logic in `ui/`.
 - No new thresholds: nothing in the UI changes color based on a number it invents (e.g. the score ring has no good/bad bands).
 - `© OpenStreetMap contributors` appears on every screen that shows street names or speed limits (§8).
@@ -34,7 +34,7 @@ All tokens live in **`ui/theme.ts`**. Change the look there first.
 | `textMuted` | `#6B6B6B` | Secondary text |
 | `route` / `location` | `#1A73E8` (Maps blue) | Route line and car dot only |
 | `coach` / `harsh` | `#F9AB00` / `#D93025` | Event severity (tier), danger buttons |
-| `good` | `#1E8E3E` | Reserved for success states |
+| `good` / `goodSoft` | `#1E8E3E` / `#E6F4EA` | Success states; coach strength chips |
 | `driveBg` / `drivePanel` / `driveBorder` | `#0B0F14` / `#161B22` / `#2A313C` | Driving mode (always dark) |
 
 Type: system font. Speed number 96 pt; driving-mode text at least 20 pt; driving buttons at least 64 pt tall (`DRIVE_BUTTON_HEIGHT`). Radius 8–24, soft shadow (`shadow`). `SAFE_TOP`/`SAFE_BOTTOM` pad content away from the notch because there is no safe-area library.
@@ -42,14 +42,14 @@ Type: system font. Speed number 96 pt; driving-mode text at least 20 pt; driving
 ## 3. Screens and flows
 
 ```
-Home ──Drive──▶ Driving ──End (stopped 30 s)──▶ Drive complete ──Get feedback──▶ Feedback ──Watch replay──▶ Replay
- │                                                                                 ▲
- ├─Past drives──▶ trip cards ──tap───────────────────────────────────────────────────┘
+Home ──Drive──▶ Driving ──End (stopped 30 s)──▶ Trip concluded ──Next──▶ Replay ─▶ Infractions ─▶ Driving growth ─▶ Your coach ──Done──▶ Home
+ │                                                                         ▲
+ ├─Past drives──▶ trip cards ──tap─────────────────────────────────────────┘  (Done returns to Past drives)
  ├─Progress
  └─Settings ──Developer tools──▶ Dev menu (WS1–WS4 debug screens, drive recorder)
 ```
 
-Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, `driving`, `ended`, `result {tripId|null}`, `replay {tripId}`, `list`, `progress`, `settings`, plus the dev routes. Dev screens keep the old plain scrolling wrapper.
+Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, `driving`, `ended`, `replay` / `infractions` / `growth` / `coach` `{tripId, origin}`, `list`, `progress`, `settings`, plus the dev routes. Dev screens keep the old plain scrolling wrapper.
 
 ### Home / Start drive: `screens/StartDriveScreen.tsx` (§12.1)
 - Full-screen map following your location (`useMapGps`).
@@ -59,31 +59,44 @@ Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, 
 - Buttons for Past drives, Progress and Settings.
 
 ### Driving mode: `screens/DrivingScreen.tsx` (§12.2, §4, §7, §16)
-- Always dark. A dark map follows the car and **can't be touched** (`interactive={false}`).
-- Shows only: **speed** (large), **speed-limit sign** (from `latestRoad`; "est." when the limit is inferred), **street name**, **trip time**, **distance**, OSM credit.
-- **No event list and no visual alerts.** Speed never turns red over the limit. Live alerts are voice only (§7).
-- **End drive** is disabled and shows `canEnd().reason` until the car has been stopped for 30+ s (§4).
-- Every touch on the map/HUD/End area calls `trip.reportTouch()` (phone-use detection, §7).
+- Always dark and nearly blank. **No map** while driving (the map is shown only in Replay), and no speed, speed limit, street or distance.
+- Shows only: the **trip time** (96 pt) and a big **stop sign** (`components/StopSign.tsx`, drawn with Views) with **"EYES ON THE ROAD"** under it.
+- **No event list and no visual alerts.** The stop sign is a static reminder, not an alert. Live alerts are voice only (§7).
+- **End drive** is hidden until the car has been stopped for 30+ s (`canEnd()`), then appears at the bottom (§4).
+- Every touch on the screen (outside the top bar) calls `trip.reportTouch()` (phone-use detection, §7).
 - **Emergency 911** (asks to confirm, then dials) and **Directions** (opens Google Maps) sit in a separate top bar *outside* the touch-reporting view, so they are not reported as phone use (§4, §7 "other than emergency or navigation").
 - The Android back button is blocked while driving.
 - When the trip starts uploading → Drive complete. If starting fails → error with Back to home.
 
-### Drive complete: `screens/TripEndedScreen.tsx`
-- The route just recorded (`trip.getTrace()`), distance and time.
-- Uploading → spinner. Done → **Get feedback** button → Feedback. Queued (offline) → "saved on this phone, will upload automatically". Error → message + Back to home.
-- The **voice debrief still starts automatically** when coaching arrives (§4; `TripSession` plays it). The button opens the written debrief; it does not gate the audio.
+### Post-trip flow (§12.3): `lib/flow.ts`
+One screen at a time, each with step dots and a big **Next** (`components/FlowFooter.tsx`); Back goes to the previous step. The flow remembers where it started (`origin`): the drive that just ended finishes on **Home** (and resets the session), a past drive finishes on **Past drives**. Every step loads the trip with `api.getTrip(tripId)`.
 
-### Feedback / debrief: `screens/TripResultScreen.tsx` (§12.3)
-- Receipt layout: route map with event pins → date → **score ring** (neutral black, "not scored" for passenger trips) + distance/time tiles → **Play/Stop voice debrief** (`modules.debrief`) → **What went well** → **Focus next time** cards (skill, why, tip) → event list → OSM credit → "Scores are a coaching tool, not a certification of safety" (§16).
-- **Watch replay** pinned at the bottom.
-- `tripId: null` = the trip that just ended (from `TripSession` state); Back resets the session and returns Home. With a tripId it loads from `api.getTrip`, and Back returns to Past drives.
+### Trip concluded: `screens/TripEndedScreen.tsx`
+- Big loading state while the trip uploads and the server scores and coaches it: a breathing blue ring around a large spinner and the server's stages in order ("Saving your route… Scoring your drive… Your coach is reviewing your drive…").
+- Done → **score reveal** (large `ScoreRing`, "not scored" for passenger trips), distance and time, then **Next** → Replay. Queued (offline) → "saved on this phone, will upload automatically" + Back to home. Error → message + Back to home.
+- No map (the route is only shown in Replay).
 
-### Replay: `screens/ReplayScreen.tsx` (§9 "Replay", §12.4)
+### Replay: `screens/ReplayScreen.tsx` (§9 "Replay"), flow step 1
 - Full route line (`api.getTrace`), a car dot interpolated along it (`lib/replay.ts positionAt`), event pins that appear once playback reaches their timestamp, and a "just happened" event card.
 - Timeline: speed bars (48 buckets) with event ticks and a playhead. **Tap the timeline to seek.** Play/Pause, **1x / 4x / 10x**.
+- The only screen with a map in the drive flow. Next works while loading, so a missing trace never traps the user.
+
+### Infractions: `screens/InfractionsScreen.tsx`, flow step 2
+- Summary card: the number of things to work on, split into serious (harsh) and minor (coach). Zero → "Clean drive".
+- Every event in time order (`EventRow`): minutes into the drive, street, speed, limit, "voice alert played". OSM credit.
+
+### Driving growth: `screens/GrowthScreen.tsx`, flow step 3
+- **Placeholder** for the future game-style progress: a blue "Coming soon" hero (level badge, empty progress track) and locked badge ideas (Smooth Stopper, Phone-Free Streak, Speed Keeper, Road Test Ready). Nothing is computed yet: no invented numbers (rule in §1).
+
+### Your coach: `screens/CoachScreen.tsx` (§10, §11), flow step 4
+- The Gemini coaching as a **chat**: header with the coach's avatar and name (**Coach Chris**, the ElevenLabs voice), live status ("Talking…" with sound bars, "Paused", "Finished"). Messages appear as left-aligned bubbles on a light gray background; a typing indicator shows just before each one. The student only listens; there is no input.
+- **Voice sync:** the ElevenLabs debrief (`modules.debrief`) starts automatically; each bubble appears when the voice starts saying it, using `CoachOutput.chat_audio_starts_s` from the server (fallbacks in `lib/chat.ts`: spread by length over the audio, or a reading pace with no audio). If the audio doesn't start within 8 s, the chat plays out at reading pace.
+- Controls: **Pause/Resume**, **Replay**, **Show all**. When the coach finishes, a **Your takeaways** card shows the focus areas (skill + tip) and strength chips.
+- Passenger trip or no coaching → one friendly bubble explaining why. **Done** → Home (or Past drives).
+- Older trips without `chat` use the short summary split into sentences.
 
 ### Past drives: `screens/TripListScreen.tsx`
-- Uber-style cards: static route preview (`routePreview`, Android `liteMode`), date, distance, duration, event count, score. Tap → Feedback.
+- Uber-style cards: static route preview (`routePreview`, Android `liteMode`), date, distance, duration, event count, score. Tap → the post-trip flow (Replay first).
 
 ### Progress: `screens/ProgressScreen.tsx` (§12.5)
 - Test-readiness card, score trend (plain bars, no chart library), per-skill totals and per-10-mi rates, recurring spots on a map + list. All numbers come from `GET /progress`.
@@ -93,7 +106,7 @@ Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, 
 
 ### Test drive mode (presentations)
 - Off by default: the app uses real GPS, sensors, server and voice (`wiring.ts USE_REAL`).
-- On (Settings or Developer tools): the next drive uses `wiring.ts DEMO_FLAGS`. GPS replays the recorded ~3-minute fixture drive (Miami) and detection replays its events, while road data, voice alerts and the server stay real. You get real alert clips and a real Gemini + ElevenLabs debrief with the phone sitting on a table. The fixture ends parked for 35 s, so **End drive** unlocks at the end.
+- On (Settings or Developer tools): the next drive uses `wiring.ts DEMO_FLAGS`. GPS replays the recorded ~3-minute fixture drive (Miami) and detection replays its events, while road data, voice alerts and the server stay real (`DEMO_FLAGS.api` is true). You get real alert clips and real Gemini coaching on the synthetic drive with the phone sitting on a table. The phone must reach `EXPO_PUBLIC_API_URL`; if it can't, the trip is queued instead. The fixture ends parked for 35 s, so **End drive** unlocks at the end.
 - `Root.tsx` swaps to `getDemoModules()` while the switch is on. The switch is locked while a trip is running. Home and Driving show a yellow **TEST DRIVE** badge.
 - Test drives upload to the server like real ones, so they appear in Past drives and Progress.
 
@@ -124,9 +137,11 @@ Navigation is state-based (`ui/navigation.ts`, `ui/Root.tsx`). Routes: `start`, 
 | `TestDriveToggle.tsx` / `TestDriveBadge.tsx` | Test drive switch (locked mid-trip) and the yellow badge. |
 | `ScoreRing.tsx` | Score badge (neutral color on purpose). |
 | `SpeedLimitSign.tsx` | US speed-limit sign; never changes color. |
+| `FlowFooter.tsx` | Step dots + big Next/Done for the post-trip flow. |
+| `StopSign.tsx` | Red octagon stop sign drawn with plain Views (a square clipped by the same square turned 45°), used on the Driving screen. |
 | `EventRow.tsx` | One event: tier dot, label, street, speed, limit, "voice alert played". |
 
-Helpers (`ui/lib/`, all tested): `format.ts` (labels, mph, clock, durations, dates), `geo.ts` (GeoJSON ↔ map points, fit region), `replay.ts` (position at time, event offsets, speed buckets), `links.ts` (directions URL, emergency number), `transitions.ts` (which way a screen change animates).
+Helpers (`ui/lib/`, all tested): `format.ts` (labels, mph, clock, durations, dates), `geo.ts` (GeoJSON ↔ map points, fit region), `replay.ts` (position at time, event offsets, speed buckets), `links.ts` (directions URL, emergency number), `transitions.ts` (which way a screen change animates), `flow.ts` (post-trip step order, Next/Back targets), `chat.ts` (when each coach bubble appears).
 
 ### Motion
 
@@ -138,10 +153,11 @@ Built on React Native's `Animated` API (no library), native driver, cubic ease-o
 | Every light screen | Title, then map, then content, then footer enter in sequence. |
 | Buttons, cards, back button | Shrink while held, spring back on release. |
 | Home | Sheet slides up over the map; top bar drops in. |
-| Driving | Speed panel settles in, bottom panel rises; a new street name fades in with no movement (nothing moves while driving beyond that). |
-| Drive complete | Each status (saving → ready) animates in. |
+| Driving | Trip time fades in, then the stop sign settles in; End drive rises in once allowed (nothing moves while driving beyond that). |
+| Trip concluded | Ring breathes behind the spinner; each stage fades in; the score pops in. |
 | Past drives | Cards glide up one after another (staggered, capped at 8). |
-| Feedback | Score pops in, strengths slide in, focus cards and events stagger in. |
+| Infractions / Growth | Summary card scales in; rows and badges stagger in. |
+| Your coach | Each bubble fades up as it's spoken; typing dots pulse; sound bars move while talking; takeaways slide in at the end. |
 | Replay | Speed bars grow left to right; each new event card pops in. |
 | Progress | Score bars grow up, skill rows stagger in. |
 

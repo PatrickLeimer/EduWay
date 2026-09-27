@@ -1,30 +1,37 @@
 /**
- * Screen 2 (§12): Driving mode. Always dark, glanceable, CarPlay-like:
- * map that follows the car, speed, speed limit, trip time and distance.
+ * Screen 2 (§12): Driving mode. A near-blank dark screen with only the trip
+ * time and a big stop sign reading "Eyes on the road". No map, speed or street
+ * while driving: the map is shown only in Replay.
  *
  * Rules from the master doc this screen follows:
  * - No event list and no visual alerts: live alerts are voice only (§7).
- * - Nothing needs a tap while moving (§16). The map is not interactive.
+ * - Nothing needs a tap while moving (§16).
  * - Every touch is reported for phone-use detection (§7), except Emergency
  *   and Directions, which always stay available (§4). Those live outside the
  *   touch-reporting view on purpose.
- * - End only after being stopped 30+ s; TripSession.canEnd() says why not (§4).
+ * - End only after being stopped 30+ s (§4); the button appears only then.
  */
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Alert, BackHandler, Linking, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  BackHandler,
+  Linking,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
 import { useTripState } from '../../trip';
 import { Button } from '../components/Button';
-import { MapCanvas } from '../components/MapCanvas';
 import { FadeIn } from '../components/motion';
-import { OsmCredit } from '../components/primitives';
-import { SpeedLimitSign } from '../components/SpeedLimitSign';
+import { StopSign } from '../components/StopSign';
 import { TestDriveBadge } from '../components/TestDriveBadge';
-import { clockText, speedMphText } from '../lib/format';
+import { clockText } from '../lib/format';
 import { directionsUrl, EMERGENCY_NUMBER, emergencyUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
-import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
+import { colors, font, motion, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 
 /** Re-renders once a second so the trip clock ticks. */
 function useNow(): number {
@@ -41,6 +48,8 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
   const state = useTripState(trip);
   const now = useNow();
   const canEnd = trip.canEnd();
+  const { width } = useWindowDimensions();
+  const signSize = Math.min(width * 0.72, 320);
 
   // Once End is accepted the trip uploads; the ended screen shows progress.
   useEffect(() => {
@@ -55,9 +64,6 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
     return () => sub.remove();
   }, []);
 
-  const fix = state.latestFix;
-  const here = fix ? { latitude: fix.lat, longitude: fix.lon } : null;
-  const road = state.latestRoad;
   const elapsedS = state.tripStartedAt ? (now - Date.parse(state.tripStartedAt)) / 1000 : 0;
 
   const callEmergency = () =>
@@ -90,69 +96,33 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
       <StatusBar style="light" />
 
       {/* Everything in here counts as a phone touch while moving (§7). */}
-      <View style={styles.fill} onTouchStart={() => trip.reportTouch()}>
-        <MapCanvas
-          style={StyleSheet.absoluteFill}
-          follow={here}
-          car={here}
-          dark
-          interactive={false}
-        />
-
-        <FadeIn style={styles.hud} delay={motion.normal} fromScale={0.94} fromY={0}>
-          <View style={styles.speedBox}>
-            <Text style={styles.speed}>{speedMphText(fix?.speedMps)}</Text>
-            <Text style={styles.unit}>mph</Text>
-          </View>
-          <View style={styles.limitBox}>
-            <SpeedLimitSign
-              limitMph={road?.limitMph ?? null}
-              confidence={road?.limitConfidence ?? null}
-            />
-          </View>
+      <View style={[styles.fill, styles.center]} onTouchStart={() => trip.reportTouch()}>
+        <FadeIn style={styles.center} delay={motion.normal} fromY={0}>
+          <Text style={styles.time} allowFontScaling={false}>
+            {clockText(elapsedS)}
+          </Text>
+          <Text style={styles.timeLabel}>
+            {state.status === 'starting' ? 'Starting drive…' : 'Trip time'}
+          </Text>
         </FadeIn>
-        {/* A new street name fades in quietly (keyed), no movement to distract. */}
-        {road?.street ? (
-          <FadeIn key={road.street} style={styles.streetPill} fromY={0}>
-            <Text style={styles.street} numberOfLines={1}>
-              {road.street}
-            </Text>
+
+        <FadeIn style={styles.sign} delay={motion.slow} fromScale={0.94} fromY={0}>
+          <StopSign size={signSize} />
+          <Text style={styles.eyes} allowFontScaling={false}>
+            EYES ON THE ROAD
+          </Text>
+        </FadeIn>
+
+        {canEnd.ok && state.status !== 'starting' ? (
+          <FadeIn style={styles.bottom} fromY={40}>
+            <Button title="End drive" variant="danger" large onPress={() => void trip.end()} />
           </FadeIn>
         ) : null}
-
-        <FadeIn style={styles.bottom} delay={motion.normal} fromY={60} duration={motion.slow}>
-          <View style={styles.stats}>
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{clockText(elapsedS)}</Text>
-              <Text style={styles.statLabel}>time</Text>
-            </View>
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{state.distanceMi.toFixed(1)}</Text>
-              <Text style={styles.statLabel}>miles</Text>
-            </View>
-          </View>
-          {state.status === 'starting' ? (
-            <Text style={styles.status}>Starting drive…</Text>
-          ) : (
-            <Button
-              title={canEnd.ok ? 'End drive' : (canEnd.reason ?? 'Stop to end the drive')}
-              variant={canEnd.ok ? 'danger' : 'onDark'}
-              large
-              disabled={!canEnd.ok}
-              onPress={() => void trip.end()}
-            />
-          )}
-          <OsmCredit dark />
-        </FadeIn>
       </View>
 
       {/* Always available, not reported as phone use (§4, §7). */}
-      <FadeIn style={styles.safetyBar} delay={motion.screen} fromY={-12}>
-        {settings.demoMode ? (
-          <TestDriveBadge />
-        ) : state.options?.lockEnabled ? (
-          <Text style={styles.lock}>Driving lock on</Text>
-        ) : null}
+      <View style={styles.safetyBar}>
+        {settings.demoMode ? <TestDriveBadge /> : null}
         <View style={styles.safetyButtons}>
           <Button
             title="Directions"
@@ -165,67 +135,31 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
             onPress={callEmergency}
           />
         </View>
-      </FadeIn>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.driveBg },
-  center: { alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.lg },
   fill: { flex: 1 },
-  hud: {
-    marginTop: SAFE_TOP + 64,
-    marginHorizontal: space.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  center: { alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.lg },
+  time: {
+    fontSize: font.speed,
+    fontWeight: '800',
+    color: colors.textOnDark,
+    fontVariant: ['tabular-nums'],
   },
-  speedBox: {
-    backgroundColor: colors.drivePanel,
-    borderRadius: radius.xl,
-    paddingHorizontal: space.xl,
-    paddingVertical: space.sm,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.driveBorder,
-  },
-  speed: { fontSize: font.speed, fontWeight: '800', color: colors.textOnDark, lineHeight: 104 },
-  unit: { fontSize: font.driveMin, color: colors.textOnDarkMuted, marginTop: -8 },
-  limitBox: { alignSelf: 'flex-start' },
-  streetPill: {
-    alignSelf: 'flex-start',
-    marginTop: space.md,
-    marginHorizontal: space.lg,
-    backgroundColor: colors.drivePanel,
-    borderRadius: radius.pill,
-    paddingHorizontal: space.lg,
-    paddingVertical: space.sm,
-    maxWidth: '90%',
-  },
-  street: { fontSize: font.driveMin, color: colors.textOnDark, fontWeight: '600' },
-  bottom: {
-    position: 'absolute',
-    left: space.lg,
-    right: space.lg,
-    bottom: SAFE_BOTTOM,
-    backgroundColor: colors.drivePanel,
-    borderRadius: radius.xl,
-    padding: space.lg,
-    borderWidth: 1,
-    borderColor: colors.driveBorder,
-    gap: space.md,
-  },
-  stats: { flexDirection: 'row' },
-  stat: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 32, fontWeight: '700', color: colors.textOnDark },
-  statLabel: { fontSize: font.driveMin, color: colors.textOnDarkMuted },
-  status: {
-    fontSize: font.driveMin,
-    color: colors.textOnDarkMuted,
+  timeLabel: { fontSize: font.driveMin, color: colors.textOnDarkMuted, marginTop: -space.sm },
+  sign: { alignItems: 'center', gap: space.xl, marginTop: space.xl },
+  eyes: {
+    fontSize: 40,
+    fontWeight: '900',
+    color: colors.textOnDark,
     textAlign: 'center',
-    paddingVertical: space.lg,
+    letterSpacing: 1,
   },
+  bottom: { position: 'absolute', left: space.lg, right: space.lg, bottom: SAFE_BOTTOM },
   safetyBar: {
     position: 'absolute',
     top: SAFE_TOP,
@@ -233,9 +167,7 @@ const styles = StyleSheet.create({
     right: space.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
-  lock: { fontSize: font.small, color: colors.textOnDarkMuted },
   safetyButtons: { flexDirection: 'row', gap: space.sm, marginLeft: 'auto' },
   errorTitle: { fontSize: font.title, fontWeight: '700', color: colors.textOnDark },
   errorText: { fontSize: font.body, color: colors.textOnDarkMuted, textAlign: 'center' },

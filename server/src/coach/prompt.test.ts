@@ -30,9 +30,20 @@ describe('buildSystemPrompt (§10 guidelines)', () => {
     expect(prompt).toMatch(/Phone use: treat it seriously but do not lecture/);
   });
 
-  it('caps focus areas and debrief length from COACH', () => {
+  it('caps focus areas, chat and summary length from COACH', () => {
     expect(prompt).toContain(`1 to ${COACH.maxFocusAreas}`);
-    expect(prompt).toContain(`Under ${COACH.maxDebriefWords} words`);
+    expect(prompt).toContain(`${COACH.chatMinMessages} to ${COACH.chatMaxMessages} messages`);
+    expect(prompt).toContain(`under ${COACH.maxChatWords} words`);
+    expect(prompt).toContain(`under ${COACH.maxDebriefWords} words`);
+  });
+
+  it('asks for a conversational, personable coach, not a report', () => {
+    expect(prompt).toMatch(/Sound like a real person, not a report or a bot/);
+    expect(prompt).toMatch(/Never read out lists, labels, or headings/);
+    expect(prompt).toMatch(/No questions that expect an answer/);
+    expect(prompt).toMatch(/Never say "logged", "detected", "recorded"/);
+    expect(prompt).toMatch(/Always use contractions/);
+    expect(prompt).toMatch(/Copy the voice, never its facts/);
   });
 
   it('compares with history and recurring spots', () => {

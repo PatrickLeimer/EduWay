@@ -2,6 +2,7 @@
  * Screen 4 (§12, §9 "Replay"): full route, a car that moves along it, event
  * pins that pop in at their timestamps, and a speed timeline with a scrub bar
  * and 1x / 4x / 10x playback. Shows what was recorded; never re-runs detection.
+ * Step 1 of the post-trip flow (lib/flow.ts); the only screen with a map.
  *
  * Known gap: the trace stores speed only, not the limit at each second, so the
  * timeline shows speed plus event ticks. A true "speed vs limit" line needs a
@@ -14,10 +15,12 @@ import { useApiQuery } from '../../api';
 import { Button } from '../components/Button';
 import { ConnectionError } from '../components/ConnectionError';
 import { EventRow } from '../components/EventRow';
+import { FlowFooter } from '../components/FlowFooter';
 import { MapCanvas } from '../components/MapCanvas';
 import { FadeIn, GrowBar } from '../components/motion';
 import { Muted, OsmCredit } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { nextRoute, prevRoute } from '../lib/flow';
 import { clockText } from '../lib/format';
 import { pointFromGeo, pointsFromTrace } from '../lib/geo';
 import {
@@ -28,7 +31,7 @@ import {
   traceDurationS,
   type ReplaySpeed,
 } from '../lib/replay';
-import type { ScreenProps } from '../navigation';
+import type { FlowOrigin, ScreenProps } from '../navigation';
 import { colors, font, motion, radius, space } from '../theme';
 
 const TICK_MS = 200;
@@ -36,7 +39,12 @@ const BARS = 48;
 /** How long an event stays in the "just happened" card, in replay seconds. */
 const EVENT_CARD_S = 8;
 
-export function ReplayScreen({ modules, navigate, tripId }: ScreenProps & { tripId: string }) {
+export function ReplayScreen({
+  modules,
+  navigate,
+  tripId,
+  origin,
+}: ScreenProps & { tripId: string; origin: FlowOrigin }) {
   const tripQ = useApiQuery(`trip:${tripId}`, () => modules.api.getTrip(tripId));
   const traceQ = useApiQuery(`trace:${tripId}`, () => modules.api.getTrace(tripId));
 
@@ -68,12 +76,13 @@ export function ReplayScreen({ modules, navigate, tripId }: ScreenProps & { trip
     return () => clearInterval(id);
   }, [running, speed, durationS]);
 
-  const back = () => navigate({ name: 'result', tripId });
+  const back = () => navigate(prevRoute('replay', tripId, origin));
+  const next = () => navigate(nextRoute('replay', tripId, origin));
 
   if (!trace || !trip) {
     const error = tripQ.error ?? traceQ.error;
     return (
-      <Screen title="Replay" onBack={back}>
+      <Screen title="Replay" onBack={back} footer={<FlowFooter step="replay" onPress={next} />}>
         {error ? (
           <ConnectionError
             error={error}
@@ -112,7 +121,8 @@ export function ReplayScreen({ modules, navigate, tripId }: ScreenProps & { trip
     <Screen
       title="Replay"
       onBack={back}
-      backLabel="Feedback"
+      backLabel={origin === 'trip' ? 'Summary' : 'Past drives'}
+      footer={<FlowFooter step="replay" onPress={next} />}
       hero={<MapCanvas style={styles.map} route={route} fitTo={route} pins={pins} car={car} />}
     >
       <View style={styles.eventSlot}>

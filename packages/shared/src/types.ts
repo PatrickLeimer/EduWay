@@ -204,8 +204,20 @@ export const CoachOutputSchema = z.object({
   strengths: z.array(z.string()),
   /** 1 to 2 most important areas (§10 prompt guidelines). */
   focus_areas: z.array(z.object({ skill: z.string(), why: z.string(), tip: z.string() })),
-  /** Spoken by ElevenLabs; keep under ~60 words. */
+  /** Short written summary of the coaching; keep under ~60 words. */
   debrief_script: z.string(),
+  /**
+   * The coaching conversation (§10 "Output", §11): 6 to 10 short, friendly
+   * messages from the coach, shown as chat bubbles and spoken by ElevenLabs.
+   * Optional so trips coached before it existed still parse.
+   */
+  chat: z.array(z.string()).optional(),
+  /**
+   * Seconds into the debrief audio where each `chat` message starts, from
+   * ElevenLabs timings. Set by the server, never by Gemini. Lets the app show
+   * each bubble as the coach says it.
+   */
+  chat_audio_starts_s: z.array(z.number().nonnegative()).optional(),
 });
 export type CoachOutput = z.infer<typeof CoachOutputSchema>;
 

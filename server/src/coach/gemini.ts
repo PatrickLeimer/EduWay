@@ -16,21 +16,33 @@ export interface GeminiOptions {
   model: string;
 }
 
-/** What Gemini must return, generated from the shared schema so the two cannot drift. */
-export const COACH_RESPONSE_JSON_SCHEMA = z.toJSONSchema(CoachOutputSchema);
+/**
+ * What Gemini must return: the shared schema with `chat` required and the
+ * server-set audio timings left out. Built from CoachOutputSchema so the two
+ * cannot drift.
+ */
+const GeminiReplySchema = CoachOutputSchema.omit({ chat_audio_starts_s: true }).extend({
+  chat: z.array(z.string().min(1)).min(1),
+});
+export const COACH_RESPONSE_JSON_SCHEMA = z.toJSONSchema(GeminiReplySchema);
 
 /**
- * The student is waiting at trip end, so keep the worst case bounded.
- * Retries cover the free tier's frequent 503 "high demand" and 429 replies
- * (the SDK's default retryable codes: 408, 429, 5xx).
+ * Tried in order after GEMINI_MODEL when it fails. The free tier often answers
+ * 503 "high demand" for one model while others still work. Same generation as
+ * the main model, checked for quality on the fixture summary. No "-latest"
+ * aliases: they can change model without notice.
+ */
+export const GEMINI_FALLBACK_MODELS = ['gemini-3.7-flash', 'gemini-3.6-flash'] as const;
+
+/**
+ * The student is waiting on the Trip concluded screen, so keep the worst case
+ * bounded. One call per model, no SDK retries: a 429 means that model's quota
+ * is used up (retrying only waits), and a busy 503 can take ~10 s to come back,
+ * so moving on to the next model is faster than retrying the same one.
  */
 export const GEMINI_HTTP = {
-  /** Per attempt, not total. */
-  timeoutMs: 20_000,
-  /** Including the first call. */
-  attempts: 3,
-  initialDelayS: 1,
-  maxDelayS: 4,
+  /** Per model. */
+  timeoutMs: 25_000,
 } as const;
 
 export async function generateCoaching(
@@ -40,31 +52,46 @@ export async function generateCoaching(
   const { GoogleGenAI } = await import('@google/genai');
   const ai = new GoogleGenAI({
     apiKey: opts.apiKey,
-    httpOptions: {
-      timeout: GEMINI_HTTP.timeoutMs,
-      retryOptions: {
-        attempts: GEMINI_HTTP.attempts,
-        initialDelay: GEMINI_HTTP.initialDelayS,
-        maxDelay: GEMINI_HTTP.maxDelayS,
-      },
-    },
+    httpOptions: { timeout: GEMINI_HTTP.timeoutMs },
   });
-  const res = await ai.models.generateContent({
-    model: opts.model,
-    contents: JSON.stringify(summary),
-    config: {
-      systemInstruction: buildSystemPrompt(),
-      responseMimeType: 'application/json',
-      responseJsonSchema: COACH_RESPONSE_JSON_SCHEMA,
-    },
-  });
-  return parseCoachReply(res.text);
+  const models = [...new Set([opts.model, ...GEMINI_FALLBACK_MODELS])];
+  let lastError: unknown;
+  for (const model of models) {
+    try {
+      const res = await ai.models.generateContent({
+        model,
+        contents: JSON.stringify(summary),
+        config: {
+          systemInstruction: buildSystemPrompt(),
+          responseMimeType: 'application/json',
+          responseJsonSchema: COACH_RESPONSE_JSON_SCHEMA,
+        },
+      });
+      return parseCoachReply(res.text);
+    } catch (e) {
+      lastError = e;
+      console.warn(
+        `[coach] ${model} failed, ${model === models.at(-1) ? 'giving up' : 'trying next model'}:`,
+        errorSummary(e),
+      );
+    }
+  }
+  throw lastError;
+}
+
+function errorSummary(e: unknown): string {
+  if (e && typeof e === 'object' && 'status' in e) return `HTTP ${String(e.status)}`;
+  return e instanceof Error ? e.message.slice(0, 200) : String(e);
 }
 
 /** Validates Gemini's JSON text. Throws on empty, non-JSON, or off-schema replies. */
 export function parseCoachReply(text: string | undefined): CoachOutput {
   if (!text) throw new Error('Gemini returned no text');
-  const coach = CoachOutputSchema.parse(JSON.parse(text));
-  // The prompt asks for at most COACH.maxFocusAreas (§10); enforce it rather than trust it.
-  return { ...coach, focus_areas: coach.focus_areas.slice(0, COACH.maxFocusAreas) };
+  const coach = GeminiReplySchema.parse(JSON.parse(text));
+  // The prompt sets these limits (§10); enforce them rather than trust them.
+  return {
+    ...coach,
+    focus_areas: coach.focus_areas.slice(0, COACH.maxFocusAreas),
+    chat: coach.chat.slice(0, COACH.chatMaxMessages),
+  };
 }

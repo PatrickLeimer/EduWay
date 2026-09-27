@@ -26,6 +26,8 @@ export const colors = {
 
   // Meaning only: event severity (tier) and success states
   good: '#1E8E3E',
+  /** Background for success chips (coach strengths). */
+  goodSoft: '#E6F4EA',
   coach: '#F9AB00',
   harsh: '#D93025',
 

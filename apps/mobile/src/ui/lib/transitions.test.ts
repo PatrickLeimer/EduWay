@@ -5,10 +5,13 @@ import { routeKey, transitionFor } from './transitions';
 describe('transitionFor', () => {
   it('slides forward into deeper screens and back out of them', () => {
     expect(transitionFor('start', 'list')).toBe('forward');
-    expect(transitionFor('list', 'result')).toBe('forward');
-    expect(transitionFor('result', 'replay')).toBe('forward');
-    expect(transitionFor('replay', 'result')).toBe('back');
-    expect(transitionFor('result', 'start')).toBe('back');
+    expect(transitionFor('list', 'replay')).toBe('forward');
+    expect(transitionFor('ended', 'replay')).toBe('forward');
+    expect(transitionFor('replay', 'infractions')).toBe('forward');
+    expect(transitionFor('infractions', 'growth')).toBe('forward');
+    expect(transitionFor('growth', 'coach')).toBe('forward');
+    expect(transitionFor('coach', 'growth')).toBe('back');
+    expect(transitionFor('coach', 'start')).toBe('back');
   });
 
   it('rises into driving mode and fades out of it', () => {
@@ -23,8 +26,7 @@ describe('transitionFor', () => {
 
 describe('routeKey', () => {
   it('includes the trip id so two trips animate separately', () => {
-    expect(routeKey({ name: 'result', tripId: 'a' })).toBe('result:a');
-    expect(routeKey({ name: 'result', tripId: null })).toBe('result:current');
+    expect(routeKey({ name: 'coach', tripId: 'a', origin: 'trip' })).toBe('coach:a');
     expect(routeKey({ name: 'list' })).toBe('list');
   });
 });

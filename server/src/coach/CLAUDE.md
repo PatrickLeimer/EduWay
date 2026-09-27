@@ -21,9 +21,9 @@ Builds the compact trip summary (master doc §10 "Input"), asks Gemini for struc
 | `service.ts` | Done: Gemini → ElevenLabs with graceful fallbacks |
 | `promptContext.ts` | Done: thresholds rendered for the prompt |
 | `summary.ts` | Done: reproduces `fixtures/trip-summary.json` from the fixture trip (tested) |
-| `prompt.ts` | Done: §10 guidelines, voice rules kept separate for tuning (tested) |
-| `gemini.ts` | Done: JSON mode + schema from `CoachOutputSchema`, reply validated, SDK retries on 429/5xx (tested with a fake SDK) |
-| `elevenlabs.ts` | STUB: TTS + audio hosting (open decision) |
+| `prompt.ts` | Done: §10 guidelines + conversational chat rules and a style example (tested) |
+| `gemini.ts` | Done: JSON mode (chat required), reply validated, falls back through `GEMINI_FALLBACK_MODELS` one call each (tested with a fake SDK) |
+| `elevenlabs.ts` | Done: chat voiced as one track with character timings → `chat_audio_starts_s`; mp3 saved to `server/audio`, served at `/audio` (tested) |
 | `mocks/` | Fixture coaching + fake audio URL |
 
 ## Done means (master doc §14)

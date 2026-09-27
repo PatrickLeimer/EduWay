@@ -4,14 +4,19 @@
  */
 import type { AppModules } from '../wiring';
 
+/** Where the post-trip flow started: the drive that just ended, or Past drives (lib/flow.ts). */
+export type FlowOrigin = 'trip' | 'history';
+
 export type Route =
   | { name: 'start' }
   | { name: 'driving' }
-  /** Trip just ended: upload status + "Get feedback" button. */
+  /** Trip concluded: loading while it uploads and is coached, then the score and Next. */
   | { name: 'ended' }
-  /** Debrief. tripId null = the trip that just ended (from TripSession state). */
-  | { name: 'result'; tripId: string | null }
-  | { name: 'replay'; tripId: string }
+  // Post-trip flow, one step at a time (lib/flow.ts, §12 screen 3).
+  | { name: 'replay'; tripId: string; origin: FlowOrigin }
+  | { name: 'infractions'; tripId: string; origin: FlowOrigin }
+  | { name: 'growth'; tripId: string; origin: FlowOrigin }
+  | { name: 'coach'; tripId: string; origin: FlowOrigin }
   | { name: 'list' }
   | { name: 'progress' }
   | { name: 'settings' }

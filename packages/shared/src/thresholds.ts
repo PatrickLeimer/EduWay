@@ -201,7 +201,12 @@ export const SCORING = {
 
 export const COACH = {
   maxFocusAreas: 2,
+  /** Written summary (debrief_script). */
   maxDebriefWords: 60,
+  /** Coaching chat (§10 "Output"): message count and total spoken words. ~900 ElevenLabs characters per trip. */
+  chatMinMessages: 6,
+  chatMaxMessages: 10,
+  maxChatWords: 160,
   historyScores: 5,
   /** Same type within this radius on ≥ minCount trips = recurring spot. TODO(WS3): tune. */
   recurringSpotRadiusM: 50,
