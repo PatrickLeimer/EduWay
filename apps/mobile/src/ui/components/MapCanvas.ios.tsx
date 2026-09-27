@@ -64,6 +64,7 @@ function MapMessage({
 function GoogleWebMap({
   style,
   route,
+  routes,
   pins,
   car,
   follow,
@@ -91,6 +92,7 @@ function GoogleWebMap({
 
   const state: WebMapState = {
     route: route ?? [],
+    routes: routes ?? [],
     pins: pins ?? [],
     car: car ?? null,
     follow: follow ?? null,

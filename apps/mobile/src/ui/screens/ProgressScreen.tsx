@@ -1,26 +1,36 @@
 /**
- * Screen 5 (§12): Progress. Score trend (simple bars, no chart library), test
- * readiness, per-skill totals and recurring spots on the map. All numbers come
- * from GET /progress; this screen only draws them.
+ * Screen 5 (§12): Progress. Score trend over time, test readiness, per-skill
+ * totals and recurring spots on the map. Numbers come from GET /progress.
+ * Route lines come from each trip's routePreview (GET /trips). This screen only draws them.
  */
-import { DEMO_USER_ID, EVENT_TYPES } from '@edudriver/shared';
+import { DEMO_USER_ID, EVENT_TYPES, type TripListItem } from '@edudriver/shared';
+import { useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
 import { ConnectionError } from '../components/ConnectionError';
 import { MapCanvas } from '../components/MapCanvas';
-import { FadeIn, GrowBar, staggerDelay } from '../components/motion';
+import { FadeIn, staggerDelay } from '../components/motion';
 import { Card, Muted, OsmCredit, SectionTitle } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { ScoreTrendChart } from '../components/ScoreTrendChart';
 import { EVENT_LABEL } from '../lib/format';
-import { pointFromGeo } from '../lib/geo';
+import { pointFromGeo, pointsFromLine, type MapPoint } from '../lib/geo';
 import type { ScreenProps } from '../navigation';
 import { colors, font, fonts, motion, radius, space } from '../theme';
 
+/** One polyline per trip. A single joined line would draw straight shots between drives. */
+function routeLines(trips: TripListItem[]): MapPoint[][] {
+  return trips.map((trip) => pointsFromLine(trip.routePreview)).filter((line) => line.length > 1);
+}
+
 export function ProgressScreen({ modules, navigate }: ScreenProps) {
   const { data, error, reload } = useApiQuery('progress', () =>
-    modules.api.getProgress(DEMO_USER_ID),
+    Promise.all([modules.api.getProgress(DEMO_USER_ID), modules.api.listTrips(DEMO_USER_ID)]).then(
+      ([progress, list]) => ({ progress, trips: list.trips }),
+    ),
   );
+  const routes = useMemo(() => (data ? routeLines(data.trips) : []), [data]);
   const home = () => navigate({ name: 'start' });
 
   if (!data) {
@@ -35,22 +45,23 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
     );
   }
 
-  const scored = data.scores.filter((s) => s.score != null);
-  const spots = data.recurringSpots.map((s, i) => ({
+  const { progress } = data;
+  const spots = progress.recurringSpots.map((s, i) => ({
     id: String(i),
     ...pointFromGeo(s.location),
     color: colors.harsh,
     title: `${EVENT_LABEL[s.type]} ×${s.count}`,
     description: s.street,
   }));
+  const fitTo = [...routes.flat(), ...spots];
 
   return (
     <Screen title="Progress" onBack={home} backLabel="Home">
       <Card style={styles.readiness}>
         <Text style={styles.readyTitle}>
-          {data.testReadiness.ready ? 'Looking test-ready' : 'Not test-ready yet'}
+          {progress.testReadiness.ready ? 'Looking test-ready' : 'Not test-ready yet'}
         </Text>
-        {data.testReadiness.notes.map((n) => (
+        {progress.testReadiness.notes.map((n) => (
           <Text key={n} style={styles.note}>
             • {n}
           </Text>
@@ -58,25 +69,11 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
       </Card>
 
       <SectionTitle>Score trend</SectionTitle>
-      {scored.length === 0 ? (
-        <Muted>Scores show up after your first scored drive.</Muted>
-      ) : (
-        <View style={styles.chart}>
-          {scored.map((s, i) => (
-            <View key={s.tripId} style={styles.col}>
-              <Text style={styles.colValue}>{Math.round(s.score ?? 0)}</Text>
-              <GrowBar
-                delay={staggerDelay(i, motion.normal)}
-                style={[styles.colBar, { height: `${Math.max(4, s.score ?? 0)}%` }]}
-              />
-            </View>
-          ))}
-        </View>
-      )}
+      <ScoreTrendChart trips={progress.qualifyingTrips} />
 
       <SectionTitle>Skills</SectionTitle>
       {EVENT_TYPES.map((type, i) => {
-        const skill = data.skills[type];
+        const skill = progress.skills[type];
         if (!skill) return null;
         return (
           <FadeIn key={type} delay={staggerDelay(i, motion.slow)} style={styles.skillRow}>
@@ -89,16 +86,31 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
       })}
 
       <SectionTitle>Recurring spots</SectionTitle>
-      {spots.length === 0 ? (
+      {spots.length === 0 && routes.length === 0 ? (
         <Muted>No repeat trouble spots. Nice.</Muted>
       ) : (
         <>
-          <MapCanvas style={styles.map} pins={spots} fitTo={spots} />
-          {data.recurringSpots.map((s, i) => (
-            <Text key={i} style={styles.spot}>
-              {EVENT_LABEL[s.type]} on {s.street} · {s.count} drives
-            </Text>
-          ))}
+          <MapCanvas style={styles.map} routes={routes} pins={spots} fitTo={fitTo} />
+          {spots.length === 0 ? (
+            <Muted>No repeat trouble spots. Nice.</Muted>
+          ) : (
+            progress.recurringSpots.map((s, i) => (
+              <FadeIn key={`${s.type}-${s.street}-${i}`} delay={staggerDelay(i, motion.fast)}>
+                <View style={styles.spot}>
+                  <View style={styles.spotCount}>
+                    <Text style={styles.spotCountText}>{s.count}</Text>
+                  </View>
+                  <View style={styles.spotBody}>
+                    <Text style={styles.spotTitle}>{EVENT_LABEL[s.type]}</Text>
+                    <Text style={styles.spotStreet}>{s.street}</Text>
+                  </View>
+                  <Text style={styles.spotDrives}>
+                    {s.count === 1 ? '1 drive' : `${s.count} drives`}
+                  </Text>
+                </View>
+              </FadeIn>
+            ))
+          )}
           <OsmCredit />
         </>
       )}
@@ -116,23 +128,6 @@ const styles = StyleSheet.create({
     marginBottom: space.sm,
   },
   note: { fontFamily: fonts.regular, fontSize: font.body, color: colors.text, marginTop: space.xs },
-  chart: {
-    height: 160,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: space.sm,
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: radius.md,
-    padding: space.md,
-  },
-  col: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center' },
-  colValue: {
-    fontFamily: fonts.regular,
-    fontSize: font.tiny,
-    color: colors.textMuted,
-    marginBottom: 2,
-  },
-  colBar: { width: '100%', backgroundColor: colors.primary, borderRadius: 4 },
   skillRow: {
     paddingVertical: space.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -147,9 +142,29 @@ const styles = StyleSheet.create({
   },
   map: { height: 220, borderRadius: radius.lg, overflow: 'hidden', marginBottom: space.md },
   spot: {
-    fontFamily: fonts.regular,
-    fontSize: font.body,
-    color: colors.text,
-    marginBottom: space.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    paddingVertical: space.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
+  spotCount: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.pill,
+    backgroundColor: colors.coral100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  spotCountText: { fontFamily: fonts.semiBold, fontSize: font.body, color: colors.coral700 },
+  spotBody: { flex: 1 },
+  spotTitle: { fontFamily: fonts.semiBold, fontSize: font.body, color: colors.text },
+  spotStreet: {
+    fontFamily: fonts.regular,
+    fontSize: font.small,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  spotDrives: { fontFamily: fonts.semiBold, fontSize: font.small, color: colors.textMuted },
 });

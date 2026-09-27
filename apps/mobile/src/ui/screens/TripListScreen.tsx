@@ -66,10 +66,7 @@ export function TripListScreen({ modules, navigate }: ScreenProps) {
       {/* Cards glide up one after another. */}
       {data?.trips.map((t, i) => (
         <FadeIn key={t._id} delay={staggerDelay(i, motion.fast)} fromY={28}>
-          <TripCard
-            trip={t}
-            onPress={() => navigate({ name: 'replay', tripId: t._id, origin: 'history' })}
-          />
+          <TripCard trip={t} onPress={() => navigate({ name: 'ended', tripId: t._id })} />
         </FadeIn>
       ))}
     </Screen>

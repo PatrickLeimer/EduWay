@@ -18,6 +18,7 @@ const FOLLOW_DELTA = 0.01;
 export function NativeMapCanvas({
   style,
   route,
+  routes,
   pins,
   car,
   follow,
@@ -70,9 +71,11 @@ export function NativeMapCanvas({
         showsPointsOfInterests={!dark}
         showsCompass={false}
       >
-        {route && route.length > 1 ? (
-          <Polyline coordinates={route} strokeColor={colors.route} strokeWidth={5} />
-        ) : null}
+        {(routes ?? (route && route.length > 1 ? [route] : [])).map((path, i) =>
+          path.length > 1 ? (
+            <Polyline key={i} coordinates={path} strokeColor={colors.route} strokeWidth={5} />
+          ) : null,
+        )}
         {pins?.map((p) => (
           <Marker
             key={p.id}

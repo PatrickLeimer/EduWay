@@ -3,16 +3,23 @@
  * state while the trip uploads and the server scores and coaches it, then the
  * score reveal and Next into the post-trip flow (lib/flow.ts). No map here:
  * the route is shown only in Replay.
+ *
+ * A past drive opened from Past drives gets the same summary first
+ * (PastDriveSummaryScreen), reading the trip from GET /trips/:id instead.
  */
+import type { Trip } from '@edudriver/shared';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, StyleSheet, Text, View } from 'react-native';
 
+import { useApiQuery } from '../../api';
 import { useTripState } from '../../trip';
 import { Button } from '../components/Button';
+import { ConnectionError } from '../components/ConnectionError';
 import { FadeIn, useReducedMotion } from '../components/motion';
 import { StatTile } from '../components/primitives';
 import { ScoreRing } from '../components/ScoreRing';
-import { durationText, milesText, secondsBetween } from '../lib/format';
+import { BackButton } from '../components/Screen';
+import { dateText, durationText, milesText, secondsBetween } from '../lib/format';
 import type { ScreenProps } from '../navigation';
 import { colors, font, fonts, motion, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 
@@ -52,6 +59,21 @@ function Pulse() {
   return <Animated.View style={[styles.pulse, { opacity, transform: [{ scale }] }]} />;
 }
 
+/** The score reveal: ring, headline and the two stat tiles. */
+function ScoreSummary({ trip, headline, sub }: { trip: Trip; headline: string; sub: string }) {
+  return (
+    <FadeIn style={styles.center} fromScale={0.9} fromY={0} duration={motion.slow}>
+      <ScoreRing score={trip.score} size={184} />
+      <Text style={styles.headline}>{headline}</Text>
+      <Text style={styles.sub}>{sub}</Text>
+      <View style={styles.tiles}>
+        <StatTile label="Distance" value={milesText(trip.distanceMi)} />
+        <StatTile label="Time" value={durationText(secondsBetween(trip.startedAt, trip.endedAt))} />
+      </View>
+    </FadeIn>
+  );
+}
+
 export function TripEndedScreen({ modules, navigate }: ScreenProps) {
   const trip = modules.trip;
   const state = useTripState(trip);
@@ -64,29 +86,20 @@ export function TripEndedScreen({ modules, navigate }: ScreenProps) {
   };
 
   const result = state.result;
-  const timeText = result
-    ? durationText(secondsBetween(result.trip.startedAt, result.trip.endedAt))
-    : '…';
 
   let body;
   let footer = null;
   if (state.status === 'done' && result) {
     body = (
-      <FadeIn style={styles.center} fromScale={0.9} fromY={0} duration={motion.slow}>
-        <ScoreRing score={result.trip.score} size={184} />
-        <Text style={styles.headline}>
-          {result.trip.passenger ? 'Passenger trip saved' : 'Your drive is ready'}
-        </Text>
-        <Text style={styles.sub}>
-          {result.coach
+      <ScoreSummary
+        trip={result.trip}
+        headline={result.trip.passenger ? 'Passenger trip saved' : 'Your drive is ready'}
+        sub={
+          result.coach
             ? 'Let’s look back at your drive, then hear from your coach.'
-            : 'Let’s look back at your drive.'}
-        </Text>
-        <View style={styles.tiles}>
-          <StatTile label="Distance" value={milesText(result.trip.distanceMi)} />
-          <StatTile label="Time" value={timeText} />
-        </View>
-      </FadeIn>
+            : 'Let’s look back at your drive.'
+        }
+      />
     );
     footer = (
       <Button
@@ -132,6 +145,60 @@ export function TripEndedScreen({ modules, navigate }: ScreenProps) {
 
   return (
     <View style={styles.root}>
+      <FadeIn delay={motion.fast / 2} fromY={8}>
+        <Text style={styles.title}>Trip concluded</Text>
+      </FadeIn>
+      <View style={styles.body}>{body}</View>
+      {footer ? (
+        <FadeIn delay={motion.normal} fromY={24} style={styles.footer}>
+          {footer}
+        </FadeIn>
+      ) : null}
+    </View>
+  );
+}
+
+/**
+ * The same summary for a drive opened from Past drives, so its debrief starts
+ * on the score ring too. Next goes into the flow as a 'history' trip.
+ */
+export function PastDriveSummaryScreen({
+  modules,
+  navigate,
+  tripId,
+}: ScreenProps & { tripId: string }) {
+  const { data, error, reload } = useApiQuery(`trip:${tripId}`, () => modules.api.getTrip(tripId));
+
+  let body;
+  let footer = null;
+  if (data) {
+    body = (
+      <ScoreSummary
+        trip={data.trip}
+        headline={dateText(data.trip.startedAt)}
+        sub={
+          data.trip.coach
+            ? 'Let’s look back at your drive, then hear from your coach.'
+            : 'Let’s look back at your drive.'
+        }
+      />
+    );
+    footer = (
+      <Button
+        title="Next"
+        large
+        onPress={() => navigate({ name: 'replay', tripId, origin: 'history' })}
+      />
+    );
+  } else if (error) {
+    body = <ConnectionError error={error} onRetry={reload} />;
+  } else {
+    body = <ActivityIndicator size="large" color={colors.route} />;
+  }
+
+  return (
+    <View style={styles.root}>
+      <BackButton label="Past drives" onPress={() => navigate({ name: 'list' })} />
       <FadeIn delay={motion.fast / 2} fromY={8}>
         <Text style={styles.title}>Trip concluded</Text>
       </FadeIn>

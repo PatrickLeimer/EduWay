@@ -10,7 +10,7 @@
  */
 import { Platform, StatusBar } from 'react-native';
 
-export const colors = {
+const palette = {
   // Brand palette: teal is the main color, used as real surfaces. Coral is
   // rare and always means streaks or harsh events. Amber is coach-tier events.
   teal50: '#EAF7F4',
@@ -64,6 +64,19 @@ export const colors = {
   driveBorder: '#0B3B38',
 
   disabled: '#D7E7E3',
+} as const;
+
+export const colors = {
+  ...palette,
+
+  // The score ring drawn as a road (ScoreRing.tsx): driven surface, road still
+  // ahead, lane dashes and the fixed 100 marker. One neutral road color on
+  // purpose — score bands would be new thresholds, and those belong in
+  // packages/shared/src/thresholds.ts.
+  road: palette.teal900,
+  roadMuted: palette.teal100,
+  roadLane: palette.white,
+  roadFinish: palette.teal900,
 } as const;
 
 /**
