@@ -25,7 +25,7 @@ describe('post-trip flow', () => {
       origin: 'history',
     });
     expect(prevRoute('replay', 't', 'trip')).toEqual({ name: 'ended' });
-    expect(prevRoute('replay', 't', 'history')).toEqual({ name: 'list' });
+    expect(prevRoute('replay', 't', 'history')).toEqual({ name: 'ended', tripId: 't' });
   });
 
   it('numbers the steps from 1', () => {

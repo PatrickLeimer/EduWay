@@ -121,7 +121,7 @@ export function ReplayScreen({
     <Screen
       title="Replay"
       onBack={back}
-      backLabel={origin === 'trip' ? 'Summary' : 'Past drives'}
+      backLabel="Summary"
       footer={<FlowFooter step="replay" onPress={next} />}
       hero={<MapCanvas style={styles.map} route={route} fitTo={route} pins={pins} car={car} />}
     >

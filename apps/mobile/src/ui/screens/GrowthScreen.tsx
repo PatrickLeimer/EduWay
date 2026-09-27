@@ -14,6 +14,7 @@ import { FlowFooter } from '../components/FlowFooter';
 import { FadeIn } from '../components/motion';
 import { Card, Muted, SectionTitle } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { ScoreTrendChart } from '../components/ScoreTrendChart';
 import { nextRoute, prevRoute } from '../lib/flow';
 import {
   readinessChangeText,
@@ -83,6 +84,9 @@ export function GrowthScreen({
           <Text style={styles.heroSub}>{tierProgressText(p)}</Text>
         </View>
       </FadeIn>
+
+      <SectionTitle>Score trend</SectionTitle>
+      <ScoreTrendChart trips={data.qualifyingTrips} />
 
       {update ? (
         <>
