@@ -26,6 +26,7 @@ import {
 import { useApiQuery } from '../../api';
 import { Button } from '../components/Button';
 import { BackButton } from '../components/Screen';
+import { StreetViewCard } from '../components/StreetViewCard';
 import { FlowFooter } from '../components/FlowFooter';
 import { FadeIn, useReducedMotion } from '../components/motion';
 import { ConnectionError } from '../components/ConnectionError';
@@ -174,6 +175,7 @@ export function CoachScreen({
   const [retry, setRetry] = useState<'idle' | 'working' | 'failed'>('idle');
   const trip = (retried ?? q.data)?.trip;
   const coach = trip?.coach ?? null;
+  const streetView = (retried ?? q.data)?.streetView ?? null;
   const audioUrl = trip && !trip.passenger ? trip.coachAudioUrl : null;
   const messages = useMemo(() => (coach ? chatMessages(coach) : []), [coach]);
   const debrief = modules.debrief;
@@ -350,6 +352,12 @@ export function CoachScreen({
           </FadeIn>
         ))}
         {progress.typing ? <TypingDots /> : null}
+        {/* Street View (§12): the spot the coach pulled up, once they're done talking. */}
+        {phase === 'finished' && streetView ? (
+          <FadeIn fromY={16} duration={motion.slow}>
+            <StreetViewCard callout={streetView} />
+          </FadeIn>
+        ) : null}
         {phase === 'finished' ? <Takeaways coach={coach} /> : null}
       </>
     );
