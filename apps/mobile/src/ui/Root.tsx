@@ -1,23 +1,32 @@
 /**
- * Placeholder app shell: state-based navigation between the placeholder
- * screens. No navigation library until the UI phase.
+ * App shell: state-based navigation between screens (see navigation.ts).
+ * Product screens (and the dev menu) draw their own full-screen layout; the
+ * WS1–WS4 debug screens keep the plain scrolling wrapper they were built for.
  */
 import { useCallback, useState } from 'react';
-import { Button, ScrollView, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import type { AppModules } from '../wiring';
+import { getDemoModules, type AppModules } from '../wiring';
 
 import { DriveRecorderScreen } from './dev/DriveRecorderScreen';
 import { Ws1Debug } from './dev/Ws1Debug';
 import { Ws2Debug } from './dev/Ws2Debug';
 import { Ws3Debug } from './dev/Ws3Debug';
 import { Ws4Debug } from './dev/Ws4Debug';
-import type { Route, ScreenProps } from './navigation';
+import { ScreenTransition } from './components/motion';
+import { BackButton } from './components/Screen';
+import { routeKey, transitionFor, type TransitionKind } from './lib/transitions';
+import { DEFAULT_SETTINGS, type AppSettings, type Route, type ScreenProps } from './navigation';
 import { DevMenuScreen } from './screens/DevMenuScreen';
 import { DrivingScreen } from './screens/DrivingScreen';
+import { ProgressScreen } from './screens/ProgressScreen';
+import { ReplayScreen } from './screens/ReplayScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { StartDriveScreen } from './screens/StartDriveScreen';
+import { TripEndedScreen } from './screens/TripEndedScreen';
 import { TripListScreen } from './screens/TripListScreen';
 import { TripResultScreen } from './screens/TripResultScreen';
+import { colors, SAFE_TOP, space } from './theme';
 
 function renderRoute(route: Route, props: ScreenProps) {
   switch (route.name) {
@@ -25,10 +34,18 @@ function renderRoute(route: Route, props: ScreenProps) {
       return <StartDriveScreen {...props} />;
     case 'driving':
       return <DrivingScreen {...props} />;
+    case 'ended':
+      return <TripEndedScreen {...props} />;
     case 'result':
       return <TripResultScreen {...props} tripId={route.tripId} />;
+    case 'replay':
+      return <ReplayScreen {...props} tripId={route.tripId} />;
     case 'list':
       return <TripListScreen {...props} />;
+    case 'progress':
+      return <ProgressScreen {...props} />;
+    case 'settings':
+      return <SettingsScreen {...props} />;
     case 'dev':
       return <DevMenuScreen {...props} />;
     case 'ws1':
@@ -44,22 +61,50 @@ function renderRoute(route: Route, props: ScreenProps) {
   }
 }
 
-/** Screens without a Home button: never leave driving mode by navigation (§4, §16). */
-const NO_HOME: Route['name'][] = ['start', 'driving'];
+/** WS1–WS4 debug screens: plain ScrollView + back button, as before the UI phase. */
+const DEV_ROUTES: Route['name'][] = ['ws1', 'ws2', 'ws3', 'ws4', 'recorder'];
 
 export function Root({ modules }: { modules: AppModules }) {
-  const [route, setRoute] = useState<Route>({ name: 'start' });
-  const navigate = useCallback((r: Route) => setRoute(r), []);
+  const [nav, setNav] = useState<{ route: Route; kind: TransitionKind }>({
+    route: { name: 'start' },
+    kind: 'fade',
+  });
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const navigate = useCallback(
+    (r: Route) => setNav((prev) => ({ route: r, kind: transitionFor(prev.route.name, r.name) })),
+    [],
+  );
+  const { route, kind } = nav;
+  const updateSettings = useCallback(
+    (patch: Partial<AppSettings>) => setSettings((s) => ({ ...s, ...patch })),
+    [],
+  );
+  // Test drive swaps in the simulated modules; Settings only allows it while no trip is running.
+  const active = settings.demoMode ? getDemoModules() : modules;
+  const props: ScreenProps = { modules: active, navigate, settings, updateSettings };
 
+  // A new key remounts the transition, so every screen change animates in.
+  // The backdrop matches the incoming screen so the fade never flashes white.
+  const dark = route.name === 'driving';
   return (
-    // paddingTop only keeps content below the status bar; real layout comes in the UI phase.
-    <ScrollView contentContainerStyle={{ paddingTop: 48 }}>
-      {!NO_HOME.includes(route.name) && (
-        <View>
-          <Button title="Home" onPress={() => navigate({ name: 'start' })} />
-        </View>
-      )}
-      {renderRoute(route, { modules, navigate })}
-    </ScrollView>
+    <View style={[styles.backdrop, dark && styles.backdropDark]}>
+      <ScreenTransition key={routeKey(route)} kind={kind}>
+        {DEV_ROUTES.includes(route.name) ? (
+          <ScrollView style={styles.dev} contentContainerStyle={styles.devContent}>
+            <BackButton label="Developer tools" onPress={() => navigate({ name: 'dev' })} />
+            {renderRoute(route, props)}
+          </ScrollView>
+        ) : (
+          renderRoute(route, props)
+        )}
+      </ScreenTransition>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  backdrop: { flex: 1, backgroundColor: colors.surface },
+  backdropDark: { backgroundColor: colors.driveBg },
+  dev: { flex: 1, backgroundColor: colors.surface },
+  devContent: { paddingTop: SAFE_TOP, paddingHorizontal: space.sm },
+});

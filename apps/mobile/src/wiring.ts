@@ -60,17 +60,33 @@ export interface ModuleFlags {
 
 /**
  * One flag per module. false = mock, true = real implementation.
- * WS2 owns this file. road + trip are real. gps stays on the fixture replay so a
- * desk demo still moves; flip `gps` on a phone. detection / api / voice stay mock
- * until those workstreams land — do not flip them from WS2.
+ * WS2 owns this file. Real: phone GPS and sensors, road data and the bundled
+ * voice clips. `api` stays on the in-app mock until the phone can reach the
+ * server (eduroam blocks phone-to-laptop traffic; needs a tunnel or hotspot).
+ * Set it to true then. For a desk demo, turn on "Test drive" in Settings.
  */
 export const USE_REAL: ModuleFlags = {
+  detection: true,
+  road: true,
+  trip: true,
+  api: false,
+  voice: true,
+  /** Real GPS (expo-location) for the real TripSession; false replays the fixture drive. */
+  gps: true,
+};
+
+/**
+ * "Test drive" (Settings / Dev tools): the phone doesn't have to move. GPS replays
+ * the fixture drive and detection replays the fixture events; road and voice stay
+ * real, so live alerts play. `api` uses the in-app mock so the demo never depends
+ * on the network; set it to true for a real Gemini + ElevenLabs debrief.
+ */
+export const DEMO_FLAGS: ModuleFlags = {
   detection: false,
   road: true,
   trip: true,
   api: false,
-  voice: false,
-  /** Real GPS (expo-location) for the real TripSession; false replays the fixture drive. */
+  voice: true,
   gps: false,
 };
 
@@ -131,3 +147,11 @@ export function createModules(flags: ModuleFlags = USE_REAL): AppModules {
 
 /** The app-wide instance. App.tsx passes it to ui/. */
 export const modules: AppModules = createModules();
+
+let demoModules: AppModules | null = null;
+
+/** Modules for the "Test drive" mode (DEMO_FLAGS), created on first use. */
+export function getDemoModules(): AppModules {
+  demoModules ??= createModules(DEMO_FLAGS);
+  return demoModules;
+}
