@@ -101,6 +101,32 @@ describe('createPhoneUseTracker: leaving the app', () => {
     expect(tracker.onTouch(T0 + 11_000)).toBeNull();
   });
 
+  it('lock off: opening navigation or an emergency call is not phone use', () => {
+    const { tracker } = setup(false);
+    tracker.onSafeExit();
+    tracker.onAppState('inactive', T0);
+    expect(tracker.onAppState('background', T0 + 500)).toBeNull();
+    expect(tracker.onAppState('active', T0 + 60_000)).toBeNull();
+    expect(tracker.close(T0 + 61_000)).toBeNull();
+  });
+
+  it('a safe exit only excuses the next trip to the background', () => {
+    const { tracker } = setup(false);
+    tracker.onSafeExit();
+    tracker.onAppState('background', T0);
+    tracker.onAppState('active', T0 + 30_000);
+    tracker.onAppState('background', T0 + 40_000);
+    expect(tracker.onAppState('active', T0 + 50_000)).toMatchObject({ durationS: 10 });
+  });
+
+  it('an in-app touch drops an unused safe exit (the link did not open)', () => {
+    const { tracker } = setup(false);
+    tracker.onSafeExit();
+    expect(tracker.onTouch(T0)).not.toBeNull();
+    tracker.onAppState('background', T0 + 10_000);
+    expect(tracker.onAppState('active', T0 + 20_000)).toMatchObject({ durationS: 10 });
+  });
+
   it('close emits an episode still open at trip end', () => {
     const { tracker } = setup(false);
     tracker.onAppState('background', T0);

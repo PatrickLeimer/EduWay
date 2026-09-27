@@ -269,6 +269,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
     getState: () => store.get(),
     getTrace: () => trace.toUpload(),
     reportTouch: () => deps.phoneUse.reportTouch(),
+    reportSafeExit: () => deps.phoneUse.reportSafeExit(),
     subscribe: (l) => store.subscribe(l),
   };
   return session;
