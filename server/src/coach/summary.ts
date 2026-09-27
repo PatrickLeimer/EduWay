@@ -12,13 +12,24 @@ const MOTION_TYPES: readonly EventType[] = ['hard_brake', 'hard_accel', 'rough_t
 /** One decimal is plenty for the prompt and keeps raw detector floats out of it. */
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
+/** The event the backend picked for Street View (§12), and whether it is at a recurring spot. */
+export interface StreetViewPick {
+  event: DrivingEvent;
+  recurringSpot: boolean;
+}
+
+/**
+ * `streetView`: the Street View pick for Gemini's caption. Leave it out when the
+ * picker did not run; pass null when it ran and nothing qualified.
+ */
 export function buildTripSummary(
   trip: Trip,
   events: DrivingEvent[],
   history: TripSummary['history'],
+  streetView?: StreetViewPick | null,
 ): TripSummary {
   const durationMs = Date.parse(trip.endedAt) - Date.parse(trip.startedAt);
-  return {
+  const summary: TripSummary = {
     trip: {
       duration_min: round1(durationMs / 60_000),
       distance_mi: trip.distanceMi,
@@ -32,6 +43,16 @@ export function buildTripSummary(
     },
     history,
   };
+  if (streetView !== undefined)
+    summary.street_view_event = streetView && toStreetViewEvent(streetView);
+  return summary;
+}
+
+/** The summary event plus the limit (for any type) and the recurring-spot flag (§12). */
+function toStreetViewEvent({ event, recurringSpot }: StreetViewPick) {
+  const e = toSummaryEvent(event);
+  if (e.limit_mph === undefined && event.limitMph != null) e.limit_mph = event.limitMph;
+  return { ...e, recurring_spot: recurringSpot };
 }
 
 /** Keeps only the fields that matter for the event's type (§10 "Input"). */

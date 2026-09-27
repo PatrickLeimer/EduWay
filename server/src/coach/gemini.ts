@@ -23,6 +23,7 @@ export interface GeminiOptions {
  */
 const GeminiReplySchema = CoachOutputSchema.omit({ chat_audio_starts_s: true }).extend({
   chat: z.array(z.string().min(1)).min(1),
+  street_view_caption: z.string().nullable(),
 });
 export const COACH_RESPONSE_JSON_SCHEMA = z.toJSONSchema(GeminiReplySchema);
 
@@ -67,7 +68,9 @@ export async function generateCoaching(
           responseJsonSchema: COACH_RESPONSE_JSON_SCHEMA,
         },
       });
-      return parseCoachReply(res.text);
+      const coach = parseCoachReply(res.text);
+      // No Street View event → no caption, whatever the model wrote (§12).
+      return summary.street_view_event ? coach : { ...coach, street_view_caption: null };
     } catch (e) {
       lastError = e;
       console.warn(

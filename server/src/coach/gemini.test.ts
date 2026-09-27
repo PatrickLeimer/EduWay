@@ -71,7 +71,7 @@ describe('generateCoaching', () => {
 
   it('returns the validated coaching', async () => {
     const coach = await generateCoaching(tripSummaryFixture, { apiKey: 'k', model: 'm' });
-    expect(coach).toStrictEqual(coachOutputFixture);
+    expect(coach).toStrictEqual({ ...coachOutputFixture, street_view_caption: null });
   });
 
   it('rejects an off-schema reply so the service can degrade to coach: null', async () => {
@@ -79,6 +79,39 @@ describe('generateCoaching', () => {
     await expect(
       generateCoaching(tripSummaryFixture, { apiKey: 'k', model: 'm' }),
     ).rejects.toThrow();
+  });
+});
+
+describe('generateCoaching Street View caption (§12)', () => {
+  const event = { type: 'hard_brake' as const, street: 'SW 8th St', recurring_spot: true };
+
+  beforeEach(() => {
+    sdk.reply = fixtureJson;
+    sdk.busy.clear();
+  });
+
+  it('keeps the caption when an event was picked', async () => {
+    const coach = await generateCoaching(
+      { ...tripSummaryFixture, street_view_event: event },
+      { apiKey: 'k', model: 'm' },
+    );
+    expect(coach.street_view_caption).toBe(coachOutputFixture.street_view_caption);
+  });
+
+  it('drops a caption the model wrote without an event', async () => {
+    for (const street_view_event of [null, undefined]) {
+      const coach = await generateCoaching(
+        { ...tripSummaryFixture, street_view_event },
+        { apiKey: 'k', model: 'm' },
+      );
+      expect(coach.street_view_caption).toBeNull();
+    }
+  });
+
+  it('requires the caption field (null allowed) in the Gemini schema', () => {
+    expect(COACH_RESPONSE_JSON_SCHEMA).toMatchObject({
+      required: expect.arrayContaining(['street_view_caption']),
+    });
   });
 });
 
@@ -99,7 +132,7 @@ describe('generateCoaching fallback models', () => {
     sdk.busy.add('main');
     const coach = await generateCoaching(tripSummaryFixture, { apiKey: 'k', model: 'main' });
     expect(sdk.modelsTried).toEqual(['main', GEMINI_FALLBACK_MODELS[0]]);
-    expect(coach).toStrictEqual(coachOutputFixture);
+    expect(coach.chat).toEqual(coachOutputFixture.chat);
   });
 
   it('tries every model once, in order, then throws the last error', async () => {
