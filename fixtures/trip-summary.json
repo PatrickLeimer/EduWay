@@ -119,6 +119,11 @@
         "street": "SW 8th St",
         "count": 3
       }
-    ]
+    ],
+    "main_problem": {
+      "type": "hard_brake",
+      "trip_count": 3,
+      "street": "SW 8th St"
+    }
   }
 }
