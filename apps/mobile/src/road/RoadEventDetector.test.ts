@@ -58,7 +58,7 @@ describe('speeding', () => {
     const events = [];
     for (let i = 0; i < speedsMph.length; i++) {
       events.push(
-        ...det.onGps(fix({ t: i * 1000, speedMps: mps(speedsMph[i]!), accuracyM }), road),
+        ...det.onGps(fix({ t: i * 1000, speedMps: mps(speedsMph[i]!), accuracyM }), road).events,
       );
     }
     return events;
@@ -79,6 +79,40 @@ describe('speeding', () => {
       match({ limitMph: 25, limitConfidence: 'inferred' }),
     );
     expect(inferred[0]).toMatchObject({ tier: 'coach' });
+  });
+
+  /** Seconds (fix index) at which a live alert was signalled. */
+  function alertTimes(speedsMph: number[], road: RoadMatch = posted) {
+    const det = createRoadEventDetector(emptyCache());
+    const times: number[] = [];
+    for (let i = 0; i < speedsMph.length; i++) {
+      const { alerts } = det.onGps(fix({ t: i * 1000, speedMps: mps(speedsMph[i]!) }), road);
+      for (const a of alerts) {
+        expect(a).toEqual({ type: 'speeding', limitMph: road.limitMph });
+        times.push(i);
+      }
+    }
+    return times;
+  }
+
+  it('alerts once per harsh posted episode while still speeding, not when it ends', () => {
+    // Over the limit from t=0; the alert is due at 5 s, long before the car slows at 9 s.
+    expect(alertTimes([56, 56, 56, 56, 56, 56, 56, 56, 56, 30])).toEqual([5]);
+    // Turns harsh partway through: alerts on the first harsh fix after 5 s.
+    expect(alertTimes([46, 46, 46, 46, 46, 46, 46, 56, 56, 30])).toEqual([7]);
+    // A new episode alerts again.
+    expect(alertTimes([56, 56, 56, 56, 56, 56, 30, 56, 56, 56, 56, 56, 56, 30])).toEqual([5, 12]);
+  });
+
+  it('does not alert for coach speeding, inferred limits, or short episodes', () => {
+    expect(alertTimes([46, 46, 46, 46, 46, 46, 46, 30])).toEqual([]);
+    expect(
+      alertTimes(
+        [50, 50, 50, 50, 50, 50, 20],
+        match({ limitMph: 25, limitConfidence: 'inferred' }),
+      ),
+    ).toEqual([]);
+    expect(alertTimes([60, 60, 60, 60, 30])).toEqual([]);
   });
 
   it('does not emit before 5 s or with a poor fix', () => {
@@ -104,7 +138,8 @@ describe('rolling stops', () => {
     for (let i = 0; i < lats.length; i++) {
       const speed = speedsMph[Math.min(i, speedsMph.length - 1)]!;
       events.push(
-        ...det.onGps(fix({ t: i * 1000, lat: lats[i]!, speedMps: mps(speed), heading }), null),
+        ...det.onGps(fix({ t: i * 1000, lat: lats[i]!, speedMps: mps(speed), heading }), null)
+          .events,
       );
     }
     return events;
@@ -140,7 +175,7 @@ describe('rolling stops', () => {
     bindStopHeadings(cache, stops, [way]);
     const det = createRoadEventDetector(cache);
     const step = (heading: number, lat: number, t: number) =>
-      det.onGps(fix({ t, lat, speedMps: mps(8), heading }), null);
+      det.onGps(fix({ t, lat, speedMps: mps(8), heading }), null).events;
 
     expect(step(0, 25.7603, 0)).toHaveLength(0);
     expect(step(0, 25.76, 1000)).toHaveLength(0);
