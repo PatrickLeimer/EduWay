@@ -68,6 +68,9 @@ describe('API routes (mock deps)', () => {
     expect(res.status).toBe(201);
     const body = CreateTripResponseSchema.parse(await res.json());
     expect(body.coach).not.toBeNull();
+    // Fixture drive is 1.27 mi, not a passenger trip: it counts toward streaks/tier/readiness.
+    expect(body.progressUpdate?.qualifying).toBe(true);
+    expect(body.progressUpdate?.readiness.after).toBeGreaterThan(0);
   });
 
   it('POST /trips rejects a bad body with ErrorResponse', async () => {
@@ -88,7 +91,11 @@ describe('API routes (mock deps)', () => {
   });
 
   it('GET /progress and POST /ask', async () => {
-    GetProgressResponseSchema.parse(await (await get(`/progress?userId=${DEMO_USER_ID}`)).json());
+    const progress = GetProgressResponseSchema.parse(
+      await (await get(`/progress?userId=${DEMO_USER_ID}`)).json(),
+    );
+    expect(progress.qualifyingTrips.length).toBe(progress.userProgress.qualifyingTrips);
+    expect(progress.qualifyingTrips.length).toBeGreaterThan(0);
     AskResponseSchema.parse(
       await (
         await post('/ask', { userId: DEMO_USER_ID, question: 'Am I better at stops?' })

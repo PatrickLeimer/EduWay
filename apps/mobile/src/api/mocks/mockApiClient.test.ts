@@ -36,4 +36,29 @@ describe('mock ApiClient', () => {
       true,
     );
   });
+
+  it('returns a progressUpdate: tier-up and streak-broken samples, nothing for passengers', async () => {
+    const api = createMockApiClient(0);
+    const req = (passenger: boolean) => ({
+      userId: DEMO_USER_ID,
+      trip: {
+        startedAt: traceFixture.startedAt,
+        endedAt: traceFixture.startedAt,
+        distanceMi: 3,
+        passenger,
+        lockEnabled: true,
+      },
+      events: eventsFixture,
+      traceGzipB64: encodeTrace(TraceUploadSchema.parse(traceFixture)),
+    });
+    const first = await api.createTrip(req(false));
+    const second = await api.createTrip(req(false));
+    const updates = [first.progressUpdate, second.progressUpdate];
+    expect(updates.map((u) => u?.tier.change).sort()).toEqual(['same', 'up']);
+    expect(updates.some((u) => u?.streaks.phoneFree.change === 'broken')).toBe(true);
+
+    const passenger = await api.createTrip(req(true));
+    expect(passenger.progressUpdate?.qualifying).toBe(false);
+    expect(passenger.progressUpdate?.readiness.delta).toBe(0);
+  });
 });

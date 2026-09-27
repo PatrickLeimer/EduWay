@@ -16,6 +16,12 @@ import {
 } from '@edudriver/shared';
 import { ObjectId, type Db } from 'mongodb';
 
+import {
+  buildProgress,
+  toGamificationTrip,
+  type ProgressSpot,
+  type ProgressTrip,
+} from '../gamification';
 import { COLLECTIONS } from './collections';
 import type { TripsRepo } from './repo';
 
@@ -67,6 +73,79 @@ export function createMongoTripsRepo(db: Db): TripsRepo {
   const traces = db.collection<TraceDoc>(COLLECTIONS.traces);
   // Optional fields left undefined (e.g. overMph) must be omitted, not stored as null.
   const writeOpts = { ignoreUndefined: true } as const;
+
+  /** Trip summaries + harsh-event counts for progress and gamification. Never loads traces (§9). */
+  async function progressRows(userId: string): Promise<ProgressTrip[]> {
+    const docs = await trips
+      .find({ userId })
+      .project<
+        Pick<
+          TripDoc,
+          '_id' | 'startedAt' | 'endedAt' | 'distanceMi' | 'passenger' | 'score' | 'counts'
+        >
+      >({
+        startedAt: 1,
+        endedAt: 1,
+        distanceMi: 1,
+        passenger: 1,
+        score: 1,
+        counts: 1,
+      })
+      .toArray();
+    const harsh = await events
+      .aggregate<{ _id: ObjectId; n: number }>([
+        { $match: { userId, tier: 'harsh' } },
+        { $group: { _id: '$tripId', n: { $sum: 1 } } },
+      ])
+      .toArray();
+    const harshByTrip = new Map(harsh.map((h) => [h._id.toHexString(), h.n]));
+    return docs.map((d) => {
+      const id = d._id.toHexString();
+      return {
+        id,
+        startedAt: d.startedAt.toISOString(),
+        endedAt: d.endedAt.toISOString(),
+        distanceMi: d.distanceMi,
+        passenger: d.passenger,
+        score: d.score,
+        counts: d.counts,
+        harshEvents: harshByTrip.get(id) ?? 0,
+      };
+    });
+  }
+
+  /**
+   * Recurring spots across all trips: the same event type on the same street on
+   * at least COACH.recurringSpotMinCount different trips. (getHistory does the
+   * 50 m 2dsphere version per event for the Gemini summary; per-street grouping
+   * keeps the progress screen to one query.)
+   */
+  async function recurringSpotsFor(userId: string): Promise<ProgressSpot[]> {
+    return events
+      .aggregate<ProgressSpot>([
+        { $match: { userId, street: { $ne: null } } },
+        {
+          $group: {
+            _id: { type: '$type', street: '$street' },
+            trips: { $addToSet: '$tripId' },
+            location: { $first: '$location' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            type: '$_id.type',
+            street: '$_id.street',
+            count: { $size: '$trips' },
+            location: { type: '$location.type', coordinates: '$location.coordinates' },
+          },
+        },
+        { $match: { count: { $gte: COACH.recurringSpotMinCount } } },
+        { $sort: { count: -1 } },
+        { $limit: 20 },
+      ])
+      .toArray();
+  }
 
   return {
     async insertTrip({ trip, events: recorded, trace }) {
@@ -190,10 +269,13 @@ export function createMongoTripsRepo(db: Db): TripsRepo {
       return { last_5_scores: last5, recurring_spots: [...spots.values()] };
     },
 
-    // TODO(WS3, §12 screen 5): score trend, per-type totals and per-10-mi rates,
-    //   recurring spots, test readiness rule (team to define).
-    getProgress: async () => {
-      throw new Error('TODO(WS3): MongoTripsRepo.getProgress not implemented');
+    async getProgress(userId) {
+      const [rows, spots] = await Promise.all([progressRows(userId), recurringSpotsFor(userId)]);
+      return buildProgress(rows, spots);
+    },
+
+    async listGamificationTrips(userId) {
+      return (await progressRows(userId)).map(toGamificationTrip);
     },
   };
 }
