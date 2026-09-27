@@ -17,6 +17,7 @@ import {
 import { ObjectId, type Db } from 'mongodb';
 
 import { COLLECTIONS } from './collections';
+import { pickMainProblem } from './mainProblem';
 import type { TripsRepo } from './repo';
 
 type TripDoc = Omit<Trip, '_id' | 'startedAt' | 'endedAt'> & {
@@ -187,7 +188,29 @@ export function createMongoTripsRepo(db: Db): TripsRepo {
         }
       }
 
-      return { last_5_scores: last5, recurring_spots: [...spots.values()] };
+      // Scores stay "before this trip". The pattern count includes this trip, so
+      // the debrief can be the moment a problem reaches the minimum.
+      const patternEvents = await events
+        .find({ userId })
+        .project<{ type: EventDoc['type']; street: EventDoc['street']; tripId: ObjectId }>({
+          _id: 0,
+          type: 1,
+          street: 1,
+          tripId: 1,
+        })
+        .toArray();
+
+      return {
+        last_5_scores: last5,
+        recurring_spots: [...spots.values()],
+        main_problem: pickMainProblem(
+          patternEvents.map((event) => ({
+            type: event.type,
+            street: event.street,
+            tripId: event.tripId.toHexString(),
+          })),
+        ),
+      };
     },
 
     // TODO(WS3, §12 screen 5): score trend, per-type totals and per-10-mi rates,

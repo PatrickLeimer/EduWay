@@ -30,8 +30,9 @@ export interface TripsRepo {
   getTrip(tripId: string): Promise<{ trip: Trip; events: DrivingEvent[] } | null>;
   getTrace(tripId: string): Promise<Trace | null>;
   /**
-   * History block of the Gemini summary (§10): last scores before this trip and
-   * recurring spots from the 2dsphere index.
+   * History block of the Gemini summary (§10): last scores before this trip,
+   * recurring spots from the 2dsphere index, and main_problem across every
+   * saved trip including this one.
    */
   getHistory(userId: string, excludeTripId: string): Promise<TripSummary['history']>;
   getProgress(userId: string): Promise<Progress>;
