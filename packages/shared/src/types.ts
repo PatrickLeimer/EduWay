@@ -338,6 +338,14 @@ export const TripSummarySchema = z.object({
     last_5_scores: z.array(z.number()),
     recurring_spots: z.array(RecurringSpotSchema),
   }),
+  /**
+   * The one event shown in Street View (§12 "Street View callout"), for Gemini's
+   * street_view_caption. Null when none was picked; absent when the backend did
+   * not run the picker (e.g. no Street View key).
+   */
+  street_view_event: SummaryEventSchema.extend({ recurring_spot: z.boolean() })
+    .nullable()
+    .optional(),
 });
 export type TripSummary = z.infer<typeof TripSummarySchema>;
 
