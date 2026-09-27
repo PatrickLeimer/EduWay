@@ -92,7 +92,7 @@ One screen at a time, each with step dots and a big **Next** (`components/FlowFo
 - The Gemini coaching as a **chat**: header with the coach's avatar and name (**Coach Chris**, the ElevenLabs voice), live status ("Talking…" with sound bars, "Paused", "Finished"). Messages appear as left-aligned bubbles on a light gray background; a typing indicator shows just before each one. The student only listens; there is no input.
 - **Voice sync:** the ElevenLabs debrief (`modules.debrief`) starts automatically; each bubble appears when the voice starts saying it, using `CoachOutput.chat_audio_starts_s` from the server (fallbacks in `lib/chat.ts`: spread by length over the audio, or a reading pace with no audio). If the audio doesn't start within 8 s, the chat plays out at reading pace.
 - Controls: **Pause/Resume**, **Replay**, **Show all**. When the coach finishes, a **Your takeaways** card shows the focus areas (skill + tip) and strength chips.
-- Passenger trip or no coaching → one friendly bubble explaining why. **Done** → Home (or Past drives).
+- Passenger trip → one friendly bubble explaining there's nothing to coach. No coaching (Gemini busy or out of quota) → a bubble saying so and a **Try again** button (`api.retryCoaching`, `POST /trips/:id/coach`); on success the chat and voice start as usual, on failure the bubble asks to try again in a minute. **Done** → Home (or Past drives).
 - Older trips without `chat` use the short summary split into sentences.
 
 ### Past drives: `screens/TripListScreen.tsx`
