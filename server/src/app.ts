@@ -6,7 +6,14 @@ import { API_ROUTES } from '@edudriver/shared';
 import express, { type Express } from 'express';
 
 import { DEBRIEF_AUDIO_DIR, DEBRIEF_AUDIO_ROUTE } from './coach';
-import { askRouter, errorHandler, progressRouter, tripsRouter, type RouteDeps } from './routes';
+import {
+  askRouter,
+  errorHandler,
+  progressRouter,
+  streetViewRouter,
+  tripsRouter,
+  type RouteDeps,
+} from './routes';
 
 export function createApp(deps: RouteDeps): Express {
   const app = express();
@@ -19,6 +26,8 @@ export function createApp(deps: RouteDeps): Express {
   app.use('/trips', tripsRouter(deps));
   app.use(API_ROUTES.getProgress, progressRouter(deps));
   app.use(API_ROUTES.ask, askRouter(deps));
+  // Street View callout images and panorama page (§12); off without GOOGLE_STREETVIEW_KEY.
+  app.use('/streetview', streetViewRouter(deps));
   // ElevenLabs debrief mp3s written by coach/ (§11); coachAudioUrl points here.
   app.use(DEBRIEF_AUDIO_ROUTE, express.static(DEBRIEF_AUDIO_DIR));
 

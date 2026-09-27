@@ -231,4 +231,40 @@ export const COACH = {
   /** Distinct trips on one street before main_problem names that street. */
   mainProblemStreetMinTrips: 2,
   mainProblemTieBreak: MAIN_PROBLEM_TIE_BREAK,
+  /** Street View caption (street_view_caption), §12. */
+  maxStreetViewCaptionWords: 30,
+} as const;
+
+// ---------------------------------------------------------------------------
+// Street View callout (§12 "Street View callout")
+// ---------------------------------------------------------------------------
+
+export const STREET_VIEW = {
+  /**
+   * Event types that can be shown, most useful first (ranking rule 3). Types not
+   * listed never qualify: phone use and hard acceleration teach nothing from a
+   * location view.
+   */
+  typePriority: [
+    'rolling_stop',
+    'speeding',
+    'hard_brake',
+    'rough_turn',
+    'swerve',
+  ] as readonly EventType[],
+  /** Coverage checks per trip, to limit API calls. */
+  maxCandidates: 3,
+  /** Camera faces the driving direction this long before the event (what the student saw on approach). */
+  headingLookbackS: 3,
+  /** A trace fix counts for a moment when it is within this many seconds of it. */
+  headingMatchWindowS: 1.5,
+  /** Street View metadata search radius around the event. */
+  metadataRadiusM: 50,
+  /** Static thumbnail: size (the Static API maximum is 640), pitch, field of view. */
+  imageWidthPx: 640,
+  imageHeightPx: 400,
+  pitchDeg: 0,
+  fovDeg: 90,
+  /** Short browser cache for the thumbnail (Google's terms: no long-term storage). */
+  thumbnailCacheS: 300,
 } as const;

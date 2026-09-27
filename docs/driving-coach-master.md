@@ -63,6 +63,7 @@ Differentiators:
 | App | React Native with Expo (`expo-sensors`, `expo-location`, `expo-keep-awake`) |
 | Backend | Our own server, hosted and deployed (framework and host TBD, e.g. Node.js or FastAPI) |
 | Map display | Google Maps via `react-native-maps` |
+| Street View | After a trip only (section 12): Street View Static API + metadata endpoint on the server, and the Maps JavaScript API (Street View panorama only) on a page our backend serves, shown in `react-native-webview` |
 | Road data | OpenStreetMap via the Overpass API: street names, speed limits (`maxspeed`), road class (`highway`), stop signs (`highway=stop`) |
 
 Not used: Google Roads speed limits (needs an Asset Tracking license), Valhalla, TomTom, HERE, Mapbox, MapLibre. See section 19 for when those might come back.
@@ -266,7 +267,8 @@ trips:  { _id, userId, startedAt, endedAt, distanceMi, passenger /* bool */,
           routePreview /* simplified GeoJSON LineString for lists and thumbnails */,
           counts: { brake, accel, turn, swerve, speeding, rollingStop, phoneUse },
           stats: { eventsPer10Mi, pctTimeSpeeding, phoneUseSeconds },
-          score, coach /* Gemini JSON */, coachAudioUrl }
+          score, coach /* Gemini JSON */, coachAudioUrl,
+          streetView /* { eventId, heading, caption } or null; never the image (section 12) */ }
 
 events: { _id, tripId, userId, type, tier /* coach | harsh */, peak, durationS,
           speedMph, limitMph, limitConfidence /* posted | inferred | unknown */,
@@ -342,6 +344,7 @@ Use `response_mime_type: application/json` with a response schema:
     { "skill": "Braking early", "why": "4 hard brakes approaching the same SW 8th St intersection", "tip": "Start easing off when the light first comes into view" }
   ],
   "debrief_script": "Solid drive, 71 today...",
+  "street_view_caption": "This is the stop sign on Oak St. You slowed to 5 mph here; come to a full stop behind the white line.",
   "chat": [
     "Hey, nice drive! Let's talk it through.",
     "Your turns were really smooth today. That's exactly what examiners look for.",
@@ -361,6 +364,7 @@ Use `response_mime_type: application/json` with a response schema:
 - Compare with history; call out improvement and recurring spots.
 - Keep `debrief_script` (a short written summary) under about 60 words.
 - `chat` is the coaching conversation: 6 to 10 short messages, about 160 words in total, spoken aloud. Sound like a real, personable coach talking to the student after the drive, not a report: warm, conversational, specific. Same fact rules as above.
+- `street_view_caption`: for the one event picked for Street View (`street_view_event` in the input), one or two sentences under about 30 words that name the place and give one concrete tip. Gemini cannot see the image, so it must describe only the event data, never what the picture shows (signs, lanes, buildings). Null when no event was picked. The chat may mention it briefly ("I pulled up the spot on Oak St for you") only when a callout exists.
 - Tone: encouraging, specific, plain language.
 
 ### Ask the coach (stretch)
@@ -383,6 +387,16 @@ The student asks "Am I getting better at stops?" The backend pulls relevant trip
 2. Driving mode (lock screen or minimal driving screen; emergency and navigation access)
 3. Post-trip flow, one screen at a time with Next: Trip concluded (loading, then score reveal) → Replay (Google Maps route, animated playback, event pins, speed vs limit timeline) → Infractions (every event and where it happened) → Driving growth (placeholder for the future game-style progress) → Coaching chat (the Gemini conversation, voiced by ElevenLabs) → Home. Past drives open the same flow without the loading screen.
 4. (Merged into 3.)
+
+### Street View callout
+
+After a trip, the coaching shows one Street View card for the most important infraction: where it happened, facing the way the student was driving, with Gemini's `street_view_caption`. The card shows a thumbnail; tapping it opens a full interactive panorama.
+
+- The backend picks at most one event (harsh before coach, recurring spots first, then rolling stop, speeding, hard braking, rough turn, swerve, then higher peak). Phone use, hard acceleration, fixes worse than 20 m, and speeding against inferred or unknown limits never qualify. It tries at most 3 candidates against the free Street View metadata check (about 50 m radius, outdoor only).
+- Camera heading: the trace heading about 3 seconds **before** the event, so it shows what the student saw on approach.
+- Only after a trip, never while driving. Street View images are never stored in MongoDB or on the phone beyond normal display caching (Google's terms); we store only our own data: the picked event, its heading, and the caption.
+- Google keys stay on the server. The debrief's `streetView` callout carries URLs to our backend only.
+- No qualifying event or no imagery: the feature is simply absent for that trip. No error shown to the student.
 5. Progress (score trend, skill breakdown, recurring spots, test readiness)
 6. Settings (lock toggle default)
 
@@ -392,7 +406,7 @@ The student asks "Am I getting better at stops?" The backend pulls relevant trip
 
 - Hosted and deployed by the team (host TBD).
 - Holds the Gemini and ElevenLabs API keys and the MongoDB connection string. Keys never ship in the app.
-- Endpoints [Proposed]: `POST /trips` (events + stats + gzipped trace, returns coaching + audio URL), `GET /trips`, `GET /trips/:id`, `GET /trips/:id/trace`, `GET /progress`, `POST /ask` (stretch).
+- Endpoints [Proposed]: `POST /trips` (events + stats + gzipped trace, returns coaching + audio URL), `GET /trips`, `GET /trips/:id`, `GET /trips/:id/trace`, `POST /trips/:id/coach` (re-run coaching for a trip saved without it, e.g. when Gemini was busy; the coaching screen offers "Try again"), `GET /progress`, `POST /ask` (stretch), `GET /streetview/:tripId/thumbnail` (Street View Static image, fetched on demand and not stored), `GET /streetview/:tripId/panorama` (a small page with the Maps JavaScript Street View panorama, for the app's WebView).
 
 ---
 
@@ -428,6 +442,7 @@ The student asks "Am I getting better at stops?" The backend pulls relevant trip
 - Never require screen interaction while moving.
 - Keep live voice short and limited to dangerous moments.
 - Motion sensor data is never stored. The GPS trace is stored per trip only for the report and replay; add a delete-trip option [Proposed].
+- Street View images are never stored, only which event was shown, its heading and the caption (section 12).
 - Never collect test data by driving recklessly.
 - Scores are coaching tools, not a certification of safety.
 

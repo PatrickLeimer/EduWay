@@ -7,19 +7,30 @@
  * remembers it so listTrips/getTrip show it afterwards. Its progressUpdate
  * alternates between "tier went up" and "streak just broke" so the debrief can
  * be built against both; passenger trips get a non-qualifying update.
+ *
+ * Street View (§12): the fixture trip has a callout, a second seeded trip has
+ * none (streetView: null), so screens can be built against both. New trips get
+ * a callout unless they are passenger trips.
+ *
+ * A third seeded trip has no coaching (as when Gemini was busy), so the coach
+ * screen's "Try again" can be built; retryCoaching fills it in.
  */
 import {
-  eventsFixture,
+  debriefWithoutStreetViewFixture,
+  debriefWithStreetViewFixture,
+  fixtureEventsWithIds,
   progressFixture,
   progressUpdateStreakBrokenFixture,
   progressUpdateTierUpFixture,
+  streetViewCalloutFixture,
   traceFixture,
   tripFixture,
 } from '@edudriver/fixtures';
 import {
   CreateTripRequestSchema,
-  type DrivingEvent,
+  type GetTripResponse,
   type ProgressUpdate,
+  type StreetViewCallout,
   type Trip,
 } from '@edudriver/shared';
 
@@ -43,12 +54,28 @@ function unchanged(from: ProgressUpdate): ProgressUpdate {
 }
 
 export function createMockApiClient(latencyMs = 300): ApiClient {
-  const trips = new Map<string, { trip: Trip; events: DrivingEvent[] }>();
-  const withIds = (tripId: string, userId: string): DrivingEvent[] =>
-    eventsFixture.map((e, i) => ({ ...e, _id: `${tripId}-evt-${i}`, tripId, userId }));
-  trips.set(tripFixture._id, {
-    trip: tripFixture,
-    events: withIds(tripFixture._id, tripFixture.userId),
+  const trips = new Map<string, GetTripResponse>();
+  trips.set(tripFixture._id, debriefWithStreetViewFixture);
+  const noCalloutId = `${tripFixture._id}-no-streetview`;
+  trips.set(noCalloutId, {
+    trip: { ...debriefWithoutStreetViewFixture.trip, _id: noCalloutId },
+    events: fixtureEventsWithIds(noCalloutId, tripFixture.userId),
+    streetView: null,
+  });
+
+  const noCoachId = `${tripFixture._id}-no-coach`;
+  trips.set(noCoachId, {
+    trip: { ...tripFixture, _id: noCoachId, coach: null, coachAudioUrl: null },
+    events: fixtureEventsWithIds(noCoachId, tripFixture.userId),
+    streetView: null,
+  });
+
+  /** The fixture callout, re-pointed at another trip (same event index). */
+  const calloutFor = (tripId: string): StreetViewCallout => ({
+    ...streetViewCalloutFixture,
+    eventId: streetViewCalloutFixture.eventId.replace(tripFixture._id, tripId),
+    thumbnailUrl: `/streetview/${tripId}/thumbnail`,
+    panoramaUrl: `/streetview/${tripId}/panorama`,
   });
 
   const find = (id: string) => {
@@ -69,11 +96,18 @@ export function createMockApiClient(latencyMs = 300): ApiClient {
         userId: body.userId,
         score: body.trip.passenger ? null : tripFixture.score,
       };
-      trips.set(_id, { trip, events: withIds(_id, body.userId) });
+      const streetView = body.trip.passenger ? null : calloutFor(_id);
+      trips.set(_id, { trip, events: fixtureEventsWithIds(_id, body.userId), streetView });
       const sample =
         trips.size % 2 === 0 ? progressUpdateTierUpFixture : progressUpdateStreakBrokenFixture;
       const progressUpdate = body.trip.passenger ? unchanged(sample) : sample;
-      return { trip, coach: trip.coach, coachAudioUrl: trip.coachAudioUrl, progressUpdate };
+      return {
+        trip,
+        coach: trip.coach,
+        coachAudioUrl: trip.coachAudioUrl,
+        streetView,
+        progressUpdate,
+      };
     },
     async listTrips(userId) {
       await delay(latencyMs);
@@ -95,6 +129,17 @@ export function createMockApiClient(latencyMs = 300): ApiClient {
     async getTrip(id) {
       await delay(latencyMs);
       return find(id);
+    },
+    async retryCoaching(id) {
+      await delay(latencyMs);
+      const found = find(id);
+      if (found.trip.passenger || found.trip.coach) return found;
+      const coached: GetTripResponse = {
+        ...found,
+        trip: { ...found.trip, coach: tripFixture.coach, coachAudioUrl: tripFixture.coachAudioUrl },
+      };
+      trips.set(id, coached);
+      return coached;
     },
     async getTrace(id) {
       await delay(latencyMs);

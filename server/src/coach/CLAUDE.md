@@ -20,9 +20,9 @@ Builds the compact trip summary (master doc §10 "Input"), asks Gemini for struc
 |---|---|
 | `service.ts` | Done: Gemini → ElevenLabs with graceful fallbacks |
 | `promptContext.ts` | Done: thresholds rendered for the prompt |
-| `summary.ts` | Done: reproduces `fixtures/trip-summary.json` from the fixture trip (tested) |
-| `prompt.ts` | Done: §10 guidelines + conversational chat rules and a style example (tested) |
-| `gemini.ts` | Done: JSON mode (chat required), reply validated, falls back through `GEMINI_FALLBACK_MODELS` one call each (tested with a fake SDK) |
+| `summary.ts` | Done: reproduces `fixtures/trip-summary.json` from the fixture trip; adds `street_view_event` when the backend picked one (tested) |
+| `prompt.ts` | Done: §10 guidelines + conversational chat rules and a style example; Street View caption rules (§12: event data only, never describe the picture) (tested) |
+| `gemini.ts` | Done: JSON mode (chat required), reply validated; falls back through `GEMINI_FALLBACK_MODELS` one call each, then one more pass after 3 s skipping models out of quota (tested with a fake SDK) |
 | `elevenlabs.ts` | Done: chat voiced as one track with character timings → `chat_audio_starts_s`; mp3 saved to `server/audio`, served at `/audio` (tested) |
 | `mocks/` | Fixture coaching + fake audio URL |
 

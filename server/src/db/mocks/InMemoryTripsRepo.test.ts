@@ -16,7 +16,8 @@ describe('InMemoryTripsRepo', () => {
     });
 
     const loaded = await repo.getTrip(saved._id);
-    expect(GetTripResponseSchema.safeParse(loaded).success).toBe(true);
+    // The repo returns trip + events; the route adds `streetView` (Street View Part 1).
+    expect(GetTripResponseSchema.omit({ streetView: true }).safeParse(loaded).success).toBe(true);
     expect(loaded?.events).toHaveLength(eventsFixture.length);
     expect(TraceSchema.parse(await repo.getTrace(saved._id)).tripId).toBe(saved._id);
     expect((await repo.listTrips(trip.userId)).map((t) => t._id)).toContain(saved._id);

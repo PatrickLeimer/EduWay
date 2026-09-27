@@ -14,6 +14,7 @@ import {
   DrivingEventSchema,
   ProgressSchema,
   RecordedEventSchema,
+  StreetViewCalloutSchema,
   TraceSchema,
   TripSchema,
 } from './types';
@@ -64,6 +65,8 @@ export const CreateTripResponseSchema = z.object({
   coach: CoachOutputSchema.nullable(),
   /** ElevenLabs debrief audio (§11). Null when passenger or voice failed. */
   coachAudioUrl: z.string().nullable(),
+  /** One infraction to show in Street View (§12). Null when none qualifies or there is no imagery. */
+  streetView: StreetViewCalloutSchema.nullable(),
   /**
    * What this trip changed in streaks, tier and readiness (gamification.ts).
    * The server always sends it; optional only so older clients and hand-built
@@ -102,6 +105,8 @@ export type ListTripsResponse = z.infer<typeof ListTripsResponseSchema>;
 export const GetTripResponseSchema = z.object({
   trip: TripSchema,
   events: z.array(DrivingEventSchema),
+  /** One infraction to show in Street View (§12). Null when none qualifies or there is no imagery. */
+  streetView: StreetViewCalloutSchema.nullable(),
 });
 export type GetTripResponse = z.infer<typeof GetTripResponseSchema>;
 
@@ -149,6 +154,8 @@ export const API_ROUTES = {
   listTrips: '/trips',
   getTrip: (id: string) => `/trips/${encodeURIComponent(id)}`,
   getTrace: (id: string) => `/trips/${encodeURIComponent(id)}/trace`,
+  /** Re-run coaching for a trip that has none (Gemini was busy). Responds with GetTripResponse. */
+  retryCoaching: (id: string) => `/trips/${encodeURIComponent(id)}/coach`,
   getProgress: '/progress',
   ask: '/ask',
   health: '/health',

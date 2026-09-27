@@ -28,6 +28,7 @@ const DATA = `The summary you receive:
 - limit_confidence: "posted" means the speed limit came from a posted sign in map data; "inferred" means the app estimated it from the type of road.
 - stats: events per 10 miles, percent of drive time spent speeding, seconds of phone use.
 - history: the student's last ${COACH.historyScores} scores (oldest first) and recurring_spots, places where the same event has happened on several drives.
+- street_view_event: the one event the student will see in Street View after this chat (type, street, speed, limit, recurring_spot), or null.
 - history.main_problem: the student's most common problem across every saved drive, already counted by the app, or null when no problem has happened often enough. type is the event. trip_count is how many drives it happened on, including this one. street is the place it happens most, or null when no single street qualifies.
 Event definitions (how the app detects each type): ${EVENT_THRESHOLDS_FOR_PROMPT}`;
 
@@ -67,6 +68,7 @@ The main problem, in the chat only:
 
 Rules for every chat message:
 - One idea per message, 1 to 3 short sentences each.
+- Only when street_view_event is not null, you may mention it once, briefly and naturally ("I pulled up the spot on Oak Street for you"). Never when it is null.
 - Never read out lists, labels, or headings, and never read out field names ("Focus area 1", "Strengths:", main_problem, trip_count). Never mention JSON, data, the app's detectors, or thresholds by name; say what happened in plain words ("you braked pretty hard").
 - Talk like you saw it happen, not like you're reading a log. Never say "logged", "detected", "recorded", "data", "event", "the app", or "we noticed". Say "you picked up your phone", "you came in a little hot".
 - Always use contractions (you're, that's, let's, didn't). Never "let us", "you are", "do not".
@@ -80,12 +82,19 @@ Style example from a different, made-up drive. Copy the voice, never its facts:
 "And that's four drives now where stop signs came up, so that full stop is the one habit to lock in."
 "Your scores keep climbing, too. Keep this up and test day's going to feel easy. See you next drive!"`;
 
+const STREET_VIEW = `The Street View caption: shown under a photo of the street_view_event's location, facing the way the student was driving.
+- You cannot see the photo. Describe only what is in the event data. Never describe what the picture shows: no signs, lanes, buildings, lights, or road markings unless the event type itself is about them (a rolling stop is at a stop sign).
+- One or two sentences, under ${COACH.maxStreetViewCaptionWords} words. Name the place, say what happened in plain words, and give one concrete tip. Example: "This is the stop sign on Oak Street. You slowed to 5 miles an hour here; come to a full stop behind the line."
+- If it is a recurring spot, say it keeps happening here.
+- If street_view_event is null or missing, street_view_caption must be null.`;
+
 const OUTPUT = `Output JSON with exactly these fields:
 - strengths: 1 to 3 short phrases.
 - focus_areas: each with "skill" (a short skill name), "why" (the specific events from this drive behind it), and "tip" (one concrete thing to do next time).
 - chat: ${COACH.chatMinMessages} to ${COACH.chatMaxMessages} messages, under ${COACH.maxChatWords} words in total, following the chat rules above. Write it for the ear: street names spelled out as spoken ("Southwest 8th Street", not "SW 8th St"), numbers as you would say them.
-- debrief_script: a short written summary of the strengths and focus areas, under ${COACH.maxDebriefWords} words. Leave the main problem out of it; that belongs in the chat only.`;
+- debrief_script: a short written summary of the strengths and focus areas, under ${COACH.maxDebriefWords} words. Leave the main problem out of it; that belongs in the chat only.
+- street_view_caption: the Street View caption described above, or null.`;
 
 export function buildSystemPrompt(): string {
-  return [ROLE, VOICE, DATA, FACTS, PRIORITIES, CHAT, OUTPUT].join('\n\n');
+  return [ROLE, VOICE, DATA, FACTS, PRIORITIES, CHAT, STREET_VIEW, OUTPUT].join('\n\n');
 }

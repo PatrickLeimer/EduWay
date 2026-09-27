@@ -24,12 +24,14 @@ import {
 } from '../gamification';
 import { COLLECTIONS } from './collections';
 import { pickMainProblem } from './mainProblem';
-import type { TripsRepo } from './repo';
+import type { StoredStreetView, TripsRepo } from './repo';
 
 type TripDoc = Omit<Trip, '_id' | 'startedAt' | 'endedAt'> & {
   _id: ObjectId;
   startedAt: Date;
   endedAt: Date;
+  /** Street View callout (§12); only our own data, never the image. */
+  streetView?: StoredStreetView | null;
 };
 type EventDoc = Omit<DrivingEvent, '_id' | 'tripId' | 'at'> & {
   _id: ObjectId;
@@ -48,7 +50,7 @@ const EARTH_RADIUS_M = 6378100;
 const toObjectId = (id: string): ObjectId | null =>
   /^[0-9a-f]{24}$/i.test(id) ? new ObjectId(id) : null;
 
-const toTrip = ({ _id, startedAt, endedAt, ...rest }: TripDoc): Trip => ({
+const toTrip = ({ _id, startedAt, endedAt, streetView: _streetView, ...rest }: TripDoc): Trip => ({
   ...rest,
   _id: _id.toHexString(),
   startedAt: startedAt.toISOString(),
@@ -193,6 +195,19 @@ export function createMongoTripsRepo(db: Db): TripsRepo {
       const _id = toObjectId(tripId);
       if (!_id) return;
       await trips.updateOne({ _id }, { $set: { coach, coachAudioUrl: audioUrl } });
+    },
+
+    async setStreetView(tripId, streetView) {
+      const _id = toObjectId(tripId);
+      if (!_id) return;
+      await trips.updateOne({ _id }, { $set: { streetView } });
+    },
+
+    async getStreetView(tripId) {
+      const _id = toObjectId(tripId);
+      if (!_id) return null;
+      const doc = await trips.findOne({ _id }, { projection: { streetView: 1 } });
+      return doc?.streetView ?? null;
     },
 
     async listTrips(userId) {

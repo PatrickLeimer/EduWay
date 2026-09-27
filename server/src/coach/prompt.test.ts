@@ -46,6 +46,15 @@ describe('buildSystemPrompt (§10 guidelines)', () => {
     expect(prompt).toMatch(/Copy the voice, never its facts/);
   });
 
+  it('captions Street View from the event data only, never the picture (§12)', () => {
+    expect(prompt).toMatch(/street_view_event/);
+    expect(prompt).toMatch(/You cannot see the photo/);
+    expect(prompt).toMatch(/Never describe what the picture shows/);
+    expect(prompt).toContain(`under ${COACH.maxStreetViewCaptionWords} words`);
+    expect(prompt).toMatch(/street_view_caption must be null/);
+    expect(prompt).toMatch(/Never when it is null/);
+  });
+
   it('compares with history and recurring spots', () => {
     expect(prompt).toMatch(/recurring spot/);
     expect(prompt).toMatch(/Call out improvement/);

@@ -1,0 +1,12 @@
+{
+  "$comment": "Street View callout for the fixture trip (master doc section 12). The harsh hard brake on SW 8th St (event 9): harsh tier + recurring spot, so the Part 1 picker would choose it. Real Miami location on Tamiami Trail; heading 90 = driving east, from the trace 3 s before the event. URLs are relative to the API base URL.",
+  "eventId": "trip-fixture-001-evt-9",
+  "eventType": "hard_brake",
+  "street": "SW 8th St",
+  "lat": 25.7625,
+  "lng": -80.354487,
+  "heading": 90,
+  "caption": "This is Southwest 8th Street, where hard braking keeps coming up. Start easing off as soon as the light comes into view.",
+  "thumbnailUrl": "/streetview/trip-fixture-001/thumbnail",
+  "panoramaUrl": "/streetview/trip-fixture-001/panorama"
+}
