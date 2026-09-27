@@ -3,7 +3,7 @@ import type { RecordedEvent } from '@edudriver/shared';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { EVENT_LABEL } from '../lib/format';
-import { colors, font, space } from '../theme';
+import { colors, font, fonts, space } from '../theme';
 import { TierDot } from './primitives';
 
 export function EventRow({ event, time }: { event: RecordedEvent; time?: string }) {
@@ -38,7 +38,12 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   text: { flex: 1 },
-  title: { fontSize: font.body, fontWeight: '600', color: colors.text },
-  details: { fontSize: font.small, color: colors.textMuted, marginTop: 2 },
-  time: { fontSize: font.small, color: colors.textMuted },
+  title: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  details: {
+    fontFamily: fonts.regular,
+    fontSize: font.small,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  time: { fontFamily: fonts.regular, fontSize: font.small, color: colors.textMuted },
 });

@@ -31,7 +31,7 @@ import { TestDriveBadge } from '../components/TestDriveBadge';
 import { clockText } from '../lib/format';
 import { directionsUrl, EMERGENCY_NUMBER, emergencyUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
-import { colors, font, motion, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
+import { colors, font, fonts, motion, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 
 /** Re-renders once a second so the trip clock ticks. */
 function useNow(): number {
@@ -146,15 +146,20 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.lg },
   time: {
     fontSize: font.speed,
-    fontWeight: '800',
+    fontFamily: fonts.semiBold,
     color: colors.textOnDark,
     fontVariant: ['tabular-nums'],
   },
-  timeLabel: { fontSize: font.driveMin, color: colors.textOnDarkMuted, marginTop: -space.sm },
+  timeLabel: {
+    fontFamily: fonts.regular,
+    fontSize: font.driveMin,
+    color: colors.textOnDarkMuted,
+    marginTop: -space.sm,
+  },
   sign: { alignItems: 'center', gap: space.xl, marginTop: space.xl },
   eyes: {
     fontSize: 40,
-    fontWeight: '900',
+    fontFamily: fonts.semiBold,
     color: colors.textOnDark,
     textAlign: 'center',
     letterSpacing: 1,
@@ -169,6 +174,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   safetyButtons: { flexDirection: 'row', gap: space.sm, marginLeft: 'auto' },
-  errorTitle: { fontSize: font.title, fontWeight: '700', color: colors.textOnDark },
-  errorText: { fontSize: font.body, color: colors.textOnDarkMuted, textAlign: 'center' },
+  errorTitle: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.textOnDark },
+  errorText: {
+    fontFamily: fonts.regular,
+    fontSize: font.body,
+    color: colors.textOnDarkMuted,
+    textAlign: 'center',
+  },
 });

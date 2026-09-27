@@ -7,7 +7,7 @@ import { createElement, type ComponentType } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { regionFor } from '../lib/geo';
-import { colors, font } from '../theme';
+import { colors, font, fonts } from '../theme';
 import type { MapCanvasProps } from './mapTypes';
 
 const Frame = 'iframe' as unknown as ComponentType<{
@@ -51,5 +51,5 @@ export function MapCanvas({
 
 const styles = StyleSheet.create({
   empty: { backgroundColor: colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
-  emptyText: { color: colors.textMuted, fontSize: font.body },
+  emptyText: { fontFamily: fonts.regular, color: colors.textMuted, fontSize: font.body },
 });

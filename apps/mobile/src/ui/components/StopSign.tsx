@@ -5,7 +5,7 @@
  */
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors } from '../theme';
+import { colors, fonts } from '../theme';
 
 /**
  * Regular octagon = a square clipped by the same square turned 45°. The outer
@@ -45,5 +45,5 @@ const styles = StyleSheet.create({
   clip: { overflow: 'hidden', transform: [{ rotate: '45deg' }] },
   fill: { transform: [{ rotate: '-45deg' }] },
   center: { alignItems: 'center', justifyContent: 'center' },
-  word: { color: colors.white, fontWeight: '900', letterSpacing: 2 },
+  word: { color: colors.white, fontFamily: fonts.semiBold, letterSpacing: 2 },
 });

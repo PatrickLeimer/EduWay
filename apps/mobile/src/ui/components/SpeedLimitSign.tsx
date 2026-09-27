@@ -6,7 +6,7 @@
 import type { LimitConfidence } from '@edudriver/shared';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, font } from '../theme';
+import { colors, font, fonts } from '../theme';
 
 export function SpeedLimitSign({
   limitMph,
@@ -37,11 +37,11 @@ const styles = StyleSheet.create({
   },
   top: {
     fontSize: font.tiny,
-    fontWeight: '800',
+    fontFamily: fonts.semiBold,
     color: colors.black,
     textAlign: 'center',
     lineHeight: 12,
   },
-  value: { fontSize: 36, fontWeight: '800', color: colors.black },
-  est: { fontSize: font.tiny, color: colors.textMuted },
+  value: { fontSize: 36, fontFamily: fonts.semiBold, color: colors.black },
+  est: { fontFamily: fonts.regular, fontSize: font.tiny, color: colors.textMuted },
 });
