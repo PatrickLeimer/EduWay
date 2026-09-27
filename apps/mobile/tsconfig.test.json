@@ -1,0 +1,9 @@
+{
+  // Vitest files run in Node (not React Native), so they get Node types.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src/**/*.test.ts"],
+  "exclude": ["node_modules"]
+}
