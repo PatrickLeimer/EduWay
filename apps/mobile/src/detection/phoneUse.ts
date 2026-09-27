@@ -11,6 +11,10 @@
  *   episode; it is emitted when the app is active again, with durationS = time
  *   away (the warning plays on return, §18 flag 2). Location and speed are
  *   from when the student left.
+ * - Navigation and emergency calls always stay available (§4): after
+ *   onSafeExit, the next trip to the background is not phone use. The excuse
+ *   is used up by that trip, or dropped at the next in-app touch (the link
+ *   did not open).
  */
 import { MPS_TO_MPH, PHONE_USE, PIPELINE, type DraftEvent, type GpsFix } from '@edudriver/shared';
 
@@ -20,6 +24,8 @@ export type AppStateLike = 'active' | 'background' | 'inactive' | 'unknown' | 'e
 export interface PhoneUseTracker {
   onAppState(state: AppStateLike, t: number): DraftEvent | null;
   onTouch(t: number): DraftEvent | null;
+  /** The app is opening navigation or an emergency call. */
+  onSafeExit(): void;
   /** Trip end: emits any episode still open. */
   close(t: number): DraftEvent | null;
 }
@@ -46,6 +52,7 @@ export function createPhoneUseTracker(opts: {
   let away: { startT: number; fix: GpsFix } | null = null;
   /** Last touch, or return from the background; later touches within the merge window join it. */
   let lastUseT: number | null = null;
+  let safeExit = false;
 
   function endAway(t: number): DraftEvent | null {
     if (!away) return null;
@@ -59,16 +66,24 @@ export function createPhoneUseTracker(opts: {
     onAppState(state, t) {
       if (state === 'active') return endAway(t);
       if (state !== 'background' || opts.lockEnabled || away) return null;
+      if (safeExit) {
+        safeExit = false;
+        return null;
+      }
       const fix = opts.getLatestFix();
       if (isMoving(fix)) away = { startT: t, fix };
       return null;
     },
     onTouch(t) {
+      safeExit = false;
       const fix = opts.getLatestFix();
       if (!isMoving(fix)) return null;
       const merged = lastUseT !== null && t - lastUseT < PIPELINE.mergeWindowS * 1000;
       lastUseT = t;
       return merged ? null : toEvent(fix, t, t);
+    },
+    onSafeExit() {
+      safeExit = true;
     },
     close: endAway,
   };

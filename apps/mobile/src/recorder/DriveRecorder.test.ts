@@ -76,7 +76,7 @@ function harness(opts: { fetch?: OverpassFetch } = {}) {
     }),
     clear() {},
   };
-  const roadDetector: RoadEventDetector = { onGps: () => [], reset() {} };
+  const roadDetector: RoadEventDetector = { onGps: () => ({ events: [], alerts: [] }), reset() {} };
 
   const recorder = createDriveRecorder({
     motionSource: {
@@ -229,7 +229,7 @@ describe('DriveRecorder', () => {
       },
       createRoadCache: () => ({}) as RoadCache,
       fetchOverpass: async () => ({}),
-      createRoadDetector: () => ({ onGps: () => [], reset() {} }),
+      createRoadDetector: () => ({ onGps: () => ({ events: [], alerts: [] }), reset() {} }),
       sink: { append() {} },
       now: h.now,
       flushEveryMs: 0,

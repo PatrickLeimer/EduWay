@@ -220,7 +220,7 @@ export function createDriveRecorder(deps: RecorderDeps): DriveRecorder {
     const match = roadCache.match(fix);
     status.road = roadCache.getStatus();
     deps.motionDetector.onGps(fix);
-    for (const ev of roadDetector.onGps(fix, match)) recordEvent('road', ev);
+    for (const ev of roadDetector.onGps(fix, match).events) recordEvent('road', ev);
     status.roadMatch = match;
   }
 

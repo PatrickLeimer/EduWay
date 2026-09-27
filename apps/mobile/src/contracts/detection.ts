@@ -59,4 +59,9 @@ export interface PhoneUseMonitor extends Subscribable<DraftEvent> {
   stop(): void;
   /** UI calls this from a root touch handler while driving. */
   reportTouch(): void;
+  /**
+   * The app is about to open navigation or an emergency call, which always stay
+   * available (§4): the next trip to the background is not phone use.
+   */
+  reportSafeExit(): void;
 }

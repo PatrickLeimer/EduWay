@@ -69,7 +69,14 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
   const callEmergency = () =>
     Alert.alert(`Call ${EMERGENCY_NUMBER}?`, undefined, [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Call', style: 'destructive', onPress: () => void Linking.openURL(emergencyUrl()) },
+      {
+        text: 'Call',
+        style: 'destructive',
+        onPress: () => {
+          trip.reportSafeExit();
+          void Linking.openURL(emergencyUrl());
+        },
+      },
     ]);
 
   if (state.status === 'error') {
@@ -127,7 +134,10 @@ export function DrivingScreen({ modules, navigate, settings }: ScreenProps) {
           <Button
             title="Directions"
             variant="onDark"
-            onPress={() => void Linking.openURL(directionsUrl())}
+            onPress={() => {
+              trip.reportSafeExit();
+              void Linking.openURL(directionsUrl());
+            }}
           />
           <Button
             title={`Emergency ${EMERGENCY_NUMBER}`}

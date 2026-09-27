@@ -171,6 +171,9 @@ export function createMockTripSession(deps: MockTripSessionDeps): TripSession {
     reportTouch() {
       // The mock ignores touches; phone use comes from the fixture event.
     },
+    reportSafeExit() {
+      // Nothing to excuse: the mock does not watch AppState.
+    },
     subscribe: (l) => store.subscribe(l),
   };
   return session;
