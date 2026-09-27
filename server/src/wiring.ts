@@ -8,6 +8,7 @@ import type { Config } from './config';
 import { connectDb, createInMemoryTripsRepo, createMongoTripsRepo } from './db';
 import type { RouteDeps } from './routes';
 import { mockScoreTrip, scoreTrip } from './scoring';
+import { createGoogleStreetView } from './streetview';
 
 export async function createDeps(config: Config): Promise<RouteDeps> {
   let repo = createInMemoryTripsRepo();
@@ -25,9 +26,18 @@ export async function createDeps(config: Config): Promise<RouteDeps> {
       })
     : createMockCoachService();
 
+  // Street View (§12) is on whenever its server key is set; no mock needed (absent = off).
+  const streetView = config.GOOGLE_STREETVIEW_KEY
+    ? createGoogleStreetView({
+        staticKey: config.GOOGLE_STREETVIEW_KEY,
+        mapsJsKey: config.GOOGLE_MAPS_JS_KEY,
+      })
+    : undefined;
+
   return {
     repo,
     scoreTrip: config.USE_REAL_SCORING ? scoreTrip : mockScoreTrip,
     coach,
+    streetView,
   };
 }

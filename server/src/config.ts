@@ -24,6 +24,11 @@ const EnvSchema = z.object({
   ELEVENLABS_API_KEY: z.string().optional(),
   ELEVENLABS_VOICE_ID: z.string().optional(),
 
+  /** Street View (§12). Static API + metadata; without it the feature is off. */
+  GOOGLE_STREETVIEW_KEY: z.string().optional(),
+  /** Maps JavaScript API for the Street View panorama page; referrer-restricted to this backend. */
+  GOOGLE_MAPS_JS_KEY: z.string().optional(),
+
   /** Public base URL used to build debrief audio links, e.g. https://api.example.com. */
   PUBLIC_BASE_URL: z.string().optional(),
 
