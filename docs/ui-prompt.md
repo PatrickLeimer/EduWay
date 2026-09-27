@@ -118,7 +118,7 @@ One screen at a time, each with step dots and a big **Next** (`components/FlowFo
 - Links to the drive recorder and WS1–WS4 debug screens (these return to Developer tools).
 
 ### How maps work (and which Google APIs)
-- **Basemap:** `react-native-maps` `MapView`. On **Android** that is the **Google Maps SDK for Android** (a Google Maps Platform API). Expo Go ships with its own key; a development/EAS build needs our own key configured in `app.json` (follow the SDK 57 `react-native-maps` docs for the exact setting). On **iOS in Expo Go**, it's Apple Maps (no Google key in Expo Go's iOS binary); a dev build can switch to Google with an iOS key. The **browser** debug map (`dev/Ws2Map.web.tsx`) uses the **Maps JavaScript API** with `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY`.
+- **Basemap:** `react-native-maps` `MapView`. On **Android** that is the **Google Maps SDK for Android** (a Google Maps Platform API). Expo Go ships with its own key; a development/EAS build needs our own key configured in `app.json` (follow the SDK 57 `react-native-maps` docs for the exact setting). On **iPhone**, Expo Go can't show the native Google Maps SDK (no Google key in Expo Go's iOS binary), so `MapCanvas.ios.tsx` shows **real Google Maps through the Maps JavaScript API inside a `react-native-webview`**, driven by `lib/googleMapHtml.ts` (React Native injects `applyState`; the page posts `ready`/`error`). Google Maps only, never Apple Maps: without a key, or if Google rejects it, the map area shows the reason. A dev build could later switch iPhone to the native Google SDK instead. The **browser** debug map (`dev/Ws2Map.web.tsx`) uses the **Maps JavaScript API** with `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY`.
 - **What we draw on it:** our own recorded GPS trace (route line), event locations (pins), and the car dot. No Google service computes these.
 - **Street names and speed limits:** OpenStreetMap via Overpass (WS2), not Google.
 - **Directions:** a plain Google Maps link (`google.com/maps/dir/?api=1…`) that opens the Maps app. No API key, no Directions API.
@@ -128,7 +128,9 @@ One screen at a time, each with step dots and a big **Next** (`components/FlowFo
 
 | Component | What it is |
 |---|---|
-| `MapCanvas.tsx` | The only map. Google Maps on Android, Apple Maps on iOS (Expo Go's iOS build has no Google key; same choice as `dev/Ws2Map.tsx`). Props: `route`, `pins`, `car`, `follow`, `fitTo`, `interactive`, `dark`, `lite`. |
+| `MapCanvas.tsx` | The only map screens import. Android → `NativeMapCanvas.tsx` (native Google Maps SDK). Props: `route`, `pins`, `car`, `follow`, `fitTo`, `interactive`, `dark`, `lite`. |
+| `MapCanvas.ios.tsx` | iPhone: Google Maps (Maps JavaScript API) in a WebView, same props; shows the reason instead of a map without a working key (never Apple Maps). |
+| `NativeMapCanvas.tsx` | `react-native-maps` implementation with `PROVIDER_GOOGLE` (Android). Dark style is `mapDarkStyle` in `theme.ts`, shared with the iPhone page. |
 | `MapCanvas.web.tsx` | Browser version: a keyless Google Maps embed centered on the car or route; no route line or pins. |
 | `Screen.tsx` | Light-screen shell: `BackButton` (rounded pill with a drawn chevron, springs when pressed), large title, optional edge-to-edge `hero` (map), scrolling body, pinned `footer`. Title, hero, body and footer enter one after another. |
 | `Button.tsx` | `primary` (black), `secondary` (gray), `danger` (red), `onDark` (driving); `large` for in-car sizes. Shrinks slightly while held. |
@@ -188,7 +190,8 @@ Built on React Native's `Animated` API (no library), native driver, cubic ease-o
 2. **Speed vs limit timeline** (§9 Replay): the trace stores speed only, so the replay shows speed + event ticks. A per-second limit needs a trace contract change (WS2/WS3).
 3. **Delete trip** (§16 [Proposed]): no endpoint in the `ApiClient` contract, so it's not in Settings.
 4. **Settings persistence:** in memory only; resets when the app restarts. Needs a storage choice (AsyncStorage would be a new dependency; `expo-file-system` is approved).
-5. **Dependencies to approve if wanted:** Expo Router (`AGENTS.md` expects it in the UI phase), `@gorhom/bottom-sheet` (+ reanimated, gesture-handler) for a draggable sheet, `react-native-safe-area-context` for exact notch padding, an icon set.
+5. **iPhone map key:** `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` in `apps/mobile/.env` must have the **Maps JavaScript API** enabled. If it has HTTP referrer restrictions, allow `https://edudriver.app/*` (`WEB_MAP_BASE_URL`).
+6. **Dependencies to approve if wanted:** Expo Router (`AGENTS.md` expects it in the UI phase), `@gorhom/bottom-sheet` (+ reanimated, gesture-handler) for a draggable sheet, `react-native-safe-area-context` for exact notch padding, an icon set.
 6. **Emergency number** is `911` (`ui/lib/links.ts`). Change it if the demo is outside the US.
 7. **Web preview:** the project has no `react-native-web`/`react-dom`, so `expo start --web` doesn't run. `MapCanvas.web.tsx` is ready for when it does.
 8. **Ask the coach** (§10 stretch) has no screen yet; `api.ask` exists.
