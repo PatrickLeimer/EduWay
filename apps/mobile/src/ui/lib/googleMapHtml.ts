@@ -15,6 +15,8 @@ export function googleMapsKey(): string {
 /** What React Native sends to the page on every change. */
 export interface WebMapState {
   route: MapPoint[];
+  /** Separate polylines, one per drive. Empty means draw `route` instead. */
+  routes?: MapPoint[][];
   pins: (MapPoint & { id: string; color: string; title?: string })[];
   car: MapPoint | null;
   follow: MapPoint | null;
@@ -40,7 +42,7 @@ export function googleMapHtml(
 </head><body><div id="map"></div>
 <script>
 var DARK = ${JSON.stringify(opts.darkStyle)};
-var map, route, car, pins = [], started = false, lastRoute = '', lastPins = '';
+var map, routeLines = [], car, pins = [], started = false, lastRoute = '', lastPins = '';
 function send(m) { window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(m)); }
 function ll(p) { return { lat: p.latitude, lng: p.longitude }; }
 function sig(a) { var l = a[a.length - 1]; return a.length ? a.length + ':' + a[0].latitude + ',' + a[0].longitude + ':' + l.latitude + ',' + l.longitude : ''; }
@@ -66,7 +68,6 @@ function init() {
       center: { lat: 0, lng: 0 }, zoom: 15, disableDefaultUI: true, clickableIcons: false,
       keyboardShortcuts: false, backgroundColor: ${JSON.stringify(opts.background)}
     });
-    route = new google.maps.Polyline({ map: map, strokeColor: ${JSON.stringify(opts.routeColor)}, strokeWeight: 5, strokeOpacity: 0.95 });
     send({ type: 'ready' });
   } catch (e) {
     send({ type: 'error', message: 'Google Maps failed to start: ' + (e && e.message) });
@@ -75,8 +76,17 @@ function init() {
 window.applyState = function (s) {
   if (!map) return;
   map.setOptions({ styles: s.dark ? DARK : null, gestureHandling: s.interactive ? 'greedy' : 'none' });
-  var r = sig(s.route);
-  if (r !== lastRoute) { route.setPath(s.route.map(ll)); lastRoute = r; }
+  var lines = (s.routes && s.routes.length) ? s.routes : (s.route && s.route.length ? [s.route] : []);
+  var r = JSON.stringify(lines);
+  if (r !== lastRoute) {
+    routeLines.forEach(function (line) { line.setMap(null); });
+    routeLines = [];
+    lines.forEach(function (path) {
+      if (!path || path.length < 2) return;
+      routeLines.push(new google.maps.Polyline({ map: map, path: path.map(ll), strokeColor: ${JSON.stringify(opts.routeColor)}, strokeWeight: 5, strokeOpacity: 0.95 }));
+    });
+    lastRoute = r;
+  }
   var p = JSON.stringify(s.pins);
   if (p !== lastPins) {
     pins.forEach(function (m) { m.setMap(null); });

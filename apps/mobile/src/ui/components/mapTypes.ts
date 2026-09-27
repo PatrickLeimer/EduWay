@@ -11,8 +11,10 @@ export interface MapPin extends MapPoint {
 
 export interface MapCanvasProps {
   style?: ViewStyle;
-  /** Route polyline (Google Maps blue). */
+  /** One route polyline. */
   route?: MapPoint[];
+  /** Separate polylines, one per drive, so trips are not joined end to end. */
+  routes?: MapPoint[][];
   pins?: MapPin[];
   /** "You are here" / replay car dot. */
   car?: MapPoint | null;

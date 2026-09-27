@@ -4,6 +4,7 @@
  *
  * `origin` says where the flow started: 'trip' for the drive that just ended
  * (finishes on Home), 'history' for a past drive (finishes on Past drives).
+ * Either way the flow opens on Trip concluded, so the score ring comes first.
  */
 import type { FlowOrigin, Route } from '../navigation';
 
@@ -28,7 +29,8 @@ export function nextRoute(step: FlowStep, tripId: string, origin: FlowOrigin): R
 export function prevRoute(step: FlowStep, tripId: string, origin: FlowOrigin): Route {
   const prev = FLOW_STEPS[FLOW_STEPS.indexOf(step) - 1];
   if (prev) return { name: prev, tripId, origin };
-  return origin === 'trip' ? { name: 'ended' } : { name: 'list' };
+  // Both origins open on the Trip concluded summary; only a past drive needs the id.
+  return origin === 'trip' ? { name: 'ended' } : { name: 'ended', tripId };
 }
 
 /** 1-based position for the step dots. */

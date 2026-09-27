@@ -10,8 +10,11 @@ export type FlowOrigin = 'trip' | 'history';
 export type Route =
   | { name: 'start' }
   | { name: 'driving' }
-  /** Trip concluded: loading while it uploads and is coached, then the score and Next. */
-  | { name: 'ended' }
+  /**
+   * Trip concluded: loading while it uploads and is coached, then the score and Next.
+   * With a tripId it is the same summary for a past drive, opened from Past drives.
+   */
+  | { name: 'ended'; tripId?: string }
   // Post-trip flow, one step at a time (lib/flow.ts, §12 screen 3).
   | { name: 'replay'; tripId: string; origin: FlowOrigin }
   | { name: 'infractions'; tripId: string; origin: FlowOrigin }

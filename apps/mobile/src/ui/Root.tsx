@@ -28,7 +28,7 @@ import { ProgressScreen } from './screens/ProgressScreen';
 import { ReplayScreen } from './screens/ReplayScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { StartDriveScreen } from './screens/StartDriveScreen';
-import { TripEndedScreen } from './screens/TripEndedScreen';
+import { PastDriveSummaryScreen, TripEndedScreen } from './screens/TripEndedScreen';
 import { TripListScreen } from './screens/TripListScreen';
 import { colors, SAFE_TOP, space } from './theme';
 
@@ -39,7 +39,12 @@ function renderRoute(route: Route, props: ScreenProps) {
     case 'driving':
       return <DrivingScreen {...props} />;
     case 'ended':
-      return <TripEndedScreen {...props} />;
+      // A tripId means a past drive; without one it's the drive that just ended.
+      return route.tripId ? (
+        <PastDriveSummaryScreen {...props} tripId={route.tripId} />
+      ) : (
+        <TripEndedScreen {...props} />
+      );
     case 'replay':
       return <ReplayScreen {...props} tripId={route.tripId} origin={route.origin} />;
     case 'infractions':

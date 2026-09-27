@@ -9,11 +9,13 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
 import { useTripState } from '../../trip';
+import { BadgeGrid } from '../components/BadgeGrid';
 import { ConnectionError } from '../components/ConnectionError';
 import { FlowFooter } from '../components/FlowFooter';
 import { FadeIn } from '../components/motion';
 import { Card, Muted, SectionTitle } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { ScoreTrendChart } from '../components/ScoreTrendChart';
 import { nextRoute, prevRoute } from '../lib/flow';
 import {
   readinessChangeText,
@@ -84,6 +86,9 @@ export function GrowthScreen({
         </View>
       </FadeIn>
 
+      <SectionTitle>Score trend</SectionTitle>
+      <ScoreTrendChart trips={data.qualifyingTrips} />
+
       {update ? (
         <>
           <SectionTitle>This drive</SectionTitle>
@@ -132,6 +137,10 @@ export function GrowthScreen({
           );
         })
       )}
+
+      <SectionTitle>Badges</SectionTitle>
+      <BadgeGrid progress={p} />
+
       <Muted>Your coach is up next.</Muted>
     </Screen>
   );
