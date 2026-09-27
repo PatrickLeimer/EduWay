@@ -61,10 +61,13 @@ export function imageUrl(lat: number, lng: number, heading: number, key: string)
 /**
  * Full-screen StreetViewPanorama. The address overlay and extra controls are
  * off; Google's attribution stays (the API draws it and it must not be hidden).
+ * Finds the nearest outdoor panorama within STREET_VIEW.metadataRadiusM (like
+ * the thumbnail), and shows a short message instead of a black screen when
+ * there is none or Google rejects the key (gm_authFailure).
  */
 export function panoramaPage(lat: number, lng: number, heading: number, mapsJsKey: string): string {
-  const pano = JSON.stringify({
-    position: { lat: Number(lat), lng: Number(lng) },
+  const where = JSON.stringify({ lat: Number(lat), lng: Number(lng) });
+  const options = JSON.stringify({
     pov: { heading: Number(heading), pitch: STREET_VIEW.pitchDeg },
     zoom: 0,
     addressControl: false,
@@ -83,16 +86,41 @@ export function panoramaPage(lat: number, lng: number, heading: number, mapsJsKe
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Street View</title>
-<style>html, body, #pano { height: 100%; margin: 0; background: #000; }</style>
+<style>
+html, body, #pano { height: 100%; margin: 0; background: #000; }
+#msg { display: none; position: absolute; inset: 0; align-items: center; justify-content: center;
+  padding: 24px; color: #fff; font: 16px/1.4 -apple-system, system-ui, sans-serif; text-align: center; }
+</style>
 </head>
 <body>
 <div id="pano"></div>
+<div id="msg"></div>
 <script>
+function showMessage(text) {
+  var el = document.getElementById('msg');
+  el.textContent = text;
+  el.style.display = 'flex';
+}
+// Google calls this when it rejects the key (restrictions, API not enabled, billing).
+window.gm_authFailure = function () {
+  showMessage("Street View isn't available right now (Google rejected the panorama key).");
+};
 function initPano() {
-  new google.maps.StreetViewPanorama(document.getElementById('pano'), ${pano});
+  new google.maps.StreetViewService().getPanorama(
+    { location: ${where}, radius: ${STREET_VIEW.metadataRadiusM}, source: google.maps.StreetViewSource.OUTDOOR },
+    function (data, status) {
+      if (status !== 'OK' || !data || !data.location) {
+        showMessage("There's no Street View imagery here.");
+        return;
+      }
+      var options = ${options};
+      options.pano = data.location.pano;
+      new google.maps.StreetViewPanorama(document.getElementById('pano'), options);
+    }
+  );
 }
 </script>
-<script async src="${src}"></script>
+<script async src="${src}" onerror="showMessage('Could not load Google Maps. Check the connection.')"></script>
 </body>
 </html>`;
 }

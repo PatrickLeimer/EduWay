@@ -36,6 +36,17 @@ describe('panoramaPage', () => {
     expect(html).toContain('StreetViewPanorama');
   });
 
+  it('finds the nearest outdoor panorama within the search radius, like the thumbnail', () => {
+    expect(html).toContain('getPanorama');
+    expect(html).toContain('radius: 50');
+    expect(html).toContain('StreetViewSource.OUTDOOR');
+  });
+
+  it('shows a message instead of a black screen when the key is rejected or there is no imagery', () => {
+    expect(html).toContain('window.gm_authFailure');
+    expect(html).toContain("There's no Street View imagery here.");
+  });
+
   it('faces the heading and hides the address overlay and clutter controls', () => {
     expect(html).toContain('"heading":90');
     expect(html).toContain('"addressControl":false');
