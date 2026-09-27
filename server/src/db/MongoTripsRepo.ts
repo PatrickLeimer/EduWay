@@ -23,12 +23,15 @@ import {
   type ProgressTrip,
 } from '../gamification';
 import { COLLECTIONS } from './collections';
-import type { TripsRepo } from './repo';
+import { pickMainProblem } from './mainProblem';
+import type { StoredStreetView, TripsRepo } from './repo';
 
 type TripDoc = Omit<Trip, '_id' | 'startedAt' | 'endedAt'> & {
   _id: ObjectId;
   startedAt: Date;
   endedAt: Date;
+  /** Street View callout (§12); only our own data, never the image. */
+  streetView?: StoredStreetView | null;
 };
 type EventDoc = Omit<DrivingEvent, '_id' | 'tripId' | 'at'> & {
   _id: ObjectId;
@@ -47,7 +50,7 @@ const EARTH_RADIUS_M = 6378100;
 const toObjectId = (id: string): ObjectId | null =>
   /^[0-9a-f]{24}$/i.test(id) ? new ObjectId(id) : null;
 
-const toTrip = ({ _id, startedAt, endedAt, ...rest }: TripDoc): Trip => ({
+const toTrip = ({ _id, startedAt, endedAt, streetView: _streetView, ...rest }: TripDoc): Trip => ({
   ...rest,
   _id: _id.toHexString(),
   startedAt: startedAt.toISOString(),
@@ -194,6 +197,19 @@ export function createMongoTripsRepo(db: Db): TripsRepo {
       await trips.updateOne({ _id }, { $set: { coach, coachAudioUrl: audioUrl } });
     },
 
+    async setStreetView(tripId, streetView) {
+      const _id = toObjectId(tripId);
+      if (!_id) return;
+      await trips.updateOne({ _id }, { $set: { streetView } });
+    },
+
+    async getStreetView(tripId) {
+      const _id = toObjectId(tripId);
+      if (!_id) return null;
+      const doc = await trips.findOne({ _id }, { projection: { streetView: 1 } });
+      return doc?.streetView ?? null;
+    },
+
     async listTrips(userId) {
       const docs = await trips
         .find({ userId })
@@ -266,7 +282,29 @@ export function createMongoTripsRepo(db: Db): TripsRepo {
         }
       }
 
-      return { last_5_scores: last5, recurring_spots: [...spots.values()] };
+      // Scores stay "before this trip". The pattern count includes this trip, so
+      // the debrief can be the moment a problem reaches the minimum.
+      const patternEvents = await events
+        .find({ userId })
+        .project<{ type: EventDoc['type']; street: EventDoc['street']; tripId: ObjectId }>({
+          _id: 0,
+          type: 1,
+          street: 1,
+          tripId: 1,
+        })
+        .toArray();
+
+      return {
+        last_5_scores: last5,
+        recurring_spots: [...spots.values()],
+        main_problem: pickMainProblem(
+          patternEvents.map((event) => ({
+            type: event.type,
+            street: event.street,
+            tripId: event.tripId.toHexString(),
+          })),
+        ),
+      };
     },
 
     async getProgress(userId) {

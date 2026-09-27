@@ -23,6 +23,12 @@ export interface ApiClient {
   listTrips(userId: string): Promise<ListTripsResponse>;
   /** GET /trips/:id */
   getTrip(tripId: string): Promise<GetTripResponse>;
+  /**
+   * POST /trips/:id/coach: re-run coaching (Gemini + ElevenLabs) for a trip saved
+   * without it, e.g. when Gemini was busy. Returns the trip as GET /trips/:id does;
+   * `trip.coach` is still null if it failed again.
+   */
+  retryCoaching(tripId: string): Promise<GetTripResponse>;
   /** GET /trips/:id/trace */
   getTrace(tripId: string): Promise<GetTraceResponse>;
   /** GET /progress?userId= */

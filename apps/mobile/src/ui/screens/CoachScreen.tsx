@@ -6,8 +6,11 @@
  *
  * Without audio (voice failed, offline, older trip) the chat plays out at a
  * reading pace instead. Timing rules live in lib/chat.ts (pure, tested).
+ *
+ * A trip saved without coaching (Gemini busy or out of quota) shows "Try
+ * again", which asks the server to coach it now (ApiClient.retryCoaching).
  */
-import type { CoachOutput } from '@edudriver/shared';
+import type { CoachOutput, GetTripResponse } from '@edudriver/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -21,7 +24,9 @@ import {
 } from 'react-native';
 
 import { useApiQuery } from '../../api';
+import { Button } from '../components/Button';
 import { BackButton } from '../components/Screen';
+import { StreetViewCard } from '../components/StreetViewCard';
 import { FlowFooter } from '../components/FlowFooter';
 import { FadeIn, useReducedMotion } from '../components/motion';
 import { ConnectionError } from '../components/ConnectionError';
@@ -175,8 +180,12 @@ export function CoachScreen({
   origin,
 }: ScreenProps & { tripId: string; origin: FlowOrigin }) {
   const q = useApiQuery(`trip:${tripId}`, () => modules.api.getTrip(tripId));
-  const trip = q.data?.trip;
+  // "Try again": the retried debrief replaces the loaded one once it arrives.
+  const [retried, setRetried] = useState<GetTripResponse | null>(null);
+  const [retry, setRetry] = useState<'idle' | 'working' | 'failed'>('idle');
+  const trip = (retried ?? q.data)?.trip;
   const coach = trip?.coach ?? null;
+  const streetView = (retried ?? q.data)?.streetView ?? null;
   const audioUrl = trip && !trip.passenger ? trip.coachAudioUrl : null;
   const messages = useMemo(() => (coach ? chatMessages(coach) : []), [coach]);
   const debrief = modules.debrief;
@@ -278,6 +287,17 @@ export function CoachScreen({
     scroll.current?.scrollToEnd({ animated: true });
   }, [progress.visible, progress.typing, phase]);
 
+  const tryAgain = () => {
+    setRetry('working');
+    modules.api.retryCoaching(tripId).then(
+      (res) => {
+        setRetried(res);
+        setRetry(res.trip.coach ? 'idle' : 'failed');
+      },
+      () => setRetry('failed'),
+    );
+  };
+
   const finish = () => {
     debrief.stop();
     if (origin === 'trip') modules.trip.reset();
@@ -302,15 +322,34 @@ export function CoachScreen({
     ) : (
       <ActivityIndicator color={colors.route} style={styles.loading} />
     );
-  } else if (!coach) {
+  } else if (trip?.passenger) {
     chat = (
       <View style={[styles.bubble, styles.firstBubble]}>
         <Text style={styles.bubbleText}>
-          {trip?.passenger
-            ? 'This was a passenger trip, so there’s nothing to coach. See you when you’re behind the wheel!'
-            : 'I couldn’t review this drive just now. Your replay and infractions are saved, and I’ll be ready next time.'}
+          This was a passenger trip, so there’s nothing to coach. See you when you’re behind the
+          wheel!
         </Text>
       </View>
+    );
+  } else if (!coach) {
+    chat = (
+      <>
+        <View style={[styles.bubble, styles.firstBubble]}>
+          <Text style={styles.bubbleText}>
+            {retry === 'failed'
+              ? 'Still can’t get through, sorry. Give it a minute and try again. Your replay and infractions are saved either way.'
+              : 'I couldn’t review this drive just now. Your replay and infractions are saved. Tap Try again and I’ll give it another go.'}
+          </Text>
+        </View>
+        {retry === 'working' ? <TypingDots /> : null}
+        <View style={styles.retry}>
+          <Button
+            title={retry === 'working' ? 'Trying again…' : 'Try again'}
+            disabled={retry === 'working'}
+            onPress={tryAgain}
+          />
+        </View>
+      </>
     );
   } else {
     chat = (
@@ -323,6 +362,12 @@ export function CoachScreen({
           </FadeIn>
         ))}
         {progress.typing ? <TypingDots /> : null}
+        {/* Street View (§12): the spot the coach pulled up, once they're done talking. */}
+        {phase === 'finished' && streetView ? (
+          <FadeIn fromY={16} duration={motion.slow}>
+            <StreetViewCard callout={streetView} />
+          </FadeIn>
+        ) : null}
         {phase === 'finished' ? <Takeaways coach={coach} /> : null}
       </>
     );
@@ -422,6 +467,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   firstBubble: { marginTop: space.xs },
+  retry: { alignSelf: 'flex-start', marginTop: space.sm },
   bubbleText: { fontFamily: fonts.regular, fontSize: 17, lineHeight: 24, color: colors.text },
   typing: { flexDirection: 'row', gap: 6, paddingVertical: space.lg },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.textMuted },

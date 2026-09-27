@@ -70,7 +70,12 @@ describe.skipIf(!enabled)('MongoTripsRepo (live MongoDB)', () => {
     expect(list[0]?._id).toBe(second._id);
     for (const item of list) expect(TripListItemSchema.strict().parse(item)).toBeTruthy();
 
-    const coach = { strengths: ['Smooth turns'], focus_areas: [], debrief_script: 'Nice.' };
+    const coach = {
+      strengths: ['Smooth turns'],
+      focus_areas: [],
+      debrief_script: 'Nice.',
+      street_view_caption: null,
+    };
     await repo.setCoaching(second._id, coach, 'https://example.com/a.mp3');
     const loaded = await repo.getTrip(second._id);
     expect(loaded?.trip.coach).toEqual(coach);
@@ -87,6 +92,12 @@ describe.skipIf(!enabled)('MongoTripsRepo (live MongoDB)', () => {
     expect(history.last_5_scores).toHaveLength(2);
     expect(history.recurring_spots.length).toBeGreaterThan(0);
     expect(history.recurring_spots.every((s) => s.count === 3)).toBe(true);
+    // Three copies of the fixture tie on every type; phone use wins the tie.
+    expect(history.main_problem).toEqual({
+      type: 'phone_use',
+      trip_count: 3,
+      street: 'SW 8th St',
+    });
   });
 
   it('getProgress and listGamificationTrips from stored trips (no traces)', async () => {

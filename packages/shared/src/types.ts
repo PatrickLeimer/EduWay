@@ -218,8 +218,38 @@ export const CoachOutputSchema = z.object({
    * each bubble as the coach says it.
    */
   chat_audio_starts_s: z.array(z.number().nonnegative()).optional(),
+  /**
+   * Caption for the Street View callout (§12 "Street View callout"): one or two
+   * sentences, under ~30 words, naming the place and giving one tip. Null when
+   * no event was picked. Defaults to null so trips coached before it still parse.
+   */
+  street_view_caption: z.string().nullable().default(null),
 });
 export type CoachOutput = z.infer<typeof CoachOutputSchema>;
+
+// ---------------------------------------------------------------------------
+// Street View callout (§12 "Street View callout"): one infraction shown after
+// the trip, facing the way the student was driving. Images are never stored;
+// both URLs point to OUR backend, which fetches from Google on demand.
+// ---------------------------------------------------------------------------
+
+export const StreetViewCalloutSchema = z.object({
+  /** The picked event's _id. */
+  eventId: z.string(),
+  eventType: EventTypeSchema,
+  street: z.string().nullable(),
+  lat: z.number(),
+  lng: z.number(),
+  /** Camera heading in degrees clockwise from north: the driving direction ~3 s before the event. */
+  heading: z.number().min(0).max(360),
+  /** Gemini's caption (CoachOutput.street_view_caption); null if coaching failed. */
+  caption: z.string().nullable(),
+  /** Our backend, relative to the API base URL: GET /streetview/:tripId/thumbnail (a JPEG). */
+  thumbnailUrl: z.string(),
+  /** Our backend, relative to the API base URL: GET /streetview/:tripId/panorama (an HTML page for a WebView). */
+  panoramaUrl: z.string(),
+});
+export type StreetViewCallout = z.infer<typeof StreetViewCalloutSchema>;
 
 /** trips collection document. §9. */
 export const TripSchema = z.object({
@@ -292,6 +322,16 @@ export const RecurringSpotSchema = z.object({
 });
 export type RecurringSpot = z.infer<typeof RecurringSpotSchema>;
 
+/** The student's most common problem, counted in code. Null when none qualifies. */
+export const MainProblemSchema = z.object({
+  type: EventTypeSchema,
+  /** Distinct trips that had this event type, including the trip just completed. */
+  trip_count: z.number().int().positive(),
+  /** Street where this type happened most often, or null when no street qualifies. */
+  street: z.string().nullable(),
+});
+export type MainProblem = z.infer<typeof MainProblemSchema>;
+
 export const TripSummarySchema = z.object({
   trip: z.object({
     duration_min: z.number(),
@@ -307,7 +347,16 @@ export const TripSummarySchema = z.object({
   history: z.object({
     last_5_scores: z.array(z.number()),
     recurring_spots: z.array(RecurringSpotSchema),
+    main_problem: MainProblemSchema.nullable(),
   }),
+  /**
+   * The one event shown in Street View (§12 "Street View callout"), for Gemini's
+   * street_view_caption. Null when none was picked; absent when the backend did
+   * not run the picker (e.g. no Street View key).
+   */
+  street_view_event: SummaryEventSchema.extend({ recurring_spot: z.boolean() })
+    .nullable()
+    .optional(),
 });
 export type TripSummary = z.infer<typeof TripSummarySchema>;
 

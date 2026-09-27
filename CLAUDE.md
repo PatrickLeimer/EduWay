@@ -17,6 +17,7 @@ A phone-only driving coach for student drivers, built at a weekend hackathon by 
 - MongoDB (official `mongodb` driver), Gemini (`@google/genai`), ElevenLabs
 - Map display: Google Maps via `react-native-maps` (UI phase only)
 - Road data: OpenStreetMap via the Overpass API
+- Street View (after a trip only, master doc §12): Street View Static API + metadata endpoint (server-side), and the Maps JavaScript API for the Street View panorama only, on a page served by our backend and shown in `react-native-webview`
 - Tests: Vitest for pure logic
 
 ## Workstreams and ownership
@@ -81,7 +82,7 @@ The app keeps its existing screen structure: Start drive → Driving → Trip co
 
 - Do exactly the task asked. No unrequested refactors, renames, reformatting of files you did not change, or "while I was here" fixes.
 - Keep diffs small. If a change touches more than one workstream, stop and ask.
-- Do not add dependencies without asking. Already approved: `expo-sensors`, `expo-location`, `expo-keep-awake`, `expo-audio`, `expo-file-system`, `expo-sharing`, `react-native-maps`, `pako`, `express`, `mongodb`, `zod`, `@google/genai`, `@elevenlabs/elevenlabs-js`, `dotenv`, `vitest`, `@expo-google-fonts/lexend`, `expo-font`.
+- Do not add dependencies without asking. Already approved: `expo-sensors`, `expo-location`, `expo-keep-awake`, `expo-audio`, `expo-file-system`, `expo-sharing`, `react-native-maps`, `pako`, `express`, `mongodb`, `zod`, `@google/genai`, `@elevenlabs/elevenlabs-js`, `dotenv`, `vitest`, `react-native-webview`, `@expo-google-fonts/lexend`, `expo-font`.
 - Put detection, road, scoring, and summary logic in pure functions with no React Native or Expo imports, so it can be tested with Vitest using JSON fixtures in `fixtures/`.
 - Thresholds live in `packages/shared/src/thresholds.ts`. Never hard-code them elsewhere.
 - Run `npm run typecheck` and `npm test` before saying a task is done.
@@ -90,7 +91,7 @@ The app keeps its existing screen structure: Start drive → Driving → Trip co
 
 ## Secrets
 
-- API keys (Gemini, ElevenLabs, MongoDB URI) live only in `server/.env`. Never in the mobile app, never committed.
+- API keys (Gemini, ElevenLabs, MongoDB URI, `GOOGLE_STREETVIEW_KEY`, `GOOGLE_MAPS_JS_KEY`) live only in `server/.env`. Never in the mobile app, never committed. The app only ever gets our backend's Street View URLs, never Google's.
 - Keep `server/.env.example` updated with variable names only.
 
 ## Git

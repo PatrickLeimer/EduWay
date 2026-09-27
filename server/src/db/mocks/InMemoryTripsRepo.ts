@@ -18,12 +18,13 @@ import {
   type ProgressSpot,
   type ProgressTrip,
 } from '../../gamification';
-import type { TripsRepo } from '../repo';
+import type { StoredStreetView, TripsRepo } from '../repo';
 
 export function createInMemoryTripsRepo(): TripsRepo {
   const trips = new Map<string, Trip>();
   const events = new Map<string, DrivingEvent[]>();
   const traces = new Map<string, Trace>();
+  const streetViews = new Map<string, StoredStreetView | null>();
   let seq = 0;
 
   const withIds = (list: RecordedEvent[], tripId: string, userId: string): DrivingEvent[] =>
@@ -81,6 +82,12 @@ export function createInMemoryTripsRepo(): TripsRepo {
     async setCoaching(tripId, coach, audioUrl) {
       const t = trips.get(tripId);
       if (t) trips.set(tripId, { ...t, coach, coachAudioUrl: audioUrl });
+    },
+    async setStreetView(tripId, streetView) {
+      if (trips.has(tripId)) streetViews.set(tripId, streetView);
+    },
+    async getStreetView(tripId) {
+      return streetViews.get(tripId) ?? null;
     },
     async listTrips(userId) {
       return [...trips.values()]

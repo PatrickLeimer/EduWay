@@ -13,13 +13,17 @@
 import {
   CoachOutputSchema,
   GetProgressResponseSchema,
+  GetTripResponseSchema,
   ProgressUpdateSchema,
   RecordedEventSchema,
+  StreetViewCalloutSchema,
   TraceSchema,
   TripSchema,
   TripSummarySchema,
   type DraftEvent,
+  type DrivingEvent,
   type EventType,
+  type GetTripResponse,
   type GpsFix,
 } from '@edudriver/shared';
 import { z } from 'zod';
@@ -30,6 +34,7 @@ import overpassJson from './overpass.response.json';
 import progressUpdateStreakBrokenJson from './progress-update.streak-broken.json';
 import progressUpdateTierUpJson from './progress-update.tier-up.json';
 import progressJson from './progress.json';
+import streetViewCalloutJson from './streetview-callout.json';
 import traceJson from './trace.short-drive.json';
 import tripSummaryJson from './trip-summary.json';
 import tripJson from './trip.json';
@@ -40,6 +45,30 @@ export const tripFixture = TripSchema.parse(tripJson);
 export const tripSummaryFixture = TripSummarySchema.parse(tripSummaryJson);
 export const coachOutputFixture = CoachOutputSchema.parse(coachOutputJson);
 export const progressFixture = GetProgressResponseSchema.parse(progressJson);
+export const streetViewCalloutFixture = StreetViewCalloutSchema.parse(streetViewCalloutJson);
+
+/** The fixture events with ids, as the mock API and in-memory repo assign them: `${tripId}-evt-${index}`. */
+export function fixtureEventsWithIds(tripId: string, userId: string): DrivingEvent[] {
+  return eventsFixture.map((e, i) => ({ ...e, _id: `${tripId}-evt-${i}`, tripId, userId }));
+}
+
+/** GET /trips/:id for the fixture trip, with a Street View callout (§12 "Street View callout"). */
+export const debriefWithStreetViewFixture: GetTripResponse = GetTripResponseSchema.parse({
+  trip: tripFixture,
+  events: fixtureEventsWithIds(tripFixture._id, tripFixture.userId),
+  streetView: streetViewCalloutFixture,
+});
+
+/** The same debrief when no event qualifies or there is no imagery: the feature is simply absent. */
+export const debriefWithoutStreetViewFixture: GetTripResponse = GetTripResponseSchema.parse({
+  ...debriefWithStreetViewFixture,
+  trip: {
+    ...tripFixture,
+    coach: tripFixture.coach && { ...tripFixture.coach, street_view_caption: null },
+  },
+  streetView: null,
+});
+
 /** POST /trips progressUpdate where the phone-free streak just broke. */
 export const progressUpdateStreakBrokenFixture = ProgressUpdateSchema.parse(
   progressUpdateStreakBrokenJson,

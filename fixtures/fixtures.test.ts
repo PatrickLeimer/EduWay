@@ -3,6 +3,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  debriefWithoutStreetViewFixture,
+  debriefWithStreetViewFixture,
   draftEventsFixture,
   eventsFixture,
   traceFixture,
@@ -48,5 +50,24 @@ describe('fixtures', () => {
     for (const e of eventsFixture) {
       if (e.type === 'speeding' && e.alerted) expect(e.limitConfidence).toBe('posted');
     }
+  });
+
+  it('points the Street View callout at a real event, with our backend URLs (§12)', () => {
+    const { streetView, events, trip } = debriefWithStreetViewFixture;
+    const event = events.find((e) => e._id === streetView?.eventId);
+    expect(event).toBeDefined();
+    expect(streetView?.eventType).toBe(event?.type);
+    expect([streetView?.lng, streetView?.lat]).toEqual(event?.location.coordinates);
+    expect(streetView?.street).toBe(event?.street);
+    expect(streetView?.caption).toBe(trip.coach?.street_view_caption);
+    for (const url of [streetView?.thumbnailUrl, streetView?.panoramaUrl]) {
+      expect(url).toMatch(new RegExp(`^/streetview/${trip._id}/`));
+      expect(url).not.toMatch(/google/i);
+    }
+  });
+
+  it('has a debrief without a callout and without a caption', () => {
+    expect(debriefWithoutStreetViewFixture.streetView).toBeNull();
+    expect(debriefWithoutStreetViewFixture.trip.coach?.street_view_caption).toBeNull();
   });
 });

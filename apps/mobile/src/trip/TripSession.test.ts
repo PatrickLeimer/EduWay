@@ -9,7 +9,7 @@ import { createTripSession } from './TripSession';
 const AUDIO = 'https://example.com/debrief.mp3';
 
 function okResponse(): CreateTripResponse {
-  return { trip: tripFixture, coach: coachOutputFixture, coachAudioUrl: AUDIO };
+  return { trip: tripFixture, coach: coachOutputFixture, coachAudioUrl: AUDIO, streetView: null };
 }
 
 function fix(t: number, speedMps: number): GpsFix {
@@ -98,6 +98,9 @@ function harness(opts: {
       createTrip,
       listTrips: async () => ({ trips: [] }),
       getTrip: async () => {
+        throw new Error('unused');
+      },
+      retryCoaching: async () => {
         throw new Error('unused');
       },
       getTrace: async () => {

@@ -46,9 +46,39 @@ describe('buildSystemPrompt (§10 guidelines)', () => {
     expect(prompt).toMatch(/Copy the voice, never its facts/);
   });
 
+  it('captions Street View from the event data only, never the picture (§12)', () => {
+    expect(prompt).toMatch(/street_view_event/);
+    expect(prompt).toMatch(/You cannot see the photo/);
+    expect(prompt).toMatch(/Never describe what the picture shows/);
+    expect(prompt).toContain(`under ${COACH.maxStreetViewCaptionWords} words`);
+    expect(prompt).toMatch(/street_view_caption must be null/);
+    expect(prompt).toMatch(/Never when it is null/);
+  });
+
   it('compares with history and recurring spots', () => {
     expect(prompt).toMatch(/recurring spot/);
     expect(prompt).toMatch(/Call out improvement/);
+  });
+
+  it('keeps focus areas on the safety order and puts the pattern in the chat only', () => {
+    expect(prompt).toMatch(/main_problem does not change this choice/);
+    expect(prompt).toMatch(/Do not add, remove, or reorder a focus area/);
+    expect(prompt).toMatch(/Leave the main problem out of it; that belongs in the chat only/);
+  });
+
+  it('tells the coach when to drill the main problem and when to stay quiet', () => {
+    expect(prompt).toMatch(/If main_problem is null, do not mention a long-term pattern/);
+    expect(prompt).toMatch(/If main_problem is null, say nothing about a pattern across drives/);
+    expect(prompt).toMatch(/you must mention that pattern once in the chat/);
+    expect(prompt).toMatch(/give one concrete way to fix it/);
+    expect(prompt).toMatch(
+      /Name the street only when today's event of that type is on that street/,
+    );
+    expect(prompt).toMatch(/did not show up on this drive/);
+    expect(prompt).toMatch(
+      /Never name a different pattern, a different count, or a street that is null/,
+    );
+    expect(prompt).toMatch(/the main problem already covers it/);
   });
 
   it('asks for an encouraging, specific, plain voice', () => {
