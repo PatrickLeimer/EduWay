@@ -15,7 +15,7 @@ import { nextRoute, prevRoute } from '../lib/flow';
 import { clockText } from '../lib/format';
 import { timeEvents } from '../lib/replay';
 import type { FlowOrigin, ScreenProps } from '../navigation';
-import { colors, font, motion, space } from '../theme';
+import { colors, font, fonts, motion, space } from '../theme';
 
 export function InfractionsScreen({
   modules,
@@ -38,7 +38,7 @@ export function InfractionsScreen({
         {q.error ? (
           <ConnectionError error={q.error} onRetry={q.reload} />
         ) : (
-          <ActivityIndicator color={colors.black} style={styles.loading} />
+          <ActivityIndicator color={colors.primary} style={styles.loading} />
         )}
       </Screen>
     );
@@ -97,9 +97,9 @@ export function InfractionsScreen({
 const styles = StyleSheet.create({
   loading: { marginTop: space.xxl },
   summary: { alignItems: 'center', gap: space.xs, marginBottom: space.lg, marginTop: space.sm },
-  bigNumber: { fontSize: 64, fontWeight: '800', color: colors.text, lineHeight: 72 },
-  summaryTitle: { fontSize: font.title, fontWeight: '700', color: colors.text },
+  bigNumber: { fontSize: 64, fontFamily: fonts.semiBold, color: colors.text, lineHeight: 72 },
+  summaryTitle: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },
   legend: { flexDirection: 'row', gap: space.xl, marginTop: space.sm },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  legendText: { fontSize: font.body, color: colors.textMuted },
+  legendText: { fontFamily: fonts.regular, fontSize: font.body, color: colors.textMuted },
 });

@@ -1,11 +1,11 @@
 /**
- * Buttons. Uber-style: primary is solid black, secondary is light gray.
- * Shrinks slightly while held (PressableScale).
+ * Buttons: a solid face on a darker "lip" (a 4px bottom border). On press the
+ * face moves down 2px and the lip shrinks to 2px, so the button looks pushed
+ * in. No shadows, no gradients.
  */
-import { StyleSheet, Text, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
-import { colors, DRIVE_BUTTON_HEIGHT, font, radius, space } from '../theme';
-import { PressableScale } from './motion';
+import { colors, DRIVE_BUTTON_HEIGHT, font, fonts, lip, radius, space, stroke } from '../theme';
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'onDark';
 
@@ -28,49 +28,68 @@ export function Button({
   large = false,
   style,
 }: ButtonProps) {
+  const height = large ? DRIVE_BUTTON_HEIGHT : 52;
   return (
-    <PressableScale
+    <Pressable
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={style}
-      contentStyle={[
-        styles.base,
-        large && styles.large,
-        styles[variant],
-        disabled && styles.disabled,
-      ]}
+      style={[{ height }, style]}
     >
-      <Text
-        style={[
-          styles.label,
-          large && styles.labelLarge,
-          variant === 'secondary' ? styles.labelDark : styles.labelLight,
-        ]}
-      >
-        {title}
-      </Text>
-    </PressableScale>
+      {({ pressed }) => {
+        // Disabled buttons are flat (no lip) so they read as "not pressable yet".
+        const lipWidth = disabled ? 0 : pressed ? lip.pressed : lip.rest;
+        const drop = disabled ? lip.rest : lip.rest - lipWidth;
+        return (
+          <View
+            style={[
+              styles.face,
+              styles[variant],
+              disabled && (variant === 'onDark' ? styles.disabledDark : styles.disabled),
+              { height: height - drop, marginTop: drop, borderBottomWidth: lipWidth },
+            ]}
+          >
+            <Text
+              numberOfLines={1}
+              style={[
+                styles.label,
+                large && styles.labelLarge,
+                variant === 'secondary' ? styles.labelTeal : styles.labelLight,
+                disabled && variant !== 'onDark' && styles.labelDisabled,
+              ]}
+            >
+              {title}
+            </Text>
+          </View>
+        );
+      }}
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  base: {
-    minHeight: 52,
+  face: {
     borderRadius: radius.md,
-    paddingHorizontal: space.lg,
+    paddingHorizontal: space.xl,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  large: { minHeight: DRIVE_BUTTON_HEIGHT, borderRadius: radius.lg },
-  primary: { backgroundColor: colors.black },
-  secondary: { backgroundColor: colors.surfaceAlt },
-  danger: { backgroundColor: colors.harsh },
-  onDark: { backgroundColor: colors.drivePanel, borderWidth: 1, borderColor: colors.driveBorder },
-  disabled: { opacity: 0.4 },
-  label: { fontSize: font.body, fontWeight: '600', textAlign: 'center' },
-  labelLarge: { fontSize: font.driveMin },
-  labelLight: { color: colors.white },
-  labelDark: { color: colors.text },
+  primary: { backgroundColor: colors.primary, borderBottomColor: colors.primaryLip },
+  secondary: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderTopWidth: stroke.outline,
+    borderLeftWidth: stroke.outline,
+    borderRightWidth: stroke.outline,
+  },
+  danger: { backgroundColor: colors.harsh, borderBottomColor: colors.dangerLip },
+  onDark: { backgroundColor: colors.drivePanel, borderBottomColor: colors.driveBorder },
+  disabled: { backgroundColor: colors.disabled, borderColor: colors.disabled },
+  disabledDark: { opacity: 0.5 },
+  label: { fontSize: font.body, fontFamily: fonts.semiBold, textAlign: 'center' },
+  labelLarge: { fontFamily: fonts.regular, fontSize: font.driveMin },
+  labelLight: { color: colors.onColor },
+  labelTeal: { color: colors.good },
+  labelDisabled: { color: colors.textMuted },
 });

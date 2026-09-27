@@ -25,11 +25,11 @@ All storage, behind the `TripsRepo` interface (master doc §9): trips, events (G
 | `collections.ts` | Done: names + indexes (2dsphere on `events.location`, unique `traces.tripId`) |
 | `setup.ts` | Done: `npm run db:setup` creates collections + indexes (idempotent) |
 | `client.ts` | Done: shared MongoClient |
-| `MongoTripsRepo.ts` | Done: insertTrip (transaction), setCoaching, listTrips, getTrip, getTrace, getHistory. `getProgress` STUB (task 5) |
+| `MongoTripsRepo.ts` | Done: insertTrip (transaction), setCoaching, listTrips, getTrip, getTrace, getHistory, getProgress (trip summaries + harsh counts + per-street recurring spots → `gamification/buildProgress`), listGamificationTrips |
 | `MongoTripsRepo.test.ts` | Live Atlas test, opt-in: `RUN_MONGO_TESTS=true npm test` (throwaway `<db>_test` database) |
-| `mocks/InMemoryTripsRepo.ts` | Seeded with the fixture trip |
+| `mocks/InMemoryTripsRepo.ts` | Seeded with the fixture trip; progress computed with the same builder |
 
 ## Done means (master doc §14)
 - [x] Saturday afternoon: Atlas cluster up, `npm run db:setup` run, `USE_REAL_DB=true` saves real trips.
 - [ ] Recurring spots via 2dsphere across trips (§1 differentiator 3).
-- [ ] Progress: score trend, per-type totals, recurring spots, test readiness (rule TBD by team).
+- [x] Progress: score trend, per-type totals, recurring spots, test readiness (road test readiness 100 from a full window), plus streaks and rank tier (`gamification/`).

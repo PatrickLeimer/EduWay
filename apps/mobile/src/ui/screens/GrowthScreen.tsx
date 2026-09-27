@@ -1,130 +1,182 @@
 /**
- * Driving growth: step 3 of the post-trip flow (lib/flow.ts). A placeholder
- * for the future game-style progress (levels, streaks, badges). Nothing here
- * is computed yet: no invented numbers or thresholds (docs/ui-prompt.md §1),
- * so everything is shown locked and labeled "Coming soon".
+ * Driving growth: step 3 of the post-trip flow (lib/flow.ts). Rank tier,
+ * streaks and road test readiness from GET /progress, plus what this drive
+ * changed (the upload's progressUpdate) when the flow started from a trip.
+ * The server computes every number; this screen only draws them.
  */
-import { StyleSheet, Text, View } from 'react-native';
+import { DEMO_USER_ID, GAMIFICATION, STREAK_KINDS, type ProgressUpdate } from '@edudriver/shared';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { useApiQuery } from '../../api';
+import { useTripState } from '../../trip';
+import { ConnectionError } from '../components/ConnectionError';
 import { FlowFooter } from '../components/FlowFooter';
-import { FadeIn, staggerDelay } from '../components/motion';
-import { Card, Muted } from '../components/primitives';
+import { FadeIn } from '../components/motion';
+import { Card, Muted, SectionTitle } from '../components/primitives';
 import { Screen } from '../components/Screen';
 import { nextRoute, prevRoute } from '../lib/flow';
+import {
+  readinessChangeText,
+  STREAK_RULE,
+  STREAK_TITLE,
+  streakChangeText,
+  tierChangeText,
+  tierLine,
+  tierProgressText,
+} from '../lib/gamificationCopy';
 import type { FlowOrigin, ScreenProps } from '../navigation';
-import { colors, font, motion, radius, space } from '../theme';
+import { colors, font, fonts, lip, radius, space } from '../theme';
 
-/** Ideas for the future game; names only. */
-const BADGES = [
-  { name: 'Smooth Stopper', hint: 'Full stops, soft brakes' },
-  { name: 'Phone-Free Streak', hint: 'Drives without touching the phone' },
-  { name: 'Speed Keeper', hint: 'Holding the posted limit' },
-  { name: 'Road Test Ready', hint: 'Consistent, clean drives' },
-];
+/** One line per thing this drive changed; empty when nothing did. */
+function changeLines(u: ProgressUpdate): string[] {
+  const lines = [tierChangeText(u.tier)];
+  for (const kind of STREAK_KINDS) lines.push(streakChangeText(kind, u.streaks[kind]));
+  lines.push(readinessChangeText(u.readiness));
+  return lines.filter((l): l is string => l !== null);
+}
 
 export function GrowthScreen({
+  modules,
   navigate,
   tripId,
   origin,
 }: ScreenProps & { tripId: string; origin: FlowOrigin }) {
+  const { data, error, reload } = useApiQuery('progress', () =>
+    modules.api.getProgress(DEMO_USER_ID),
+  );
+  const tripState = useTripState(modules.trip);
+  // Only the drive that just ended carries a progressUpdate; past drives don't.
+  const update =
+    origin === 'trip' && tripState.result?.trip._id === tripId
+      ? tripState.result.progressUpdate
+      : undefined;
+
+  const footer = (
+    <FlowFooter step="growth" onPress={() => navigate(nextRoute('growth', tripId, origin))} />
+  );
+  const back = () => navigate(prevRoute('growth', tripId, origin));
+
+  if (!data) {
+    return (
+      <Screen title="Driving growth" onBack={back} backLabel="Infractions" footer={footer}>
+        {error ? (
+          <ConnectionError error={error} onRetry={reload} />
+        ) : (
+          <ActivityIndicator color={colors.primary} style={styles.loading} />
+        )}
+      </Screen>
+    );
+  }
+
+  const p = data.userProgress;
+  const lines = update ? changeLines(update) : [];
+
   return (
-    <Screen
-      title="Driving growth"
-      onBack={() => navigate(prevRoute('growth', tripId, origin))}
-      backLabel="Infractions"
-      footer={
-        <FlowFooter step="growth" onPress={() => navigate(nextRoute('growth', tripId, origin))} />
-      }
-    >
+    <Screen title="Driving growth" onBack={back} backLabel="Infractions" footer={footer}>
       <FadeIn fromScale={0.96} fromY={0}>
         <View style={styles.hero}>
-          <Text style={styles.soon}>COMING SOON</Text>
-          <View style={styles.levelBadge}>
-            <Text style={styles.levelText}>?</Text>
-          </View>
-          <Text style={styles.heroTitle}>Your driving journey</Text>
-          <Text style={styles.heroSub}>
-            Level up with every drive. Earn badges, keep streaks going, and watch yourself get road
-            test ready.
-          </Text>
+          <Text style={styles.heroLabel}>RANK</Text>
+          <Text style={styles.heroTitle}>{tierLine(p.tier)}</Text>
           <View style={styles.track}>
-            <View style={styles.trackFill} />
+            <View style={[styles.trackFill, { width: `${Math.round(p.tierProgress * 100)}%` }]} />
           </View>
+          <Text style={styles.heroSub}>{tierProgressText(p)}</Text>
         </View>
       </FadeIn>
 
-      <Text style={styles.section}>Badges to unlock</Text>
-      <View style={styles.grid}>
-        {BADGES.map((b, i) => (
-          <FadeIn key={b.name} delay={staggerDelay(i, motion.normal)} style={styles.cell}>
-            <Card style={styles.badge}>
-              <View style={styles.lock}>
-                <View style={styles.lockShackle} />
-                <View style={styles.lockBody} />
-              </View>
-              <Text style={styles.badgeName}>{b.name}</Text>
-              <Muted>{b.hint}</Muted>
+      {update ? (
+        <>
+          <SectionTitle>This drive</SectionTitle>
+          {update.qualifying ? (
+            <Card lip style={styles.changes}>
+              {lines.map((l) => (
+                <Text key={l} style={styles.changeLine}>
+                  {l}
+                </Text>
+              ))}
             </Card>
-          </FadeIn>
-        ))}
+          ) : (
+            <Muted>{"Passenger and very short drives don't change your rank or streaks."}</Muted>
+          )}
+        </>
+      ) : null}
+
+      <SectionTitle>Road test readiness</SectionTitle>
+      <View style={styles.readyRow}>
+        <Text style={styles.readyNumber}>{p.readiness}%</Text>
+        <Muted>
+          {p.readinessProvisional
+            ? `Based on ${p.qualifyingTrips} scored ${p.qualifyingTrips === 1 ? 'drive' : 'drives'} so far`
+            : `Based on your last ${GAMIFICATION.readinessWindow} scored drives`}
+        </Muted>
       </View>
+
+      <SectionTitle>Streaks</SectionTitle>
+      {p.qualifyingTrips === 0 ? (
+        <Muted>Your first scored drive starts your streaks.</Muted>
+      ) : (
+        STREAK_KINDS.map((kind) => {
+          const s = p.streaks[kind];
+          return (
+            <View key={kind} style={styles.streakRow}>
+              <View style={styles.streakText}>
+                <Text style={styles.streakTitle}>{STREAK_TITLE[kind]}</Text>
+                <Muted>
+                  {STREAK_RULE[kind]} · best {s.best}
+                </Muted>
+              </View>
+              <Text style={[styles.streakCount, s.current > 0 && styles.streakOn]}>
+                {s.current}
+              </Text>
+            </View>
+          );
+        })
+      )}
       <Muted>Your coach is up next.</Muted>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  loading: { marginTop: space.xxl },
   hero: {
-    backgroundColor: colors.route,
+    backgroundColor: colors.primary,
+    borderBottomWidth: lip.rest,
+    borderBottomColor: colors.primaryLip,
     borderRadius: radius.xl,
     padding: space.xl,
-    alignItems: 'center',
     gap: space.sm,
     marginTop: space.sm,
   },
-  soon: { fontSize: font.small, fontWeight: '800', letterSpacing: 2, color: colors.white },
-  levelBadge: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    borderWidth: 4,
-    borderColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: space.sm,
+  heroLabel: {
+    fontSize: font.small,
+    fontFamily: fonts.semiBold,
+    letterSpacing: 2,
+    color: colors.onColor,
   },
-  levelText: { fontSize: 40, fontWeight: '800', color: colors.white },
-  heroTitle: { fontSize: font.title, fontWeight: '800', color: colors.white },
-  heroSub: { fontSize: font.body, color: colors.white, textAlign: 'center', opacity: 0.9 },
+  heroTitle: { fontSize: font.display, fontFamily: fonts.semiBold, color: colors.onColor },
+  heroSub: { fontFamily: fonts.regular, fontSize: font.body, color: colors.onColor },
   track: {
-    alignSelf: 'stretch',
-    height: 10,
+    height: 12,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    marginTop: space.md,
+    backgroundColor: colors.primaryLip,
+    marginTop: space.sm,
     overflow: 'hidden',
   },
-  trackFill: { width: '8%', height: '100%', backgroundColor: colors.white },
-  section: {
-    fontSize: font.title,
-    fontWeight: '700',
-    color: colors.text,
-    marginTop: space.xl,
-    marginBottom: space.md,
+  trackFill: { height: '100%', borderRadius: radius.pill, backgroundColor: colors.onColor },
+  changes: { gap: space.sm },
+  changeLine: { fontFamily: fonts.regular, fontSize: font.body, color: colors.text },
+  readyRow: { gap: space.xs },
+  readyNumber: { fontSize: 56, lineHeight: 64, fontFamily: fonts.semiBold, color: colors.text },
+  streakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: space.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginBottom: space.lg },
-  cell: { width: '48.5%' },
-  badge: { gap: space.xs, opacity: 0.75 },
-  lock: { alignItems: 'center', alignSelf: 'flex-start', marginBottom: space.xs },
-  lockShackle: {
-    width: 14,
-    height: 10,
-    borderTopLeftRadius: 7,
-    borderTopRightRadius: 7,
-    borderWidth: 2.5,
-    borderBottomWidth: 0,
-    borderColor: colors.textMuted,
-  },
-  lockBody: { width: 20, height: 14, borderRadius: 3, backgroundColor: colors.textMuted },
-  badgeName: { fontSize: font.body, fontWeight: '700', color: colors.text },
+  streakText: { flex: 1, paddingRight: space.md },
+  streakTitle: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  streakCount: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.textMuted },
+  streakOn: { color: colors.harsh },
 });

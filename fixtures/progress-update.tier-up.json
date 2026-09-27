@@ -1,0 +1,30 @@
+{
+  "qualifying": true,
+  "streaks": {
+    "hot": {
+      "change": "extended",
+      "newBest": true,
+      "current": 3
+    },
+    "clean": {
+      "change": "extended",
+      "newBest": true,
+      "current": 4
+    },
+    "phoneFree": {
+      "change": "extended",
+      "newBest": false,
+      "current": 6
+    }
+  },
+  "tier": {
+    "before": "gold",
+    "after": "platinum",
+    "change": "up"
+  },
+  "readiness": {
+    "before": 84,
+    "after": 88,
+    "delta": 4
+  }
+}

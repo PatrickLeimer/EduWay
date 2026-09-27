@@ -69,6 +69,61 @@
   ],
   "testReadiness": {
     "ready": false,
-    "notes": ["Full stops at stop signs need work", "Phone use seen in 2 of the last 5 trips"]
-  }
+    "notes": [
+      "Road test readiness 62/100 from your last 5 drives",
+      "Full stops at stop signs need work",
+      "Phone use seen in 2 of the last 5 trips"
+    ]
+  },
+  "userProgress": {
+    "streaks": {
+      "hot": {
+        "current": 0,
+        "best": 0
+      },
+      "clean": {
+        "current": 1,
+        "best": 2
+      },
+      "phoneFree": {
+        "current": 0,
+        "best": 2
+      }
+    },
+    "tier": "silver",
+    "rollingAverage": 62.4,
+    "nextTier": "gold",
+    "tierProgress": 0.16,
+    "pointsToNextTier": 12.6,
+    "readiness": 62,
+    "readinessProvisional": false,
+    "qualifyingTrips": 5
+  },
+  "qualifyingTrips": [
+    {
+      "id": "trip-fixture-002",
+      "score": 58,
+      "completedAt": "2026-09-22T15:03:00.000Z"
+    },
+    {
+      "id": "trip-fixture-003",
+      "score": 61,
+      "completedAt": "2026-09-23T15:03:00.000Z"
+    },
+    {
+      "id": "trip-fixture-004",
+      "score": 66,
+      "completedAt": "2026-09-24T15:03:00.000Z"
+    },
+    {
+      "id": "trip-fixture-005",
+      "score": 63,
+      "completedAt": "2026-09-25T15:03:00.000Z"
+    },
+    {
+      "id": "trip-fixture-001",
+      "score": 64,
+      "completedAt": "2026-09-26T15:03:12.000Z"
+    }
+  ]
 }

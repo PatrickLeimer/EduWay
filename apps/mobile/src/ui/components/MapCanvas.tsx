@@ -11,22 +11,10 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { regionFor } from '../lib/geo';
-import { colors, font } from '../theme';
+import { colors, font, fonts, mapDarkStyle } from '../theme';
 import type { MapCanvasProps } from './mapTypes';
 
 const GOOGLE = Platform.OS === 'android';
-
-/** Google Maps night style for driving mode (Android; iOS uses userInterfaceStyle). */
-const DARK_STYLE = [
-  { elementType: 'geometry', stylers: [{ color: '#1d2126' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#8a9099' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#1d2126' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2e343c' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3c434d' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0e1318' }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-];
 
 const FOLLOW_DELTA = 0.01;
 
@@ -74,7 +62,7 @@ export function MapCanvas({
         provider={GOOGLE ? PROVIDER_GOOGLE : undefined}
         googleRenderer={GOOGLE ? 'LEGACY' : undefined}
         initialRegion={initialRegion}
-        customMapStyle={GOOGLE && dark ? DARK_STYLE : undefined}
+        customMapStyle={GOOGLE && dark ? mapDarkStyle : undefined}
         userInterfaceStyle={dark ? 'dark' : 'light'}
         liteMode={GOOGLE && lite}
         scrollEnabled={interactive}
@@ -113,7 +101,7 @@ export function MapCanvas({
 const styles = StyleSheet.create({
   empty: { backgroundColor: colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
   emptyDark: { backgroundColor: colors.driveBg },
-  emptyText: { color: colors.textMuted, fontSize: font.body },
+  emptyText: { fontFamily: fonts.regular, color: colors.textMuted, fontSize: font.body },
   emptyTextDark: { color: colors.textOnDarkMuted },
   carOuter: {
     width: 24,

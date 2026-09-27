@@ -18,7 +18,7 @@ import { Screen } from '../components/Screen';
 import { TestDriveToggle } from '../components/TestDriveToggle';
 import { speedMphText } from '../lib/format';
 import type { ScreenProps } from '../navigation';
-import { colors, font, space } from '../theme';
+import { colors, font, fonts, space } from '../theme';
 
 const MODULE_ROWS: { key: keyof ModuleFlags; label: string; real: string; mock: string }[] = [
   { key: 'gps', label: 'GPS', real: 'phone GPS', mock: 'recorded drive' },
@@ -194,16 +194,27 @@ const styles = StyleSheet.create({
     gap: space.md,
     paddingVertical: space.xs,
   },
-  rowLabel: { fontSize: font.body, color: colors.textMuted },
-  rowValue: { flexShrink: 1, fontSize: font.body, color: colors.text, textAlign: 'right' },
-  warn: { color: colors.coach, fontWeight: '600' },
+  rowLabel: { fontFamily: fonts.regular, fontSize: font.body, color: colors.textMuted },
+  rowValue: {
+    fontFamily: fonts.regular,
+    flexShrink: 1,
+    fontSize: font.body,
+    color: colors.text,
+    textAlign: 'right',
+  },
+  warn: { color: colors.coach, fontFamily: fonts.semiBold },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border,
     marginVertical: space.sm,
   },
   button: { marginTop: space.md },
-  ok: { color: colors.good, fontSize: font.body, marginTop: space.sm },
-  fail: { color: colors.harsh, fontSize: font.body, marginTop: space.sm },
+  ok: { fontFamily: fonts.regular, color: colors.good, fontSize: font.body, marginTop: space.sm },
+  fail: {
+    fontFamily: fonts.regular,
+    color: colors.harsh,
+    fontSize: font.body,
+    marginTop: space.sm,
+  },
   links: { gap: space.sm },
 });

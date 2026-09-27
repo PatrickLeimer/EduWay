@@ -4,14 +4,43 @@
  * before the real server exists.
  *
  * createTrip echoes the uploaded trip times/flags onto the fixture trip, and
- * remembers it so listTrips/getTrip show it afterwards.
+ * remembers it so listTrips/getTrip show it afterwards. Its progressUpdate
+ * alternates between "tier went up" and "streak just broke" so the debrief can
+ * be built against both; passenger trips get a non-qualifying update.
  */
-import { eventsFixture, progressFixture, traceFixture, tripFixture } from '@edudriver/fixtures';
-import { CreateTripRequestSchema, type DrivingEvent, type Trip } from '@edudriver/shared';
+import {
+  eventsFixture,
+  progressFixture,
+  progressUpdateStreakBrokenFixture,
+  progressUpdateTierUpFixture,
+  traceFixture,
+  tripFixture,
+} from '@edudriver/fixtures';
+import {
+  CreateTripRequestSchema,
+  type DrivingEvent,
+  type ProgressUpdate,
+  type Trip,
+} from '@edudriver/shared';
 
 import { ApiError, type ApiClient } from '../../contracts';
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** A passenger (or too short) trip changes nothing. */
+function unchanged(from: ProgressUpdate): ProgressUpdate {
+  const none = (current: number) => ({ change: 'none' as const, newBest: false, current });
+  return {
+    qualifying: false,
+    streaks: {
+      hot: none(from.streaks.hot.current),
+      clean: none(from.streaks.clean.current),
+      phoneFree: none(from.streaks.phoneFree.current),
+    },
+    tier: { before: from.tier.before, after: from.tier.before, change: 'same' },
+    readiness: { before: from.readiness.before, after: from.readiness.before, delta: 0 },
+  };
+}
 
 export function createMockApiClient(latencyMs = 300): ApiClient {
   const trips = new Map<string, { trip: Trip; events: DrivingEvent[] }>();
@@ -41,7 +70,10 @@ export function createMockApiClient(latencyMs = 300): ApiClient {
         score: body.trip.passenger ? null : tripFixture.score,
       };
       trips.set(_id, { trip, events: withIds(_id, body.userId) });
-      return { trip, coach: trip.coach, coachAudioUrl: trip.coachAudioUrl };
+      const sample =
+        trips.size % 2 === 0 ? progressUpdateTierUpFixture : progressUpdateStreakBrokenFixture;
+      const progressUpdate = body.trip.passenger ? unchanged(sample) : sample;
+      return { trip, coach: trip.coach, coachAudioUrl: trip.coachAudioUrl, progressUpdate };
     },
     async listTrips(userId) {
       await delay(latencyMs);

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { eventsFixture, traceFixture, tripFixture } from '@edudriver/fixtures';
 import {
+  GetProgressResponseSchema,
   GetTripResponseSchema,
   TraceSchema,
   TripListItemSchema,
@@ -92,5 +93,29 @@ describe.skipIf(!enabled)('MongoTripsRepo (live MongoDB)', () => {
       trip_count: 3,
       street: 'SW 8th St',
     });
+  });
+
+  it('getProgress and listGamificationTrips from stored trips (no traces)', async () => {
+    const repo = createMongoTripsRepo(db);
+    // Three fixture drives exist by now (previous tests), all 1.27 mi and not passenger.
+    const progress = GetProgressResponseSchema.parse(await repo.getProgress(userId));
+    expect(progress.scores).toHaveLength(3);
+    expect(progress.qualifyingTrips).toHaveLength(3);
+    expect(progress.userProgress.qualifyingTrips).toBe(3);
+    expect(progress.userProgress.tier).not.toBe('rookie');
+    // Every fixture event repeats on every trip, so each type sums to 3x the fixture count.
+    const brakes = eventsFixture.filter((e) => e.type === 'hard_brake').length;
+    expect(progress.skills.hard_brake.count).toBe(brakes * 3);
+    expect(progress.recurringSpots.length).toBeGreaterThan(0);
+    expect(progress.recurringSpots.every((s) => s.count === 3)).toBe(true);
+
+    const gam = await repo.listGamificationTrips(userId);
+    expect(gam).toHaveLength(3);
+    const harsh = eventsFixture.filter((e) => e.tier === 'harsh').length;
+    expect(gam.every((t) => t.harshEvents === harsh)).toBe(true);
+
+    // A user with no trips is a rookie, not an error.
+    const empty = GetProgressResponseSchema.parse(await repo.getProgress(`${userId}-none`));
+    expect(empty.userProgress.tier).toBe('rookie');
   });
 });

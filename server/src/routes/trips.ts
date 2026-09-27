@@ -13,6 +13,7 @@ import {
 import { Router } from 'express';
 
 import { buildTripSummary } from '../coach';
+import { computeProgressUpdate } from '../gamification';
 
 import type { RouteDeps } from './deps';
 import { HttpError, parseInput, sendValid } from './http';
@@ -54,6 +55,16 @@ export function tripsRouter({ repo, scoreTrip, coach }: RouteDeps): Router {
       await repo.setCoaching(trip._id, coachResult.coach, coachResult.audioUrl);
     }
 
+    // What this trip changed in streaks, tier and readiness, for the debrief to celebrate.
+    const history = await repo.listGamificationTrips(body.userId);
+    const latest = history.find((t) => t.id === trip._id);
+    const progressUpdate = latest
+      ? computeProgressUpdate(
+          history.filter((t) => t.id !== trip._id),
+          latest,
+        )
+      : undefined;
+
     sendValid(
       res,
       CreateTripResponseSchema,
@@ -61,6 +72,7 @@ export function tripsRouter({ repo, scoreTrip, coach }: RouteDeps): Router {
         trip: { ...trip, coach: coachResult.coach, coachAudioUrl: coachResult.audioUrl },
         coach: coachResult.coach,
         coachAudioUrl: coachResult.audioUrl,
+        progressUpdate,
       },
       201,
     );
