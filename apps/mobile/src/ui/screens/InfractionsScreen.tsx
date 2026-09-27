@@ -38,7 +38,7 @@ export function InfractionsScreen({
         {q.error ? (
           <ConnectionError error={q.error} onRetry={q.reload} />
         ) : (
-          <ActivityIndicator color={colors.black} style={styles.loading} />
+          <ActivityIndicator color={colors.primary} style={styles.loading} />
         )}
       </Screen>
     );

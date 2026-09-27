@@ -66,12 +66,12 @@ export function Screen({ title, onBack, backLabel = 'Back', hero, footer, childr
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.surface },
+  root: { flex: 1, backgroundColor: colors.bg },
   header: {
     paddingTop: SAFE_TOP,
     paddingHorizontal: space.lg,
     paddingBottom: space.md,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.bg,
   },
   backWrap: { alignSelf: 'flex-start', marginBottom: space.md },
   back: {

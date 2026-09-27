@@ -29,7 +29,7 @@ import { chatMessages, chatProgress, chatSchedule, readingDurationS } from '../l
 import { nextRoute, prevRoute } from '../lib/flow';
 import { dateText } from '../lib/format';
 import type { FlowOrigin, ScreenProps } from '../navigation';
-import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, shadow, space } from '../theme';
+import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, space, stroke } from '../theme';
 
 /** Shown in the header; the voice is ElevenLabs "Chris" (scripts/alert-clips, server/.env). */
 const COACH_NAME = 'Coach Chris';
@@ -407,9 +407,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     paddingHorizontal: space.lg,
     paddingVertical: space.md,
-    ...shadow,
-    shadowOpacity: 0.06,
-    elevation: 1,
+    borderWidth: stroke.hairline,
+    borderColor: colors.border,
   },
   firstBubble: { marginTop: space.xs },
   bubbleText: { fontSize: 17, lineHeight: 24, color: colors.text },

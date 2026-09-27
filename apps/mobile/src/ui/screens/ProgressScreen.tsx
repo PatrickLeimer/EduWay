@@ -29,7 +29,7 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
         {error ? (
           <ConnectionError error={error} onRetry={reload} />
         ) : (
-          <ActivityIndicator color={colors.black} style={styles.loading} />
+          <ActivityIndicator color={colors.primary} style={styles.loading} />
         )}
       </Screen>
     );
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   },
   col: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center' },
   colValue: { fontSize: font.tiny, color: colors.textMuted, marginBottom: 2 },
-  colBar: { width: '100%', backgroundColor: colors.black, borderRadius: 4 },
+  colBar: { width: '100%', backgroundColor: colors.primary, borderRadius: 4 },
   skillRow: {
     paddingVertical: space.md,
     borderBottomWidth: StyleSheet.hairlineWidth,

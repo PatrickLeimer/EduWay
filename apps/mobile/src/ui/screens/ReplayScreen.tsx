@@ -92,7 +92,7 @@ export function ReplayScreen({
             }}
           />
         ) : (
-          <ActivityIndicator color={colors.black} style={styles.loading} />
+          <ActivityIndicator color={colors.primary} style={styles.loading} />
         )}
       </Screen>
     );
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 2,
     marginLeft: -1,
-    backgroundColor: colors.black,
+    backgroundColor: colors.text,
   },
   times: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.xs },
   time: { fontSize: font.small, color: colors.textMuted },

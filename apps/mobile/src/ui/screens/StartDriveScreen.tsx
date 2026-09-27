@@ -22,7 +22,7 @@ import { ToggleRow } from '../components/primitives';
 import { TestDriveBadge } from '../components/TestDriveBadge';
 import { directionsUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
-import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, shadow, space } from '../theme';
+import { colors, edge, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, space, stroke } from '../theme';
 
 export function StartDriveScreen({ modules, navigate, settings }: ScreenProps) {
   const { fix, error } = useMapGps(modules.trip);
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     overflow: 'hidden',
   },
-  chip: { backgroundColor: colors.surface, borderRadius: radius.pill, ...shadow },
+  chip: { backgroundColor: colors.surface, borderRadius: radius.pill, ...edge },
   chipInner: { paddingHorizontal: space.lg, paddingVertical: space.sm },
   chipText: { fontSize: font.body, fontWeight: '600', color: colors.text },
   sheetWrap: { position: 'absolute', left: 0, right: 0, bottom: 0 },
@@ -155,7 +155,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingTop: space.sm,
     paddingBottom: SAFE_BOTTOM + space.sm,
-    ...shadow,
+    borderTopWidth: stroke.hairline,
+    borderColor: colors.border,
   },
   grabber: {
     alignSelf: 'center',

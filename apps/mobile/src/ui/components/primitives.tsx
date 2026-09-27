@@ -2,10 +2,22 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Switch, Text, View, type ViewStyle } from 'react-native';
 
-import { colors, font, radius, shadow, space } from '../theme';
+import { colors, font, lip as lipWidth, radius, space, stroke } from '../theme';
 
-export function Card({ children, style }: { children: ReactNode; style?: ViewStyle }) {
-  return <View style={[styles.card, style]}>{children}</View>;
+/**
+ * White card with a hairline border. `lip` gives it the chunky bottom edge:
+ * use it for the one hero card on a screen.
+ */
+export function Card({
+  children,
+  lip = false,
+  style,
+}: {
+  children: ReactNode;
+  lip?: boolean;
+  style?: ViewStyle;
+}) {
+  return <View style={[styles.card, lip && styles.cardLip, style]}>{children}</View>;
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
@@ -48,7 +60,7 @@ export function ToggleRow({
         value={value}
         onValueChange={onChange}
         disabled={disabled}
-        trackColor={{ true: colors.black, false: colors.border }}
+        trackColor={{ true: colors.primary, false: colors.border }}
         thumbColor={colors.white}
       />
     </View>
@@ -72,10 +84,12 @@ export function TierDot({ tier }: { tier: 'coach' | 'harsh' }) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
+    borderWidth: stroke.hairline,
+    borderColor: colors.border,
     padding: space.lg,
-    ...shadow,
   },
+  cardLip: { borderBottomWidth: lipWidth.rest },
   section: {
     fontSize: font.title,
     fontWeight: '700',
@@ -88,6 +102,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surfaceAlt,
     borderRadius: radius.md,
+    borderBottomWidth: lipWidth.rest,
+    borderBottomColor: colors.teal100,
     padding: space.md,
   },
   tileValue: { fontSize: font.title, fontWeight: '700', color: colors.text },

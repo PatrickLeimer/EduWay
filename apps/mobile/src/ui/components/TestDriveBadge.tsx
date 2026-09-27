@@ -10,7 +10,7 @@ export function TestDriveBadge() {
 const styles = StyleSheet.create({
   badge: {
     backgroundColor: colors.coach,
-    color: colors.black,
+    color: colors.text,
     fontSize: font.small,
     fontWeight: '800',
     paddingHorizontal: space.md,

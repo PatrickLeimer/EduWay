@@ -23,7 +23,7 @@ export function ScoreRing({ score, size = 120 }: { score: number | null; size?: 
 const styles = StyleSheet.create({
   ring: {
     borderWidth: 8,
-    borderColor: colors.black,
+    borderColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
