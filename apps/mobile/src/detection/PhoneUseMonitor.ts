@@ -37,6 +37,9 @@ export function createPhoneUseMonitor(): PhoneUseMonitor {
     reportTouch() {
       emit(tracker?.onTouch(Date.now()) ?? null);
     },
+    reportSafeExit() {
+      tracker?.onSafeExit();
+    },
     subscribe: (listener) => events.subscribe(listener),
   };
 }

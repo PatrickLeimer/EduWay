@@ -75,6 +75,11 @@ export interface TripSession extends Subscribable<TripState> {
    * PhoneUseMonitor.reportTouch so ui/ never talks to detection/ directly.
    */
   reportTouch(): void;
+  /**
+   * The driving screen calls this right before opening navigation or an
+   * emergency call. Forwarded to PhoneUseMonitor.reportSafeExit.
+   */
+  reportSafeExit(): void;
 }
 
 /** A trip upload waiting for connectivity (§4 "Offline"). */

@@ -67,7 +67,13 @@ function harness(opts: {
     },
     motionSource: { start: async () => {}, stop() {} },
     motionDetector: motion,
-    phoneUse: { start() {}, stop() {}, reportTouch() {}, subscribe: () => () => {} },
+    phoneUse: {
+      start() {},
+      stop() {},
+      reportTouch() {},
+      reportSafeExit() {},
+      subscribe: () => () => {},
+    },
     roadCache: {
       ensureAround: opts.ensureAround ?? (async () => {}),
       match: () => opts.road ?? posted(),

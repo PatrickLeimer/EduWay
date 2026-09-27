@@ -90,6 +90,9 @@ export function createMockPhoneUseMonitor(pollMs = 250): PhoneUseMonitor {
         location: { type: 'Point', coordinates: [fix.lon, fix.lat] },
       });
     },
+    reportSafeExit() {
+      // The mock does not watch AppState, so there is nothing to excuse.
+    },
     subscribe: (l) => events.subscribe(l),
   };
 }
