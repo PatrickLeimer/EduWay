@@ -85,7 +85,15 @@ function harness(opts: {
     },
     roadDetector: { onGps: opts.onGps ?? (() => []), reset() {} },
     alerts: { preload: async () => {}, play, reset() {} },
-    debrief: { play: debriefPlay, stop() {} },
+    debrief: {
+      play: debriefPlay,
+      stop() {},
+      pause() {},
+      resume() {},
+      positionS: () => 0,
+      durationS: () => null,
+      isPlaying: () => false,
+    },
     api: {
       createTrip,
       listTrips: async () => ({ trips: [] }),
@@ -138,7 +146,7 @@ describe('TripSession', () => {
     expect(session.getState().status).toBe('driving');
   });
 
-  it('uploads the trace, alerts on a harsh brake, and plays the debrief', async () => {
+  it('uploads the trace and alerts on a harsh brake; the debrief waits for the coaching screen', async () => {
     const h = harness({ fixes: driveThenPark() });
     await h.session.start({ passenger: false, lockEnabled: true });
     expect(h.activate).toHaveBeenCalledOnce();
@@ -150,7 +158,7 @@ describe('TripSession', () => {
     expect(result?.coachAudioUrl).toBe(AUDIO);
     expect(h.session.getState().status).toBe('done');
     expect(h.play).toHaveBeenCalledWith('hard_brake', { limitMph: 40 });
-    expect(h.debriefPlay).toHaveBeenCalledWith(AUDIO);
+    expect(h.debriefPlay).not.toHaveBeenCalled();
     const body = h.createTrip.mock.calls[0]?.[0];
     expect(body?.trip.passenger).toBe(false);
     expect(body?.events.some((e) => e.type === 'hard_brake' && e.alerted)).toBe(true);

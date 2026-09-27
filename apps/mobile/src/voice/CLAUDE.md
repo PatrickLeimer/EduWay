@@ -22,11 +22,12 @@ Plays pre-generated ElevenLabs clips for dangerous moments during the drive, wit
 |---|---|
 | `clips.ts` | Done: alert → clip id (speeding picks the matching limit clip); tests check manifest, mp3s, and the require map agree |
 | `cooldown.ts` | Done: per-type cooldown, phone use exempt (pure, tested) |
-| `AlertPlayer.ts` | Done, needs a phone test: expo-audio playback over music, `cooldown.ts`, debrief streaming |
-| `mocks/` | Logs instead of playing; uses `cooldown.ts` |
+| `AlertPlayer.ts` | Done: expo-audio alerts over music with `cooldown.ts`; debrief streaming with pause/resume/position for the coach chat |
+| `audioUrl.ts` | Done: resolves the server's relative `/audio/...` path against `API_BASE_URL` (tested) |
+| `mocks/` | Logs instead of playing; uses `cooldown.ts`; mock debrief runs a 45 s clock |
 
 ## Done means (master doc §14)
 - [x] Saturday night: clips generated (`npm run alert-clips`) and committed to `assets/alerts/`.
 - [ ] Alerts play over music with the screen on; cooldown 60 s per type, phone use exempt.
-- [ ] Debrief plays from the server URL after the trip.
+- [x] Debrief plays from the server URL on the coach screen, in sync with the chat.
 - [x] Cooldown logic in a pure file with Vitest tests.

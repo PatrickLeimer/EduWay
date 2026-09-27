@@ -5,6 +5,7 @@
 import { API_ROUTES } from '@edudriver/shared';
 import express, { type Express } from 'express';
 
+import { DEBRIEF_AUDIO_DIR, DEBRIEF_AUDIO_ROUTE } from './coach';
 import { askRouter, errorHandler, progressRouter, tripsRouter, type RouteDeps } from './routes';
 
 export function createApp(deps: RouteDeps): Express {
@@ -18,6 +19,8 @@ export function createApp(deps: RouteDeps): Express {
   app.use('/trips', tripsRouter(deps));
   app.use(API_ROUTES.getProgress, progressRouter(deps));
   app.use(API_ROUTES.ask, askRouter(deps));
+  // ElevenLabs debrief mp3s written by coach/ (§11); coachAudioUrl points here.
+  app.use(DEBRIEF_AUDIO_ROUTE, express.static(DEBRIEF_AUDIO_DIR));
 
   app.use((_req, res) => {
     res.status(404).json({ error: 'Not found' });

@@ -17,15 +17,17 @@ import { ScreenTransition } from './components/motion';
 import { BackButton } from './components/Screen';
 import { routeKey, transitionFor, type TransitionKind } from './lib/transitions';
 import { DEFAULT_SETTINGS, type AppSettings, type Route, type ScreenProps } from './navigation';
+import { CoachScreen } from './screens/CoachScreen';
 import { DevMenuScreen } from './screens/DevMenuScreen';
 import { DrivingScreen } from './screens/DrivingScreen';
+import { GrowthScreen } from './screens/GrowthScreen';
+import { InfractionsScreen } from './screens/InfractionsScreen';
 import { ProgressScreen } from './screens/ProgressScreen';
 import { ReplayScreen } from './screens/ReplayScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { StartDriveScreen } from './screens/StartDriveScreen';
 import { TripEndedScreen } from './screens/TripEndedScreen';
 import { TripListScreen } from './screens/TripListScreen';
-import { TripResultScreen } from './screens/TripResultScreen';
 import { colors, SAFE_TOP, space } from './theme';
 
 function renderRoute(route: Route, props: ScreenProps) {
@@ -36,10 +38,14 @@ function renderRoute(route: Route, props: ScreenProps) {
       return <DrivingScreen {...props} />;
     case 'ended':
       return <TripEndedScreen {...props} />;
-    case 'result':
-      return <TripResultScreen {...props} tripId={route.tripId} />;
     case 'replay':
-      return <ReplayScreen {...props} tripId={route.tripId} />;
+      return <ReplayScreen {...props} tripId={route.tripId} origin={route.origin} />;
+    case 'infractions':
+      return <InfractionsScreen {...props} tripId={route.tripId} origin={route.origin} />;
+    case 'growth':
+      return <GrowthScreen {...props} tripId={route.tripId} origin={route.origin} />;
+    case 'coach':
+      return <CoachScreen {...props} tripId={route.tripId} origin={route.origin} />;
     case 'list':
       return <TripListScreen {...props} />;
     case 'progress':

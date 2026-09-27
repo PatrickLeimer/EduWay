@@ -44,6 +44,9 @@ yarn-error.*
 .env
 **/.env
 
+# ElevenLabs debrief mp3s written by the server at runtime (server/src/coach/elevenlabs.ts)
+server/audio/
+
 # test output
 coverage/
 

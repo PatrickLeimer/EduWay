@@ -60,16 +60,16 @@ export interface ModuleFlags {
 
 /**
  * One flag per module. false = mock, true = real implementation.
- * WS2 owns this file. Real: phone GPS and sensors, road data and the bundled
- * voice clips. `api` stays on the in-app mock until the phone can reach the
- * server (eduroam blocks phone-to-laptop traffic; needs a tunnel or hotspot).
- * Set it to true then. For a desk demo, turn on "Test drive" in Settings.
+ * WS2 owns this file. Real: phone GPS and sensors, road data, the bundled voice
+ * clips, and the server API at EXPO_PUBLIC_API_URL (apps/mobile/.env). The phone
+ * must be able to reach that URL (eduroam blocks phone-to-laptop traffic; use a
+ * tunnel, hotspot, or a deployed server). For a desk demo, turn on "Test drive".
  */
 export const USE_REAL: ModuleFlags = {
   detection: true,
   road: true,
   trip: true,
-  api: false,
+  api: true,
   voice: true,
   /** Real GPS (expo-location) for the real TripSession; false replays the fixture drive. */
   gps: true,
@@ -78,14 +78,15 @@ export const USE_REAL: ModuleFlags = {
 /**
  * "Test drive" (Settings / Dev tools): the phone doesn't have to move. GPS replays
  * the fixture drive and detection replays the fixture events; road and voice stay
- * real, so live alerts play. `api` uses the in-app mock so the demo never depends
- * on the network; set it to true for a real Gemini + ElevenLabs debrief.
+ * real, so live alerts play. `api` is real too, so the synthetic drive uploads to
+ * the server and gets real Gemini coaching (not the fixture). Needs
+ * EXPO_PUBLIC_API_URL to reach the server; if it can't, the trip is queued.
  */
 export const DEMO_FLAGS: ModuleFlags = {
   detection: false,
   road: true,
   trip: true,
-  api: false,
+  api: true,
   voice: true,
   gps: false,
 };

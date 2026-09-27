@@ -3,7 +3,7 @@
  * failing the trip upload: no coaching → coach null; no voice → audioUrl null.
  */
 import { generateCoaching } from './gemini';
-import { synthesizeDebrief } from './elevenlabs';
+import { synthesizeChat } from './elevenlabs';
 import type { CoachResult, CoachService } from './types';
 
 export interface CoachServiceOptions {
@@ -11,6 +11,8 @@ export interface CoachServiceOptions {
   geminiModel?: string;
   elevenLabsApiKey?: string;
   elevenLabsVoiceId?: string;
+  /** Where debrief mp3s are written. Defaults to server/audio (served at /audio). */
+  audioDir?: string;
 }
 
 export function createCoachService(opts: CoachServiceOptions): CoachService {
@@ -32,11 +34,17 @@ export function createCoachService(opts: CoachServiceOptions): CoachService {
       }
       if (!opts.elevenLabsApiKey || !opts.elevenLabsVoiceId) return { coach, audioUrl: null };
       try {
-        const audioUrl = await synthesizeDebrief(coach.debrief_script, tripId, {
+        // Voice the chat (§11); a reply without one falls back to the short summary.
+        const messages = coach.chat?.length ? coach.chat : [coach.debrief_script];
+        const audio = await synthesizeChat(messages, tripId, {
           apiKey: opts.elevenLabsApiKey,
           voiceId: opts.elevenLabsVoiceId,
+          audioDir: opts.audioDir,
         });
-        return { coach, audioUrl };
+        const timed = coach.chat?.length
+          ? { ...coach, chat_audio_starts_s: audio.chatStartsS }
+          : coach;
+        return { coach: timed, audioUrl: audio.url };
       } catch (e) {
         console.error('[coach] ElevenLabs failed:', e);
         return { coach, audioUrl: null };

@@ -9,7 +9,9 @@
 import type { LiveAlertType } from '@edudriver/shared';
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer as ExpoPlayer } from 'expo-audio';
 
+import { API_BASE_URL } from '../api';
 import type { AlertContext, AlertPlayer, DebriefPlayer } from '../contracts';
+import { resolveAudioUrl } from './audioUrl';
 import { clipIdFor } from './clips';
 import { createAlertCooldown } from './cooldown';
 
@@ -83,7 +85,8 @@ export function createAlertPlayer(now: () => number = Date.now): AlertPlayer {
   };
 }
 
-export function createDebriefPlayer(): DebriefPlayer {
+/** Streams the ElevenLabs debrief (§11) and reports progress so the coaching chat can follow along. */
+export function createDebriefPlayer(apiBaseUrl: string = API_BASE_URL): DebriefPlayer {
   let player: ExpoPlayer | null = null;
   const stop = () => {
     player?.pause();
@@ -94,9 +97,24 @@ export function createDebriefPlayer(): DebriefPlayer {
     async play(url: string) {
       stop();
       await setDrivingAudioMode();
-      player = createAudioPlayer({ uri: url });
+      player = createAudioPlayer({ uri: resolveAudioUrl(url, apiBaseUrl) });
       player.play();
     },
     stop,
+    pause() {
+      player?.pause();
+    },
+    resume() {
+      player?.play();
+    },
+    positionS() {
+      return player?.currentTime ?? 0;
+    },
+    durationS() {
+      return player?.isLoaded && player.duration > 0 ? player.duration : null;
+    },
+    isPlaying() {
+      return player?.playing ?? false;
+    },
   };
 }

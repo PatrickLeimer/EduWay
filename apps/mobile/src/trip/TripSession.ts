@@ -246,13 +246,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
         await flushQueue();
         const result = await deps.api.createTrip(body);
         store.set({ status: 'done', result, error: null });
-        if (result.coachAudioUrl && !options.passenger) {
-          try {
-            await deps.debrief.play(result.coachAudioUrl);
-          } catch {
-            // Saved trip stands even when debrief playback fails.
-          }
-        }
+        // The voice debrief plays on the coaching screen, the last post-trip step (§4, §12).
         return result;
       } catch (e) {
         const id = globalThis.crypto?.randomUUID?.() ?? `queue-${Date.now()}`;

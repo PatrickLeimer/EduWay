@@ -15,13 +15,15 @@ const DEPTH: Record<Route['name'], number> = {
   settings: 1,
   ended: 2,
   dev: 2,
-  result: 3,
+  replay: 3,
   ws1: 3,
   ws2: 3,
   ws3: 3,
   ws4: 3,
   recorder: 3,
-  replay: 4,
+  infractions: 4,
+  growth: 5,
+  coach: 6,
 };
 
 export function transitionFor(from: Route['name'], to: Route['name']): TransitionKind {

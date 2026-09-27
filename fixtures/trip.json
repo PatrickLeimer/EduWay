@@ -64,7 +64,16 @@
         "tip": "Stop until the car settles back, count one-two, then go"
       }
     ],
-    "debrief_script": "Nice work keeping a steady speed on 107th. Two things for next time: put the phone away before you start, and come to a full stop at stop signs. The limit on 107th was estimated, but you were a bit over it too. You are making progress."
+    "debrief_script": "Nice work keeping a steady speed on 107th. Two things for next time: put the phone away before you start, and come to a full stop at stop signs. The limit on 107th was estimated, but you were a bit over it too. You are making progress.",
+    "chat": [
+      "Hey, nice work getting that drive in! Let's talk it through.",
+      "First, your speed on 107th was really steady. That calm control is exactly what examiners want to see.",
+      "Now the big one. On 8th Street you picked up your phone for about six seconds while moving. I get it, it's a reflex, but that's the habit I most want us to break.",
+      "Try this: set your music and directions before you pull out, then keep the phone out of reach.",
+      "At the stop sign on 107th you rolled through at about three miles an hour. Stop fully, count one, two, then go.",
+      "And 8th Street keeps catching you with hard braking, three drives now. Start easing off as soon as that light comes into view.",
+      "You held at 64, right in line with your last few drives. Keep stacking these habits and you'll be road test ready. See you next drive!"
+    ]
   },
   "coachAudioUrl": "https://example.invalid/audio/trip-fixture-001.mp3"
 }

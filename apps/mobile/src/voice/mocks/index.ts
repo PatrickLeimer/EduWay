@@ -33,11 +33,38 @@ export function createMockAlertPlayer(now: () => number = Date.now): MockAlertPl
   };
 }
 
-export function createMockDebriefPlayer(): DebriefPlayer {
+/** Length the mock pretends the debrief is, so the coaching chat still reveals bubble by bubble. */
+export const MOCK_DEBRIEF_S = 45;
+
+/** No audio: a clock that runs like playback would, with pause/resume. */
+export function createMockDebriefPlayer(now: () => number = Date.now): DebriefPlayer {
+  let startedAt: number | null = null;
+  let pausedAtS: number | null = null;
+  const positionS = () => {
+    if (pausedAtS !== null) return pausedAtS;
+    if (startedAt === null) return 0;
+    return Math.min(MOCK_DEBRIEF_S, (now() - startedAt) / 1000);
+  };
   return {
     async play(url) {
       console.log(`[voice mock] debrief: ${url}`);
+      startedAt = now();
+      pausedAtS = null;
     },
-    stop() {},
+    stop() {
+      startedAt = null;
+      pausedAtS = null;
+    },
+    pause() {
+      if (startedAt !== null && pausedAtS === null) pausedAtS = positionS();
+    },
+    resume() {
+      if (pausedAtS === null) return;
+      startedAt = now() - pausedAtS * 1000;
+      pausedAtS = null;
+    },
+    positionS,
+    durationS: () => (startedAt === null ? null : MOCK_DEBRIEF_S),
+    isPlaying: () => startedAt !== null && pausedAtS === null && positionS() < MOCK_DEBRIEF_S,
   };
 }

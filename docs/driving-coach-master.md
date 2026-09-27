@@ -106,7 +106,7 @@ Key rules:
 - **Phone use while driving:** whether the lock is on or off, using the phone while moving triggers a voice warning and counts against the score (section 7).
 - **Passenger option:** "I'm a passenger" skips scoring for that trip [Proposed].
 - **Keep the app in front:** `expo-keep-awake` keeps the screen on and sensor sampling at full rate. Background sensor access on iOS is not worth fighting this weekend.
-- **End:** manual, only allowed after the car has been stopped for 30+ seconds (prevents ending at a red light). The voice debrief plays when the trip ends.
+- **End:** manual, only allowed after the car has been stopped for 30+ seconds (prevents ending at a red light). After the trip ends, the app walks through the post-trip screens (section 12) and the voice debrief plays on the coaching screen, the last step.
 - **Offline:** events and the GPS trace are queued on the phone and uploaded when the trip ends and there is a connection.
 
 ---
@@ -341,7 +341,12 @@ Use `response_mime_type: application/json` with a response schema:
   "focus_areas": [
     { "skill": "Braking early", "why": "4 hard brakes approaching the same SW 8th St intersection", "tip": "Start easing off when the light first comes into view" }
   ],
-  "debrief_script": "Solid drive, 71 today..."
+  "debrief_script": "Solid drive, 71 today...",
+  "chat": [
+    "Hey, nice drive! Let's talk it through.",
+    "Your turns were really smooth today. That's exactly what examiners look for.",
+    "Now, 8th Street. That's four hard brakes at the same light..."
+  ]
 }
 ```
 
@@ -354,7 +359,8 @@ Use `response_mime_type: application/json` with a response schema:
 - Treat phone use seriously but without lecturing.
 - Pick the 1 to 2 most important focus areas.
 - Compare with history; call out improvement and recurring spots.
-- Keep `debrief_script` under about 60 words.
+- Keep `debrief_script` (a short written summary) under about 60 words.
+- `chat` is the coaching conversation: 6 to 10 short messages, about 160 words in total, spoken aloud. Sound like a real, personable coach talking to the student after the drive, not a report: warm, conversational, specific. Same fact rules as above.
 - Tone: encouraging, specific, plain language.
 
 ### Ask the coach (stretch)
@@ -366,7 +372,7 @@ The student asks "Am I getting better at stops?" The backend pulls relevant trip
 ## 11. Voice with ElevenLabs
 
 - **Live alerts:** pre-generated clips bundled in the app (section 7).
-- **Debrief:** the backend sends Gemini's `debrief_script` to ElevenLabs and returns the audio URL to the app.
+- **Debrief:** the backend sends Gemini's `chat` messages to ElevenLabs as one track (with character timings) and returns the audio URL; `chat_audio_starts_s` records when each message starts so the app shows each chat bubble as the coach says it. About 900 ElevenLabs characters per trip.
 - Check whether ElevenLabs runs a sponsor prize track.
 
 ---
@@ -375,8 +381,8 @@ The student asks "Am I getting better at stops?" The backend pulls relevant trip
 
 1. Start drive (lock toggle, passenger option)
 2. Driving mode (lock screen or minimal driving screen; emergency and navigation access)
-3. Trip debrief (score, voice playback, strengths, focus areas)
-4. Trip map and replay (Google Maps route, animated playback, event pins, speed vs limit timeline)
+3. Post-trip flow, one screen at a time with Next: Trip concluded (loading, then score reveal) → Replay (Google Maps route, animated playback, event pins, speed vs limit timeline) → Infractions (every event and where it happened) → Driving growth (placeholder for the future game-style progress) → Coaching chat (the Gemini conversation, voiced by ElevenLabs) → Home. Past drives open the same flow without the loading screen.
+4. (Merged into 3.)
 5. Progress (score trend, skill breakdown, recurring spots, test readiness)
 6. Settings (lock toggle default)
 

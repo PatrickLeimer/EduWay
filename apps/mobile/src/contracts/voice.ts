@@ -28,6 +28,15 @@ export interface AlertPlayer {
 
 /** Plays the ElevenLabs debrief returned by the server (§11). */
 export interface DebriefPlayer {
+  /** Starts playback from the beginning. Resolves once it has started. */
   play(url: string): Promise<void>;
+  /** Stops and releases the audio. */
   stop(): void;
+  pause(): void;
+  resume(): void;
+  /** Seconds played so far; 0 before playback. Drives the chat bubbles (CoachOutput.chat_audio_starts_s). */
+  positionS(): number;
+  /** Length of the loaded audio in seconds, or null until known. */
+  durationS(): number | null;
+  isPlaying(): boolean;
 }
