@@ -22,7 +22,18 @@ import { ToggleRow } from '../components/primitives';
 import { TestDriveBadge } from '../components/TestDriveBadge';
 import { directionsUrl } from '../lib/links';
 import type { ScreenProps } from '../navigation';
-import { colors, edge, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, space, stroke } from '../theme';
+import {
+  colors,
+  edge,
+  font,
+  fonts,
+  motion,
+  radius,
+  SAFE_BOTTOM,
+  SAFE_TOP,
+  space,
+  stroke,
+} from '../theme';
 
 export function StartDriveScreen({ modules, navigate, settings }: ScreenProps) {
   const { fix, error } = useMapGps(modules.trip);
@@ -136,7 +147,7 @@ const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   brand: {
     fontSize: font.title,
-    fontWeight: '800',
+    fontFamily: fonts.semiBold,
     color: colors.text,
     backgroundColor: colors.surface,
     paddingHorizontal: space.md,
@@ -146,7 +157,7 @@ const styles = StyleSheet.create({
   },
   chip: { backgroundColor: colors.surface, borderRadius: radius.pill, ...edge },
   chipInner: { paddingHorizontal: space.lg, paddingVertical: space.sm },
-  chipText: { fontSize: font.body, fontWeight: '600', color: colors.text },
+  chipText: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
   sheetWrap: { position: 'absolute', left: 0, right: 0, bottom: 0 },
   sheet: {
     backgroundColor: colors.surface,
@@ -166,7 +177,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
     marginBottom: space.md,
   },
-  error: { color: colors.harsh, fontSize: font.small, marginBottom: space.sm },
+  error: {
+    fontFamily: fonts.regular,
+    color: colors.harsh,
+    fontSize: font.small,
+    marginBottom: space.sm,
+  },
   whereRow: { flexDirection: 'row', gap: space.sm, alignItems: 'center' },
   where: {
     flex: 1,
@@ -175,10 +191,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingHorizontal: space.lg,
     fontSize: font.body,
-    fontWeight: '600',
+    fontFamily: fonts.semiBold,
     color: colors.text,
   },
   hint: {
+    fontFamily: fonts.regular,
     fontSize: font.small,
     color: colors.textMuted,
     marginTop: space.sm,

@@ -2,7 +2,9 @@
  * App shell: state-based navigation between screens (see navigation.ts).
  * Product screens (and the dev menu) draw their own full-screen layout; the
  * WS1–WS4 debug screens keep the plain scrolling wrapper they were built for.
+ * Lexend is loaded here before anything renders.
  */
+import { Lexend_400Regular, Lexend_600SemiBold, useFonts } from '@expo-google-fonts/lexend';
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
@@ -85,6 +87,10 @@ export function Root({ modules }: { modules: AppModules }) {
     (patch: Partial<AppSettings>) => setSettings((s) => ({ ...s, ...patch })),
     [],
   );
+  const [fontsLoaded, fontError] = useFonts({ Lexend_400Regular, Lexend_600SemiBold });
+  // A failed font load falls back to the system font rather than a blank app.
+  if (!fontsLoaded && !fontError) return <View style={styles.backdrop} />;
+
   // Test drive swaps in the simulated modules; Settings only allows it while no trip is running.
   const active = settings.demoMode ? getDemoModules() : modules;
   const props: ScreenProps = { modules: active, navigate, settings, updateSettings };

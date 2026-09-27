@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { colors, font, motion, radius, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
+import { colors, font, fonts, motion, radius, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 import { FadeIn, PressableScale } from './motion';
 
 interface ScreenProps {
@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
     borderColor: colors.text,
     transform: [{ rotate: '45deg' }],
   },
-  backText: { fontSize: font.body, fontWeight: '600', color: colors.text },
-  title: { fontSize: font.display, fontWeight: '800', color: colors.text },
+  backText: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  title: { fontSize: font.display, fontFamily: fonts.semiBold, color: colors.text },
   scroll: { paddingBottom: space.xxl },
   content: { paddingHorizontal: space.lg },
   footer: {

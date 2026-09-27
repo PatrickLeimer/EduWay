@@ -4,7 +4,7 @@
  */
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, font } from '../theme';
+import { colors, font, fonts } from '../theme';
 
 export function ScoreRing({ score, size = 120 }: { score: number | null; size?: number }) {
   return (
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.surface,
   },
-  value: { fontWeight: '800', color: colors.text },
-  label: { fontSize: font.small, color: colors.textMuted },
+  value: { fontFamily: fonts.semiBold, color: colors.text },
+  label: { fontFamily: fonts.regular, fontSize: font.small, color: colors.textMuted },
 });

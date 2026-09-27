@@ -5,7 +5,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { API_BASE_URL } from '../../api';
-import { colors, font, radius, space } from '../theme';
+import { colors, font, fonts, radius, space } from '../theme';
 import { Button } from './Button';
 import { FadeIn } from './motion';
 
@@ -37,7 +37,13 @@ const styles = StyleSheet.create({
     padding: space.lg,
     marginTop: space.lg,
   },
-  title: { fontSize: font.body, fontWeight: '700', color: colors.text },
-  body: { fontSize: font.small, color: colors.textMuted, marginTop: space.xs, lineHeight: 18 },
+  title: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  body: {
+    fontFamily: fonts.regular,
+    fontSize: font.small,
+    color: colors.textMuted,
+    marginTop: space.xs,
+    lineHeight: 18,
+  },
   action: { marginTop: space.md },
 });

@@ -5,7 +5,7 @@
  */
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
-import { colors, DRIVE_BUTTON_HEIGHT, font, lip, radius, space, stroke } from '../theme';
+import { colors, DRIVE_BUTTON_HEIGHT, font, fonts, lip, radius, space, stroke } from '../theme';
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'onDark';
 
@@ -87,8 +87,8 @@ const styles = StyleSheet.create({
   onDark: { backgroundColor: colors.drivePanel, borderBottomColor: colors.driveBorder },
   disabled: { backgroundColor: colors.disabled, borderColor: colors.disabled },
   disabledDark: { opacity: 0.5 },
-  label: { fontSize: font.body, fontWeight: '700', textAlign: 'center' },
-  labelLarge: { fontSize: font.driveMin },
+  label: { fontSize: font.body, fontFamily: fonts.semiBold, textAlign: 'center' },
+  labelLarge: { fontFamily: fonts.regular, fontSize: font.driveMin },
   labelLight: { color: colors.onColor },
   labelTeal: { color: colors.good },
   labelDisabled: { color: colors.textMuted },

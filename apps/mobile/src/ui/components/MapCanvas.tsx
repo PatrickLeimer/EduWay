@@ -11,7 +11,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { regionFor } from '../lib/geo';
-import { colors, font, mapDarkStyle } from '../theme';
+import { colors, font, fonts, mapDarkStyle } from '../theme';
 import type { MapCanvasProps } from './mapTypes';
 
 const GOOGLE = Platform.OS === 'android';
@@ -101,7 +101,7 @@ export function MapCanvas({
 const styles = StyleSheet.create({
   empty: { backgroundColor: colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
   emptyDark: { backgroundColor: colors.driveBg },
-  emptyText: { color: colors.textMuted, fontSize: font.body },
+  emptyText: { fontFamily: fonts.regular, color: colors.textMuted, fontSize: font.body },
   emptyTextDark: { color: colors.textOnDarkMuted },
   carOuter: {
     width: 24,

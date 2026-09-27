@@ -46,7 +46,8 @@
         }
       ],
       "expo-audio",
-      "expo-sharing"
+      "expo-sharing",
+      "expo-font"
     ],
     "extra": {
       "eas": {

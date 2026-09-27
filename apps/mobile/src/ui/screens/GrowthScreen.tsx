@@ -12,7 +12,7 @@ import { Card, Muted } from '../components/primitives';
 import { Screen } from '../components/Screen';
 import { nextRoute, prevRoute } from '../lib/flow';
 import type { FlowOrigin, ScreenProps } from '../navigation';
-import { colors, font, motion, radius, space } from '../theme';
+import { colors, font, fonts, motion, radius, space } from '../theme';
 
 /** Ideas for the future game; names only. */
 const BADGES = [
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     gap: space.sm,
     marginTop: space.sm,
   },
-  soon: { fontSize: font.small, fontWeight: '800', letterSpacing: 2, color: colors.white },
+  soon: { fontSize: font.small, fontFamily: fonts.semiBold, letterSpacing: 2, color: colors.white },
   levelBadge: {
     width: 88,
     height: 88,
@@ -93,9 +93,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: space.sm,
   },
-  levelText: { fontSize: 40, fontWeight: '800', color: colors.white },
-  heroTitle: { fontSize: font.title, fontWeight: '800', color: colors.white },
-  heroSub: { fontSize: font.body, color: colors.white, textAlign: 'center', opacity: 0.9 },
+  levelText: { fontSize: 40, fontFamily: fonts.semiBold, color: colors.white },
+  heroTitle: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.white },
+  heroSub: {
+    fontFamily: fonts.regular,
+    fontSize: font.body,
+    color: colors.white,
+    textAlign: 'center',
+    opacity: 0.9,
+  },
   track: {
     alignSelf: 'stretch',
     height: 10,
@@ -107,7 +113,7 @@ const styles = StyleSheet.create({
   trackFill: { width: '8%', height: '100%', backgroundColor: colors.white },
   section: {
     fontSize: font.title,
-    fontWeight: '700',
+    fontFamily: fonts.semiBold,
     color: colors.text,
     marginTop: space.xl,
     marginBottom: space.md,
@@ -126,5 +132,5 @@ const styles = StyleSheet.create({
     borderColor: colors.textMuted,
   },
   lockBody: { width: 20, height: 14, borderRadius: 3, backgroundColor: colors.textMuted },
-  badgeName: { fontSize: font.body, fontWeight: '700', color: colors.text },
+  badgeName: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
 });

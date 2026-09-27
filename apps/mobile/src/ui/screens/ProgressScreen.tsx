@@ -15,7 +15,7 @@ import { Screen } from '../components/Screen';
 import { EVENT_LABEL } from '../lib/format';
 import { pointFromGeo } from '../lib/geo';
 import type { ScreenProps } from '../navigation';
-import { colors, font, motion, radius, space } from '../theme';
+import { colors, font, fonts, motion, radius, space } from '../theme';
 
 export function ProgressScreen({ modules, navigate }: ScreenProps) {
   const { data, error, reload } = useApiQuery('progress', () =>
@@ -111,11 +111,11 @@ const styles = StyleSheet.create({
   readiness: { marginTop: space.md },
   readyTitle: {
     fontSize: font.title,
-    fontWeight: '700',
+    fontFamily: fonts.semiBold,
     color: colors.text,
     marginBottom: space.sm,
   },
-  note: { fontSize: font.body, color: colors.text, marginTop: space.xs },
+  note: { fontFamily: fonts.regular, fontSize: font.body, color: colors.text, marginTop: space.xs },
   chart: {
     height: 160,
     flexDirection: 'row',
@@ -126,15 +126,30 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   col: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'center' },
-  colValue: { fontSize: font.tiny, color: colors.textMuted, marginBottom: 2 },
+  colValue: {
+    fontFamily: fonts.regular,
+    fontSize: font.tiny,
+    color: colors.textMuted,
+    marginBottom: 2,
+  },
   colBar: { width: '100%', backgroundColor: colors.primary, borderRadius: 4 },
   skillRow: {
     paddingVertical: space.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
-  skillName: { fontSize: font.body, fontWeight: '600', color: colors.text },
-  skillValue: { fontSize: font.small, color: colors.textMuted, marginTop: 2 },
+  skillName: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  skillValue: {
+    fontFamily: fonts.regular,
+    fontSize: font.small,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
   map: { height: 220, borderRadius: radius.lg, overflow: 'hidden', marginBottom: space.md },
-  spot: { fontSize: font.body, color: colors.text, marginBottom: space.xs },
+  spot: {
+    fontFamily: fonts.regular,
+    fontSize: font.body,
+    color: colors.text,
+    marginBottom: space.xs,
+  },
 });

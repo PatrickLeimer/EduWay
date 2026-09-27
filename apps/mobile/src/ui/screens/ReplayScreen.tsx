@@ -32,7 +32,7 @@ import {
   type ReplaySpeed,
 } from '../lib/replay';
 import type { FlowOrigin, ScreenProps } from '../navigation';
-import { colors, font, motion, radius, space } from '../theme';
+import { colors, font, fonts, motion, radius, space } from '../theme';
 
 const TICK_MS = 200;
 const BARS = 48;
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.text,
   },
   times: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.xs },
-  time: { fontSize: font.small, color: colors.textMuted },
+  time: { fontFamily: fonts.regular, fontSize: font.small, color: colors.textMuted },
   controls: { flexDirection: 'row', gap: space.sm, marginTop: space.lg },
   playBtn: { flex: 2 },
   speedBtn: { flex: 1 },

@@ -66,6 +66,16 @@ export const colors = {
   disabled: '#D7E7E3',
 } as const;
 
+/**
+ * Lexend, loaded in Root.tsx with @expo-google-fonts/lexend. Custom fonts carry
+ * their own weight, so styles set fontFamily only (fontWeight on a custom font
+ * breaks on Android).
+ */
+export const fonts = {
+  regular: 'Lexend_400Regular',
+  semiBold: 'Lexend_600SemiBold',
+} as const;
+
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
 export const radius = { sm: 8, md: 12, lg: 16, xl: 24, pill: 999 } as const;

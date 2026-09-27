@@ -56,6 +56,7 @@ The app keeps its existing screen structure: Start drive → Driving → Trip co
 - `apps/mobile/src/ui/theme.ts` is the single source of truth for color, spacing, radius, type sizes and the lip. No raw hex values outside `theme.ts`.
 - Teal is the main color (primary buttons, active states, route line, hero surfaces). Coral is rare and always means harsh-tier events or danger. Amber means coach-tier events. Pure `black`/`white` are only for road signs (`SpeedLimitSign`, `StopSign`).
 - No gradients, glassmorphism, blur, glow, or soft drop shadows. Depth comes only from the "lip": a solid bottom border one shade darker (`lip`, `edge` in `theme.ts`).
+- Lexend for all text: set `fontFamily: fonts.regular` or `fonts.semiBold` from `theme.ts`, never `fontWeight` (it breaks custom fonts on Android). No other font names outside `theme.ts`.
 - Buttons are `components/Button.tsx` (chunky face on a lip that presses down). Cards are `Card` in `components/primitives.tsx` (white, hairline border, `lip` for the one hero card on a screen).
 - Driving mode: dark theme (`drive*` colors), text at least 20, touch targets at least 64, and nothing the driver should read while moving.
 - Show `© OpenStreetMap contributors` (`OsmCredit`) wherever OSM street names or limits appear.
@@ -80,7 +81,7 @@ The app keeps its existing screen structure: Start drive → Driving → Trip co
 
 - Do exactly the task asked. No unrequested refactors, renames, reformatting of files you did not change, or "while I was here" fixes.
 - Keep diffs small. If a change touches more than one workstream, stop and ask.
-- Do not add dependencies without asking. Already approved: `expo-sensors`, `expo-location`, `expo-keep-awake`, `expo-audio`, `expo-file-system`, `expo-sharing`, `react-native-maps`, `pako`, `express`, `mongodb`, `zod`, `@google/genai`, `@elevenlabs/elevenlabs-js`, `dotenv`, `vitest`.
+- Do not add dependencies without asking. Already approved: `expo-sensors`, `expo-location`, `expo-keep-awake`, `expo-audio`, `expo-file-system`, `expo-sharing`, `react-native-maps`, `pako`, `express`, `mongodb`, `zod`, `@google/genai`, `@elevenlabs/elevenlabs-js`, `dotenv`, `vitest`, `@expo-google-fonts/lexend`, `expo-font`.
 - Put detection, road, scoring, and summary logic in pure functions with no React Native or Expo imports, so it can be tested with Vitest using JSON fixtures in `fixtures/`.
 - Thresholds live in `packages/shared/src/thresholds.ts`. Never hard-code them elsewhere.
 - Run `npm run typecheck` and `npm test` before saying a task is done.

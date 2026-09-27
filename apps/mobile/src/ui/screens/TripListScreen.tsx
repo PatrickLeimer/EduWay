@@ -15,7 +15,7 @@ import { Screen } from '../components/Screen';
 import { dateText, durationText, milesText, secondsBetween, totalEvents } from '../lib/format';
 import { pointsFromLine } from '../lib/geo';
 import type { ScreenProps } from '../navigation';
-import { colors, edge, font, motion, radius, space } from '../theme';
+import { colors, edge, font, fonts, motion, radius, space } from '../theme';
 
 function TripCard({ trip, onPress }: { trip: TripListItem; onPress: () => void }) {
   const route = pointsFromLine(trip.routePreview);
@@ -89,9 +89,14 @@ const styles = StyleSheet.create({
   preview: { height: 130 },
   body: { flexDirection: 'row', alignItems: 'center', padding: space.lg, gap: space.md },
   info: { flex: 1 },
-  date: { fontSize: font.body, fontWeight: '700', color: colors.text },
-  meta: { fontSize: font.small, color: colors.textMuted, marginTop: space.xs },
+  date: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
+  meta: {
+    fontFamily: fonts.regular,
+    fontSize: font.small,
+    color: colors.textMuted,
+    marginTop: space.xs,
+  },
   score: { alignItems: 'center', minWidth: 56 },
-  scoreValue: { fontSize: font.title, fontWeight: '800', color: colors.text },
-  scoreLabel: { fontSize: font.tiny, color: colors.textMuted },
+  scoreValue: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },
+  scoreLabel: { fontFamily: fonts.regular, fontSize: font.tiny, color: colors.textMuted },
 });
