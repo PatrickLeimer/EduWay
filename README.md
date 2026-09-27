@@ -47,7 +47,7 @@ npx eas-cli@latest update:configure     # adds updates.url to app.json
 npx eas-cli@latest env:set --name EXPO_PUBLIC_API_URL --value https://<deployed-server> --environment preview --visibility plaintext
 ```
 
-Publish (from the repo root): `npm run publish:demo --workspace @edudriver/mobile`. The command prints an expo.dev link; that update page has the Expo Go QR code. `eas update --environment` ignores `apps/mobile/.env`, so public vars must be set with `eas env:set`.
+Publish (from the repo root): `npm run publish:demo --workspace @edudriver/mobile`. The command prints an expo.dev link; that update page has the Expo Go QR code. `eas update --environment` ignores `apps/mobile/.env`, so public vars must be set with `eas env:set`. Deploying the server for `EXPO_PUBLIC_API_URL`: [docs/render-railway-deployment.md](docs/render-railway-deployment.md).
 
 ## Checks (same as CI)
 
