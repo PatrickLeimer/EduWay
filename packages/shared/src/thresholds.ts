@@ -174,22 +174,24 @@ export const ALERTS = {
 
 /**
  * Score = 100 − Σ penalties, normalized per 10 miles, clamped to [0, 100].
- * TODO(team): the doc only fixes the ordering (harsh > coach, phone use heaviest).
- * These numbers are placeholders until tuned.
+ * The doc only fixes the ordering (harsh > coach, phone use heaviest). These
+ * numbers were fitted to the 2026-09-26 test drive (4.5 mi, 2 hard brakes,
+ * 4 rough turns, 1 speeding), which should score in the low 60s. Brake-led:
+ * brakes carry the most weight of the driving events. Re-tune on more drives.
  */
 export const SCORING = {
   base: 100,
   normalizePerMi: 10,
   /** Trips shorter than this are normalized as if they were this long, so a 0.2 mi trip isn't wrecked by one event. */
-  minNormalizeMi: 1,
+  minNormalizeMi: 3,
   penalty: {
     hard_brake: { coach: 3, harsh: 6 },
-    hard_accel: { coach: 2, harsh: 4 },
-    rough_turn: { coach: 3, harsh: 6 },
-    swerve: { coach: 4, harsh: 8 },
-    speeding: { coach: 3, harsh: 8 },
-    rolling_stop: { coach: 4, harsh: 4 },
-    phone_use: { coach: 15, harsh: 15 },
+    hard_accel: { coach: 1.5, harsh: 3 },
+    rough_turn: { coach: 1, harsh: 2 },
+    swerve: { coach: 3, harsh: 6 },
+    speeding: { coach: 2, harsh: 4 },
+    rolling_stop: { coach: 2, harsh: 2 },
+    phone_use: { coach: 10, harsh: 10 },
   } satisfies Record<EventType, Record<Tier, number>>,
 } as const;
 
