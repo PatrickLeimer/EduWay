@@ -34,6 +34,21 @@ Copy `server/.env.example` → `server/.env` and `apps/mobile/.env.example` → 
 
 Native modules in use (expo-sensors, expo-location, expo-keep-awake, expo-audio) are in Expo Go; if a later dependency is not, build a development client (`npx expo run:android|ios` or `eas build --profile development`).
 
+## Demo build (EAS Update + Expo Go)
+
+Publishes the JS bundle so anyone with Expo Go (SDK 57) can scan a QR code and run the app, no dev server needed. `runtimeVersion` uses the `sdkVersion` policy so updates stay Expo Go compatible.
+
+One-time setup (from `apps/mobile`, logged in to the team's Expo account):
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest init                 # adds extra.eas.projectId + owner to app.json
+npx eas-cli@latest update:configure     # adds updates.url to app.json
+npx eas-cli@latest env:set --name EXPO_PUBLIC_API_URL --value https://<deployed-server> --environment preview --visibility plaintext
+```
+
+Publish (from the repo root): `npm run publish:demo --workspace @edudriver/mobile`. The command prints an expo.dev link; that update page has the Expo Go QR code. `eas update --environment` ignores `apps/mobile/.env`, so public vars must be set with `eas env:set`.
+
 ## Checks (same as CI)
 
 ```bash
