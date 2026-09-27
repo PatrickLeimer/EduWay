@@ -292,6 +292,16 @@ export const RecurringSpotSchema = z.object({
 });
 export type RecurringSpot = z.infer<typeof RecurringSpotSchema>;
 
+/** The student's most common problem, counted in code. Null when none qualifies. */
+export const MainProblemSchema = z.object({
+  type: EventTypeSchema,
+  /** Distinct trips that had this event type, including the trip just completed. */
+  trip_count: z.number().int().positive(),
+  /** Street where this type happened most often, or null when no street qualifies. */
+  street: z.string().nullable(),
+});
+export type MainProblem = z.infer<typeof MainProblemSchema>;
+
 export const TripSummarySchema = z.object({
   trip: z.object({
     duration_min: z.number(),
@@ -307,6 +317,7 @@ export const TripSummarySchema = z.object({
   history: z.object({
     last_5_scores: z.array(z.number()),
     recurring_spots: z.array(RecurringSpotSchema),
+    main_problem: MainProblemSchema.nullable(),
   }),
 });
 export type TripSummary = z.infer<typeof TripSummarySchema>;

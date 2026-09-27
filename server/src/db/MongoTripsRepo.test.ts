@@ -87,6 +87,12 @@ describe.skipIf(!enabled)('MongoTripsRepo (live MongoDB)', () => {
     expect(history.last_5_scores).toHaveLength(2);
     expect(history.recurring_spots.length).toBeGreaterThan(0);
     expect(history.recurring_spots.every((s) => s.count === 3)).toBe(true);
+    // Three copies of the fixture tie on every type; phone use wins the tie.
+    expect(history.main_problem).toEqual({
+      type: 'phone_use',
+      trip_count: 3,
+      street: 'SW 8th St',
+    });
   });
 
   it('getProgress and listGamificationTrips from stored trips (no traces)', async () => {

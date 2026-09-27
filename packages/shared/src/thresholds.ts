@@ -10,6 +10,21 @@
  */
 import type { EventType, Tier } from './types';
 
+/**
+ * When two event types share the highest trip count, the earlier entry wins.
+ * Same safety order the coaching prompt uses: phone use, then motion events,
+ * then speeding, then rolling stops.
+ */
+const MAIN_PROBLEM_TIE_BREAK = [
+  'phone_use',
+  'hard_brake',
+  'hard_accel',
+  'rough_turn',
+  'swerve',
+  'speeding',
+  'rolling_stop',
+] as const satisfies readonly EventType[];
+
 export const G = 9.81;
 export const MPS_TO_MPH = 2.236936;
 export const KMH_TO_MPS = 1 / 3.6;
@@ -211,4 +226,9 @@ export const COACH = {
   /** Same type within this radius on ≥ minCount trips = recurring spot. TODO(WS3): tune. */
   recurringSpotRadiusM: 50,
   recurringSpotMinCount: 2,
+  /** Distinct trips with one event type before it is history.main_problem. */
+  mainProblemMinTrips: 3,
+  /** Distinct trips on one street before main_problem names that street. */
+  mainProblemStreetMinTrips: 2,
+  mainProblemTieBreak: MAIN_PROBLEM_TIE_BREAK,
 } as const;
