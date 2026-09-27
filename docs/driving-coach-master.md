@@ -167,7 +167,7 @@ function onMotion(s: { acc: Vec3; grav: Vec3; rot: Vec3; t: number }, gps: Fix) 
   horiz = ema(horiz, len(h));
   const lon = Math.sign(gps.dvdt) * horiz;             // + accelerating, − braking
 
-  brake.update(-lon, s.t);       // fires at 2.5 for ≥ 0.4 s, releases at 1.5
+  brake.update(-lon, s.t);       // fires at 3.5 for ≥ 0.4 s, releases at 1.5
   turn.update(Math.abs(lat), s.t);
   swerve.update(lat, s.t);       // looks for +2 then −2 within 2 s
 }
@@ -187,7 +187,7 @@ Values are m/s² after the ~2 Hz filter (1 g = 9.81 m/s²). Starting values from
 | Rolling stop | Min speed passing a stop sign | > about 4 mph | none (debrief only) | See section 8 |
 | Phone use | Touch or app leaving foreground while moving | always logged | always warned | Speed > 10 km/h |
 
-A normal lane change usually stays under 1.5 m/s² lateral, which is why the swerve rule needs ±2 and a quick sign flip.
+A normal lane change usually stays under 1.5 m/s² lateral, which is why the swerve rule needs ±2.5 and a quick sign flip.
 
 **Not in scope:** turn signal detection.
 
@@ -244,7 +244,7 @@ Score computed in code, not by Gemini, so it is consistent and explainable: star
 ### Rolling stops
 
 - A stop sign is "ours" when the car's path passes within about 15 m of the node and, if `direction` is tagged, the car's heading matches it.
-- If the minimum speed within that window stays above about 2 mph, log a rolling stop.
+- If the minimum speed within that window stays above about 4 mph, log a rolling stop.
 - Known risk: OSM stop signs often lack direction, so signs for cross traffic can cause false positives. Keep rolling stops debrief-only and tune the radius on real drives.
 
 ### Display
