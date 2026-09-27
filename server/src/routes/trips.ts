@@ -61,6 +61,8 @@ export function tripsRouter({ repo, scoreTrip, coach }: RouteDeps): Router {
         trip: { ...trip, coach: coachResult.coach, coachAudioUrl: coachResult.audioUrl },
         coach: coachResult.coach,
         coachAudioUrl: coachResult.audioUrl,
+        // TODO(WS3, Street View Part 1): pick the event, check coverage, and return the callout.
+        streetView: null,
       },
       201,
     );
@@ -74,7 +76,8 @@ export function tripsRouter({ repo, scoreTrip, coach }: RouteDeps): Router {
   r.get('/:id', async (req, res) => {
     const found = await repo.getTrip(req.params.id);
     if (!found) throw new HttpError(404, 'Trip not found');
-    sendValid(res, GetTripResponseSchema, found);
+    // TODO(WS3, Street View Part 1): return the saved callout.
+    sendValid(res, GetTripResponseSchema, { ...found, streetView: null });
   });
 
   r.get('/:id/trace', async (req, res) => {

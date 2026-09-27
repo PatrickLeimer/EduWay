@@ -69,7 +69,12 @@ describe.skipIf(!enabled)('MongoTripsRepo (live MongoDB)', () => {
     expect(list[0]?._id).toBe(second._id);
     for (const item of list) expect(TripListItemSchema.strict().parse(item)).toBeTruthy();
 
-    const coach = { strengths: ['Smooth turns'], focus_areas: [], debrief_script: 'Nice.' };
+    const coach = {
+      strengths: ['Smooth turns'],
+      focus_areas: [],
+      debrief_script: 'Nice.',
+      street_view_caption: null,
+    };
     await repo.setCoaching(second._id, coach, 'https://example.com/a.mp3');
     const loaded = await repo.getTrip(second._id);
     expect(loaded?.trip.coach).toEqual(coach);

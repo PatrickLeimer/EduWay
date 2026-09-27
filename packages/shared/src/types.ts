@@ -218,8 +218,38 @@ export const CoachOutputSchema = z.object({
    * each bubble as the coach says it.
    */
   chat_audio_starts_s: z.array(z.number().nonnegative()).optional(),
+  /**
+   * Caption for the Street View callout (§12 "Street View callout"): one or two
+   * sentences, under ~30 words, naming the place and giving one tip. Null when
+   * no event was picked. Defaults to null so trips coached before it still parse.
+   */
+  street_view_caption: z.string().nullable().default(null),
 });
 export type CoachOutput = z.infer<typeof CoachOutputSchema>;
+
+// ---------------------------------------------------------------------------
+// Street View callout (§12 "Street View callout"): one infraction shown after
+// the trip, facing the way the student was driving. Images are never stored;
+// both URLs point to OUR backend, which fetches from Google on demand.
+// ---------------------------------------------------------------------------
+
+export const StreetViewCalloutSchema = z.object({
+  /** The picked event's _id. */
+  eventId: z.string(),
+  eventType: EventTypeSchema,
+  street: z.string().nullable(),
+  lat: z.number(),
+  lng: z.number(),
+  /** Camera heading in degrees clockwise from north: the driving direction ~3 s before the event. */
+  heading: z.number().min(0).max(360),
+  /** Gemini's caption (CoachOutput.street_view_caption); null if coaching failed. */
+  caption: z.string().nullable(),
+  /** Our backend, relative to the API base URL: GET /streetview/:tripId/thumbnail (a JPEG). */
+  thumbnailUrl: z.string(),
+  /** Our backend, relative to the API base URL: GET /streetview/:tripId/panorama (an HTML page for a WebView). */
+  panoramaUrl: z.string(),
+});
+export type StreetViewCallout = z.infer<typeof StreetViewCalloutSchema>;
 
 /** trips collection document. §9. */
 export const TripSchema = z.object({

@@ -13,6 +13,7 @@ import {
   DrivingEventSchema,
   ProgressSchema,
   RecordedEventSchema,
+  StreetViewCalloutSchema,
   TraceSchema,
   TripSchema,
 } from './types';
@@ -63,6 +64,8 @@ export const CreateTripResponseSchema = z.object({
   coach: CoachOutputSchema.nullable(),
   /** ElevenLabs debrief audio (§11). Null when passenger or voice failed. */
   coachAudioUrl: z.string().nullable(),
+  /** One infraction to show in Street View (§12). Null when none qualifies or there is no imagery. */
+  streetView: StreetViewCalloutSchema.nullable(),
 });
 export type CreateTripResponse = z.infer<typeof CreateTripResponseSchema>;
 
@@ -95,6 +98,8 @@ export type ListTripsResponse = z.infer<typeof ListTripsResponseSchema>;
 export const GetTripResponseSchema = z.object({
   trip: TripSchema,
   events: z.array(DrivingEventSchema),
+  /** One infraction to show in Street View (§12). Null when none qualifies or there is no imagery. */
+  streetView: StreetViewCalloutSchema.nullable(),
 });
 export type GetTripResponse = z.infer<typeof GetTripResponseSchema>;
 
