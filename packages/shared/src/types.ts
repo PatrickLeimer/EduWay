@@ -327,7 +327,10 @@ export const ProgressSchema = z.object({
   ),
   /** From the 2dsphere query across trips (§1 differentiator 3). */
   recurringSpots: z.array(RecurringSpotSchema.extend({ location: GeoPointSchema })),
-  /** §1 differentiator 4. Rule for "ready" is TBD by the team (TODO in server/routes). */
+  /**
+   * §1 differentiator 4. `ready` = road test readiness (gamification.ts) is 100
+   * and not provisional; notes explain the numbers.
+   */
   testReadiness: z.object({ ready: z.boolean(), notes: z.array(z.string()) }),
 });
 export type Progress = z.infer<typeof ProgressSchema>;
