@@ -56,6 +56,8 @@ export function createHttpApiClient(baseUrl: string = API_BASE_URL): ApiClient {
       request(CreateTripResponseSchema, API_ROUTES.createTrip, { method: 'POST', body: req }),
     listTrips: (userId) => request(ListTripsResponseSchema, API_ROUTES.listTrips + q(userId)),
     getTrip: (id) => request(GetTripResponseSchema, API_ROUTES.getTrip(id)),
+    retryCoaching: (id) =>
+      request(GetTripResponseSchema, API_ROUTES.retryCoaching(id), { method: 'POST', body: {} }),
     getTrace: (id) => request(GetTraceResponseSchema, API_ROUTES.getTrace(id)),
     getProgress: (userId) => request(GetProgressResponseSchema, API_ROUTES.getProgress + q(userId)),
     ask: (userId, question) =>

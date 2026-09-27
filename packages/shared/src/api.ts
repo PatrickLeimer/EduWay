@@ -142,6 +142,8 @@ export const API_ROUTES = {
   listTrips: '/trips',
   getTrip: (id: string) => `/trips/${encodeURIComponent(id)}`,
   getTrace: (id: string) => `/trips/${encodeURIComponent(id)}/trace`,
+  /** Re-run coaching for a trip that has none (Gemini was busy). Responds with GetTripResponse. */
+  retryCoaching: (id: string) => `/trips/${encodeURIComponent(id)}/coach`,
   getProgress: '/progress',
   ask: '/ask',
   health: '/health',

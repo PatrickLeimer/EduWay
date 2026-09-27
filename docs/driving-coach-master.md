@@ -406,7 +406,7 @@ After a trip, the coaching shows one Street View card for the most important inf
 
 - Hosted and deployed by the team (host TBD).
 - Holds the Gemini and ElevenLabs API keys and the MongoDB connection string. Keys never ship in the app.
-- Endpoints [Proposed]: `POST /trips` (events + stats + gzipped trace, returns coaching + audio URL), `GET /trips`, `GET /trips/:id`, `GET /trips/:id/trace`, `GET /progress`, `POST /ask` (stretch), `GET /streetview/:tripId/thumbnail` (Street View Static image, fetched on demand and not stored), `GET /streetview/:tripId/panorama` (a small page with the Maps JavaScript Street View panorama, for the app's WebView).
+- Endpoints [Proposed]: `POST /trips` (events + stats + gzipped trace, returns coaching + audio URL), `GET /trips`, `GET /trips/:id`, `GET /trips/:id/trace`, `POST /trips/:id/coach` (re-run coaching for a trip saved without it, e.g. when Gemini was busy; the coaching screen offers "Try again"), `GET /progress`, `POST /ask` (stretch), `GET /streetview/:tripId/thumbnail` (Street View Static image, fetched on demand and not stored), `GET /streetview/:tripId/panorama` (a small page with the Maps JavaScript Street View panorama, for the app's WebView).
 
 ---
 

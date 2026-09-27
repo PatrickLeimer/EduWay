@@ -100,6 +100,9 @@ function harness(opts: {
       getTrip: async () => {
         throw new Error('unused');
       },
+      retryCoaching: async () => {
+        throw new Error('unused');
+      },
       getTrace: async () => {
         throw new Error('unused');
       },

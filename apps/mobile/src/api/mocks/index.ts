@@ -9,6 +9,9 @@
  * Street View (§12): the fixture trip has a callout, a second seeded trip has
  * none (streetView: null), so screens can be built against both. New trips get
  * a callout unless they are passenger trips.
+ *
+ * A third seeded trip has no coaching (as when Gemini was busy), so the coach
+ * screen's "Try again" can be built; retryCoaching fills it in.
  */
 import {
   debriefWithoutStreetViewFixture,
@@ -37,6 +40,13 @@ export function createMockApiClient(latencyMs = 300): ApiClient {
   trips.set(noCalloutId, {
     trip: { ...debriefWithoutStreetViewFixture.trip, _id: noCalloutId },
     events: fixtureEventsWithIds(noCalloutId, tripFixture.userId),
+    streetView: null,
+  });
+
+  const noCoachId = `${tripFixture._id}-no-coach`;
+  trips.set(noCoachId, {
+    trip: { ...tripFixture, _id: noCoachId, coach: null, coachAudioUrl: null },
+    events: fixtureEventsWithIds(noCoachId, tripFixture.userId),
     streetView: null,
   });
 
@@ -90,6 +100,17 @@ export function createMockApiClient(latencyMs = 300): ApiClient {
     async getTrip(id) {
       await delay(latencyMs);
       return find(id);
+    },
+    async retryCoaching(id) {
+      await delay(latencyMs);
+      const found = find(id);
+      if (found.trip.passenger || found.trip.coach) return found;
+      const coached: GetTripResponse = {
+        ...found,
+        trip: { ...found.trip, coach: tripFixture.coach, coachAudioUrl: tripFixture.coachAudioUrl },
+      };
+      trips.set(id, coached);
+      return coached;
     },
     async getTrace(id) {
       await delay(latencyMs);
