@@ -170,6 +170,12 @@ export const TRIP = {
   minStoppedToEndS: 30,
   /** "Stopped" means GPS speed below this. TODO(WS2): tune. */
   stoppedSpeedMps: 0.5,
+  /** Route trace: a fix implying more than this speed from the last kept fix is a GPS jump. */
+  maxPlausibleSpeedMps: 70,
+  /** Route trace: this many jumps in a row means the last kept fix was the bad one. */
+  maxGpsJumps: 3,
+  /** Route trace: no distance is counted across a GPS gap longer than this. */
+  maxGpsGapS: 30,
 } as const;
 
 // ---------------------------------------------------------------------------
