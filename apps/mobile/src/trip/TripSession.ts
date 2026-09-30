@@ -32,6 +32,7 @@ import type {
 } from '../contracts';
 import { encodeTrace } from '../api';
 
+import { createGpsPath, type GpsPath } from './gpsPath';
 import { createExpoKeepAwake, type KeepAwake } from './keepAwake';
 import type { LocationSource } from './locationSource';
 import { createTripStateStore, INITIAL_TRIP_STATE } from './stateStore';
@@ -60,6 +61,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
   const store = createTripStateStore();
   const keepAwake = deps.keepAwake ?? createExpoKeepAwake();
   let trace: TraceBuffer = createTraceBuffer(Date.now());
+  let path: GpsPath = createGpsPath();
   let unsubs: Array<() => void> = [];
   let gpsChain: Promise<void> = Promise.resolve();
   let ending = false;
@@ -110,7 +112,9 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
   async function ingest(fix: GpsFix) {
     const status = store.get().status;
     if (status !== 'driving' && status !== 'starting') return;
-    trace.append(fix);
+    // Only clean fixes go on the route; distance follows that route (§9).
+    const movedM = path.add(fix);
+    if (movedM != null) trace.append(fix);
     // Fire and forget: a slow or offline Overpass fetch must not stall motion,
     // phone use, or stop timing (§18 flag 1). The cache ignores overlapping calls.
     void deps.roadCache.ensureAround(fix);
@@ -122,7 +126,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
       latestFix: fix,
       latestRoad: match,
       traceLength: trace.length,
-      distanceMi: prev.distanceMi + ((fix.speedMps ?? 0) * dt) / M_PER_MI,
+      distanceMi: prev.distanceMi + (movedM ?? 0) / M_PER_MI,
       stoppedForS: isStopped ? prev.stoppedForS + dt : 0,
     });
     deps.motionDetector.onGps(fix);
@@ -193,6 +197,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
       haltSensors();
       const now = Date.now();
       trace = createTraceBuffer(now);
+      path = createGpsPath();
       gpsChain = Promise.resolve();
       store.set({
         ...INITIAL_TRIP_STATE,

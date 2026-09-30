@@ -22,6 +22,7 @@ Runs a drive from Start to End (master doc §4). Owns the single GPS subscriptio
 | File | Status |
 |---|---|
 | `traceBuffer.ts` | Done: columnar trace recorder |
+| `gpsPath.ts` | Done: drops bad fixes (accuracy, jumps) from the trace; route distance |
 | `stateStore.ts` | Done: immutable TripState store |
 | `uploadQueue.ts` | Done: in-memory queue (persistent store is an open decision) |
 | `useTripState.ts` | Done: React binding for screens |

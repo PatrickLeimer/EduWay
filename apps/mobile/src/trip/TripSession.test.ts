@@ -12,15 +12,16 @@ function okResponse(): CreateTripResponse {
   return { trip: tripFixture, coach: coachOutputFixture, coachAudioUrl: AUDIO, streetView: null };
 }
 
-function fix(t: number, speedMps: number): GpsFix {
-  return { t, lat: 25.76, lon: -80.37, speedMps, heading: 0, accuracyM: 5 };
+function fix(t: number, speedMps: number, lat = 25.76): GpsFix {
+  return { t, lat, lon: -80.37, speedMps, heading: 0, accuracyM: 5 };
 }
 
 /** A few moving fixes, then enough stopped seconds to unlock End Trip. */
 function driveThenPark(): GpsFix[] {
   const fixes: GpsFix[] = [];
-  for (let i = 0; i < 5; i++) fixes.push(fix(i * 1000, 10));
-  for (let i = 5; i <= 35; i++) fixes.push(fix(i * 1000, 0));
+  // ~11 m north per second while moving.
+  for (let i = 0; i < 5; i++) fixes.push(fix(i * 1000, 10, 25.76 + i * 0.0001));
+  for (let i = 5; i <= 35; i++) fixes.push(fix(i * 1000, 0, 25.7604));
   return fixes;
 }
 
