@@ -5,9 +5,10 @@
  * Lexend is loaded here before anything renders.
  */
 import { Lexend_400Regular, Lexend_600SemiBold, useFonts } from '@expo-google-fonts/lexend';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { useStartDriveLink } from '../trip';
 import { getDemoModules, type AppModules } from '../wiring';
 
 import { DriveRecorderScreen } from './dev/DriveRecorderScreen';
@@ -31,6 +32,7 @@ import { StartDriveScreen } from './screens/StartDriveScreen';
 import { PastDriveSummaryScreen, TripEndedScreen } from './screens/TripEndedScreen';
 import { TripListScreen } from './screens/TripListScreen';
 import { colors, SAFE_TOP, space } from './theme';
+import { syncDriveWidget } from './widget/syncDriveWidget';
 
 function renderRoute(route: Route, props: ScreenProps) {
   switch (route.name) {
@@ -92,12 +94,20 @@ export function Root({ modules }: { modules: AppModules }) {
     (patch: Partial<AppSettings>) => setSettings((s) => ({ ...s, ...patch })),
     [],
   );
+  // Test drive swaps in the simulated modules; Settings only allows it while no trip is running.
+  const active = settings.demoMode ? getDemoModules() : modules;
+
+  // Home-screen "Drive" widget: its link starts a drive and opens Driving.
+  useStartDriveLink({
+    session: active.trip,
+    lockEnabled: settings.lockByDefault,
+    onDriving: () => navigate({ name: 'driving' }),
+  });
+  useEffect(() => syncDriveWidget(), []);
+
   const [fontsLoaded, fontError] = useFonts({ Lexend_400Regular, Lexend_600SemiBold });
   // A failed font load falls back to the system font rather than a blank app.
   if (!fontsLoaded && !fontError) return <View style={styles.backdrop} />;
-
-  // Test drive swaps in the simulated modules; Settings only allows it while no trip is running.
-  const active = settings.demoMode ? getDemoModules() : modules;
   const props: ScreenProps = { modules: active, navigate, settings, updateSettings };
 
   // A new key remounts the transition, so every screen change animates in.

@@ -8,6 +8,8 @@ export { createInMemoryUploadQueue } from './uploadQueue';
 export { createTraceBuffer, type TraceBuffer } from './traceBuffer';
 export { useTripState } from './useTripState';
 export { useMapGps } from './useMapGps';
+export { DRIVE_LINK_URL } from './driveLink';
+export { useStartDriveLink } from './useStartDriveLink';
 export {
   createFixtureLocationSource,
   createMockTripSession,
