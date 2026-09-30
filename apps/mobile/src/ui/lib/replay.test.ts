@@ -52,4 +52,14 @@ describe('speedBuckets', () => {
   it('returns nothing for an empty trace', () => {
     expect(speedBuckets({ t: [], lat: [], lon: [], speedMps: [] }, 10)).toEqual([]);
   });
+  it('does not crash on fixes before the start or bad timestamps', () => {
+    const odd = {
+      t: [-2, Number.NaN, 0, 10],
+      lat: [0, 0, 0, 0],
+      lon: [0, 0, 0, 0],
+      speedMps: [5, 50, 1, 2],
+    };
+    const out = speedBuckets(odd, 2);
+    expect(out[0]!.maxMph).toBeCloseTo(5 * MPS_TO_MPH);
+  });
 });

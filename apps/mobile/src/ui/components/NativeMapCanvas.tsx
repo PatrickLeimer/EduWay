@@ -1,12 +1,12 @@
 /**
- * Native map (react-native-maps, §8 "Display"): the Google Maps SDK. Screens
- * use MapCanvas, which picks this on Android. iPhone uses MapCanvas.ios.tsx
- * (Google Maps in a WebView; Expo Go's iOS binary has no Google Maps SDK key).
- * Browser: MapCanvas.web.tsx. Never Apple Maps.
+ * Native map (react-native-maps, §8 "Display"). Screens use MapCanvas, which
+ * picks this on phones: the Google Maps SDK on Android, Apple Maps on iPhone
+ * (Expo Go's iOS binary has no Google Maps SDK, and neither needs a key in the
+ * app). Browser: MapCanvas.web.tsx.
  * OpenStreetMap supplies street and limit text elsewhere; it is not the basemap.
  */
 import { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { regionFor } from '../lib/geo';
@@ -14,6 +14,8 @@ import { colors, font, fonts, mapDarkStyle } from '../theme';
 import type { MapCanvasProps } from './mapTypes';
 
 const FOLLOW_DELTA = 0.01;
+/** Google on Android; undefined = the platform map (Apple Maps) on iPhone. */
+const PROVIDER = Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined;
 
 export function NativeMapCanvas({
   style,
@@ -57,7 +59,7 @@ export function NativeMapCanvas({
       <MapView
         ref={map}
         style={StyleSheet.absoluteFill}
-        provider={PROVIDER_GOOGLE}
+        provider={PROVIDER}
         googleRenderer="LEGACY"
         initialRegion={initialRegion}
         customMapStyle={dark ? mapDarkStyle : undefined}

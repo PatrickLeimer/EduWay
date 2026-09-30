@@ -64,14 +64,17 @@ export interface SpeedBucket {
 export function speedBuckets(trace: ReplayTrace, buckets: number): SpeedBucket[] {
   const duration = traceDurationS(trace);
   if (trace.t.length === 0 || buckets <= 0) return [];
-  const width = Math.max(duration / buckets, 1);
+  const width = Number.isFinite(duration) ? Math.max(duration / buckets, 1) : 1;
   const count = Math.max(1, Math.ceil(duration / width));
   const out: SpeedBucket[] = Array.from({ length: count }, (_, i) => ({
     startS: i * width,
     maxMph: 0,
   }));
   for (let i = 0; i < trace.t.length; i++) {
-    const idx = Math.min(count - 1, Math.floor(trace.t[i]! / width));
+    const t = trace.t[i]!;
+    // Skip bad timestamps; clamp fixes just before the start into the first bar.
+    if (!Number.isFinite(t)) continue;
+    const idx = Math.min(count - 1, Math.max(0, Math.floor(t / width)));
     const mph = (trace.speedMps[i] ?? 0) * MPS_TO_MPH;
     if (mph > out[idx]!.maxMph) out[idx]!.maxMph = mph;
   }
