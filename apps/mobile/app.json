@@ -6,11 +6,13 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
+    "scheme": "eduway",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pleimer.eduway"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,6 +21,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
+      "package": "com.pleimer.eduway",
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -53,7 +56,42 @@
       ],
       "expo-audio",
       "expo-sharing",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "DriveWidget",
+              "displayName": "Start drive",
+              "description": "One tap starts an EduWay drive.",
+              "ios": { "supportedFamilies": ["systemSmall"] },
+              "android": null
+            }
+          ]
+        }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "fonts": [
+            "../../node_modules/@expo-google-fonts/lexend/400Regular/Lexend_400Regular.ttf",
+            "../../node_modules/@expo-google-fonts/lexend/600SemiBold/Lexend_600SemiBold.ttf"
+          ],
+          "widgets": [
+            {
+              "name": "DriveWidget",
+              "label": "Start drive",
+              "description": "One tap starts an EduWay drive.",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "resizeMode": "horizontal|vertical"
+            }
+          ]
+        }
+      ]
     ],
     "extra": {
       "eas": {

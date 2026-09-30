@@ -82,7 +82,7 @@ The app keeps its existing screen structure: Start drive → Driving → Trip co
 
 - Do exactly the task asked. No unrequested refactors, renames, reformatting of files you did not change, or "while I was here" fixes.
 - Keep diffs small. If a change touches more than one workstream, stop and ask.
-- Do not add dependencies without asking. Already approved: `expo-sensors`, `expo-location`, `expo-keep-awake`, `expo-audio`, `expo-file-system`, `expo-sharing`, `react-native-maps`, `pako`, `express`, `mongodb`, `zod`, `@google/genai`, `@elevenlabs/elevenlabs-js`, `dotenv`, `vitest`, `react-native-webview`, `@expo-google-fonts/lexend`, `expo-font`.
+- Do not add dependencies without asking. Already approved: `expo-sensors`, `expo-location`, `expo-keep-awake`, `expo-audio`, `expo-file-system`, `expo-sharing`, `react-native-maps`, `pako`, `express`, `mongodb`, `zod`, `@google/genai`, `@elevenlabs/elevenlabs-js`, `dotenv`, `vitest`, `react-native-webview`, `@expo-google-fonts/lexend`, `expo-font`, `expo-widgets`, `@expo/ui`, `react-native-android-widget` (home-screen Drive widget only).
 - Put detection, road, scoring, and summary logic in pure functions with no React Native or Expo imports, so it can be tested with Vitest using JSON fixtures in `fixtures/`.
 - Thresholds live in `packages/shared/src/thresholds.ts`. Never hard-code them elsewhere.
 - Run `npm run typecheck` and `npm test` before saying a task is done.
