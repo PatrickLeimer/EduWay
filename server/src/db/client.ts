@@ -7,7 +7,7 @@ let client: MongoClient | null = null;
 
 export async function connectDb(uri: string, dbName: string): Promise<Db> {
   if (!client) {
-    client = new MongoClient(uri, { appName: 'edudriver-server' });
+    client = new MongoClient(uri, { appName: 'eduway-server' });
     await client.connect();
   }
   return client.db(dbName);

@@ -1,5 +1,5 @@
 /** GET /progress (WS3). Master doc §12 screen 5, §13. */
-import { GetProgressQuerySchema, GetProgressResponseSchema } from '@edudriver/shared';
+import { GetProgressQuerySchema, GetProgressResponseSchema } from '@eduway/shared';
 import { Router } from 'express';
 
 import type { RouteDeps } from './deps';

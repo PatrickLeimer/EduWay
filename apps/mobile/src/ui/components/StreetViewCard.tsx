@@ -7,7 +7,7 @@
  * States: a placeholder while the thumbnail loads; if the thumbnail or the
  * panorama fails, the caption stays with a short "not available" note.
  */
-import type { StreetViewCallout } from '@edudriver/shared';
+import type { StreetViewCallout } from '@eduway/shared';
 import { useState } from 'react';
 import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { WebView } from 'react-native-webview';

@@ -12,7 +12,7 @@ import type {
   Trip,
   TripListItem,
   TripSummary,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type { GamificationTrip } from '../gamification';
 

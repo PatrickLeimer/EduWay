@@ -2,7 +2,7 @@
  * WS4 debug screen (owned by WS4). Fire each live alert to check clips and
  * cooldown, and play the fixture debrief.
  */
-import { LiveAlertTypeSchema, type LiveAlertType } from '@edudriver/shared';
+import { LiveAlertTypeSchema, type LiveAlertType } from '@eduway/shared';
 import { useState } from 'react';
 import { Button, Text, View } from 'react-native';
 

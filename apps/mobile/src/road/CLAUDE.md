@@ -9,12 +9,12 @@ This is the road-data layer beside Google Maps. Maps (`react-native-maps`) draw 
 - Query Overpass per GPS update. Fetch around the car and refetch near the cache edge only.
 - Use a road-class default (inferred) limit for a live alert. Only `posted` limits can produce harsh speeding.
 - Use Google Roads, Places, Valhalla, TomTom, HERE, Mapbox or MapLibre (out of scope).
-- Hard-code thresholds or default limits. Use `SPEEDING`, `ROLLING_STOP`, `ROAD` from `@edudriver/shared`.
+- Hard-code thresholds or default limits. Use `SPEEDING`, `ROLLING_STOP`, `ROAD` from `@eduway/shared`.
 - Show OSM-derived data anywhere without "© OpenStreetMap contributors".
 
 ## Contracts
 - Implements: `RoadCache`, `RoadEventDetector` (`src/contracts/road.ts`).
-- Consumes: `GpsFix`, `DraftEvent`, `LimitConfidence` from `@edudriver/shared`.
+- Consumes: `GpsFix`, `DraftEvent`, `LimitConfidence` from `@eduway/shared`.
 - Public API: `index.ts` only.
 
 ## Files

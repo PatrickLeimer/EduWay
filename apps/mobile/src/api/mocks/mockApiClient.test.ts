@@ -1,12 +1,12 @@
 // Placeholder test: the mock API honors the shared response schemas.
-import { traceFixture, eventsFixture } from '@edudriver/fixtures';
+import { traceFixture, eventsFixture } from '@eduway/fixtures';
 import {
   CreateTripResponseSchema,
   DEMO_USER_ID,
   GetProgressResponseSchema,
   ListTripsResponseSchema,
   TraceUploadSchema,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { encodeTrace } from '../traceCodec';

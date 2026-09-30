@@ -2,7 +2,7 @@
  * Express app factory (WS3). Kept separate from index.ts so tests can mount
  * the app on an ephemeral port with mock dependencies.
  */
-import { API_ROUTES } from '@edudriver/shared';
+import { API_ROUTES } from '@eduway/shared';
 import express, { type Express } from 'express';
 
 import { DEBRIEF_AUDIO_DIR, DEBRIEF_AUDIO_ROUTE } from './coach';

@@ -1,6 +1,6 @@
 // Placeholder test: the in-memory repo round-trips a trip and honors the shared schemas.
-import { eventsFixture, traceFixture, tripFixture } from '@edudriver/fixtures';
-import { GetTripResponseSchema, TraceSchema } from '@edudriver/shared';
+import { eventsFixture, traceFixture, tripFixture } from '@eduway/fixtures';
+import { GetTripResponseSchema, TraceSchema } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createInMemoryTripsRepo } from './InMemoryTripsRepo';

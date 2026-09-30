@@ -14,7 +14,7 @@ A learning tool, not a game: rewards driving well and improving, never driving m
 
 ## Must not
 - Do I/O. The repo gathers rows (never traces) and passes them in.
-- Hard-code numbers. Use `GAMIFICATION` in `@edudriver/shared`.
+- Hard-code numbers. Use `GAMIFICATION` in `@eduway/shared`.
 - Count passenger trips or trips under `GAMIFICATION.minQualifyingMi`.
 - Add leaderboards, comparisons with other users, or anything based on miles, trip count, time driving or days in a row.
 

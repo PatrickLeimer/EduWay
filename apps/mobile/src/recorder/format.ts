@@ -8,7 +8,7 @@
  * a crash loses at most a second. Lines are NOT in time order (motion is written
  * in chunks); readers sort by time. `rt` is ms since recording start.
  */
-import type { DraftEvent, EventType, GpsFix, MotionSample } from '@edudriver/shared';
+import type { DraftEvent, EventType, GpsFix, MotionSample } from '@eduway/shared';
 
 import type { RoadMatch } from '../contracts';
 
@@ -87,7 +87,7 @@ export interface HeaderLine {
   platform: string;
   osVersion: string;
   mount: Mount;
-  /** Snapshot of @edudriver/shared thresholds in effect for this recording. */
+  /** Snapshot of @eduway/shared thresholds in effect for this recording. */
   thresholds: Record<string, unknown>;
 }
 

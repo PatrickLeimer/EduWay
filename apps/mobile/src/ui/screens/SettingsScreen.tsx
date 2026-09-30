@@ -30,8 +30,8 @@ export function SettingsScreen({ modules, navigate, settings, updateSettings }: 
 
       <SectionTitle>About</SectionTitle>
       <Muted>
-        EduDriver coaches you with short voice alerts during the drive and a debrief after it.
-        Motion sensor data never leaves your phone; only your GPS route is saved for the replay.
+        EduWay coaches you with short voice alerts during the drive and a debrief after it. Motion
+        sensor data never leaves your phone; only your GPS route is saved for the replay.
       </Muted>
       <Muted>Scores are a coaching tool, not a certification of safety.</Muted>
 

@@ -12,7 +12,7 @@ import {
   type CreateTripRequest,
   type DraftEvent,
   type GpsFix,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type {
   AlertPlayer,

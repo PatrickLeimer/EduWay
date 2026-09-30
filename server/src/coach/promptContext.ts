@@ -1,7 +1,7 @@
 /**
  * Threshold facts handed to Gemini so it explains events the way our code
  * detected them (§10: "Provide event definitions and thresholds"). Derived
- * from @edudriver/shared so the prompt never drifts from the detectors.
+ * from @eduway/shared so the prompt never drifts from the detectors.
  */
 import {
   COACH,
@@ -11,7 +11,7 @@ import {
   ROUGH_TURN,
   SPEEDING,
   SWERVE,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 export { COACH };
 

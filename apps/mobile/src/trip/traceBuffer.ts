@@ -5,7 +5,7 @@
  * trip end. Columnar arrays keep the upload small and match the `traces`
  * collection shape exactly.
  */
-import type { GpsFix, TraceUpload } from '@edudriver/shared';
+import type { GpsFix, TraceUpload } from '@eduway/shared';
 
 export interface TraceBuffer {
   append(fix: GpsFix): void;

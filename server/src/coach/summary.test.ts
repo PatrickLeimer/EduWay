@@ -1,5 +1,5 @@
-import { eventsFixture, tripFixture, tripSummaryFixture } from '@edudriver/fixtures';
-import { CoachOutputSchema, TripSummarySchema, type DrivingEvent } from '@edudriver/shared';
+import { eventsFixture, tripFixture, tripSummaryFixture } from '@eduway/fixtures';
+import { CoachOutputSchema, TripSummarySchema, type DrivingEvent } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createMockCoachService } from './mocks';

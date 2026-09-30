@@ -1,4 +1,4 @@
-import { G, MPS_TO_MPH, PIPELINE, type DraftEvent, type MotionSample } from '@edudriver/shared';
+import { G, MPS_TO_MPH, PIPELINE, type DraftEvent, type MotionSample } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createMotionDetector } from './MotionDetector';

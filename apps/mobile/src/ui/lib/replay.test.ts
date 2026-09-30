@@ -1,4 +1,4 @@
-import { MPS_TO_MPH, type DrivingEvent } from '@edudriver/shared';
+import { MPS_TO_MPH, type DrivingEvent } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { positionAt, speedBuckets, timeEvents, traceDurationS } from './replay';

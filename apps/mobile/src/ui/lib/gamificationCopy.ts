@@ -1,7 +1,7 @@
 /**
  * Display copy for streaks, rank tiers and readiness. Pure, tested in
  * gamificationCopy.test.ts. The server computes every number (gamification.ts
- * in @edudriver/shared); this only turns them into words.
+ * in @eduway/shared); this only turns them into words.
  */
 import {
   GAMIFICATION,
@@ -10,7 +10,7 @@ import {
   type StreakChange,
   type StreakKind,
   type UserProgress,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 export const TIER_NAME: Record<RankTier, string> = {
   rookie: 'Rookie',

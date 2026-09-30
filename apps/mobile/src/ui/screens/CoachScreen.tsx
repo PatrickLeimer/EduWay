@@ -10,7 +10,7 @@
  * A trip saved without coaching (Gemini busy or out of quota) shows "Try
  * again", which asks the server to coach it now (ApiClient.retryCoaching).
  */
-import type { CoachOutput, GetTripResponse } from '@edudriver/shared';
+import type { CoachOutput, GetTripResponse } from '@eduway/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,

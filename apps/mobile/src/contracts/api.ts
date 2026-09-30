@@ -2,7 +2,7 @@
  * WS3 API client boundary. One method per endpoint in master doc §13.
  * PROTECTED CONTRACT (see root CLAUDE.md).
  *
- * Request/response types come from @edudriver/shared so the server and the
+ * Request/response types come from @eduway/shared so the server and the
  * client cannot disagree. Implementations must validate responses with the
  * shared zod schemas and throw ApiError on failure.
  */
@@ -14,7 +14,7 @@ import type {
   GetTraceResponse,
   GetTripResponse,
   ListTripsResponse,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 export interface ApiClient {
   /** POST /trips: upload events + trip fields + gzipped trace; returns coaching + audio URL. */

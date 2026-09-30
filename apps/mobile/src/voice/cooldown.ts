@@ -6,7 +6,7 @@
  * suppressed attempts do not restart the window. ALERTS.cooldownExempt types
  * (phone use) always play.
  */
-import { ALERTS, type LiveAlertType } from '@edudriver/shared';
+import { ALERTS, type LiveAlertType } from '@eduway/shared';
 
 export interface AlertCooldown {
   /** True if `type` may play at `nowMs`, and records it as played. False while cooling down. */

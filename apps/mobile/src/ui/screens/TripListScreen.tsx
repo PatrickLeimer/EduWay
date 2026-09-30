@@ -3,7 +3,7 @@
  * route preview (routePreview, Android liteMode), date, distance, duration,
  * score and event count. Tapping a card opens its debrief.
  */
-import { DEMO_USER_ID, type TripListItem } from '@edudriver/shared';
+import { DEMO_USER_ID, type TripListItem } from '@eduway/shared';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';

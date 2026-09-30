@@ -13,7 +13,7 @@ Builds the compact trip summary (master doc §10 "Input"), asks Gemini for struc
 
 ## Contracts
 - Implements: `CoachService` (`types.ts`, shared with WS3's routes; agree changes first), `buildTripSummary`.
-- Consumes: `TripSummary`, `CoachOutput` schemas, `COACH` and event thresholds from `@edudriver/shared`.
+- Consumes: `TripSummary`, `CoachOutput` schemas, `COACH` and event thresholds from `@eduway/shared`.
 
 ## Files
 | File | Status |

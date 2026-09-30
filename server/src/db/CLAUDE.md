@@ -13,7 +13,7 @@ All storage, behind the `TripsRepo` interface (master doc §9): trips, events (G
 
 ## Contracts
 - Implements: `TripsRepo` (`repo.ts`).
-- Consumes: domain types from `@edudriver/shared`; `COACH` thresholds for recurring spots.
+- Consumes: domain types from `@eduway/shared`; `COACH` thresholds for recurring spots.
 
 ## Storage notes
 - `_id` and `tripId` are ObjectIds in MongoDB; hex strings everywhere else.

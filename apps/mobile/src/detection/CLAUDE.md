@@ -7,14 +7,14 @@ Turns 50 Hz DeviceMotion samples and 1 Hz GPS fixes into discrete driving events
 
 ## Must not
 - Store, upload or log motion samples beyond short in-memory ring buffers (§3, §9).
-- Hard-code thresholds. Use `HARD_BRAKE`, `HARD_ACCEL`, `ROUGH_TURN`, `SWERVE`, `PIPELINE`, `PHONE_USE` from `@edudriver/shared`.
+- Hard-code thresholds. Use `HARD_BRAKE`, `HARD_ACCEL`, `ROUGH_TURN`, `SWERVE`, `PIPELINE`, `PHONE_USE` from `@eduway/shared`.
 - Import React Native or Expo outside `expoMotionSource.ts` and `PhoneUseMonitor.ts`. Detector math stays pure so Vitest can run it.
 - Add road context (street, limit) or play alerts. The trip session does that.
 - Use ML models or detect turn signals (out of scope).
 
 ## Contracts
 - Implements: `MotionSource`, `MotionDetector`, `PhoneUseMonitor` (`src/contracts/detection.ts`).
-- Consumes: `MotionSample`, `GpsFix`, `DraftEvent` and thresholds from `@edudriver/shared`.
+- Consumes: `MotionSample`, `GpsFix`, `DraftEvent` and thresholds from `@eduway/shared`.
 - Public API: `index.ts` only.
 
 ## Files

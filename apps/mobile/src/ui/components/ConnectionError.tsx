@@ -14,7 +14,7 @@ export function ConnectionError({ error, onRetry }: { error: string; onRetry?: (
   return (
     <FadeIn style={styles.box}>
       <Text style={styles.title}>
-        {network ? "Can't reach the EduDriver server" : 'Something went wrong'}
+        {network ? "Can't reach the EduWay server" : 'Something went wrong'}
       </Text>
       <Text style={styles.body}>
         {network

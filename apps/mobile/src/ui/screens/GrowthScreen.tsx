@@ -4,7 +4,7 @@
  * changed (the upload's progressUpdate) when the flow started from a trip.
  * The server computes every number; this screen only draws them.
  */
-import { DEMO_USER_ID, GAMIFICATION, STREAK_KINDS, type ProgressUpdate } from '@edudriver/shared';
+import { DEMO_USER_ID, GAMIFICATION, STREAK_KINDS, type ProgressUpdate } from '@eduway/shared';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';

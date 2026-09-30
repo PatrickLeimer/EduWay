@@ -14,7 +14,7 @@ Shared contracts (need team agreement to change, own commit): `packages/shared/s
 
 **Owns:** `apps/mobile/src/detection/**`, `apps/mobile/src/ui/dev/Ws1Debug.tsx`
 **Implements:** `MotionSource`, `MotionDetector`, `PhoneUseMonitor` (`contracts/detection.ts`)
-**Consumes:** `MotionSample`, `GpsFix`, `DraftEvent`, thresholds (`@edudriver/shared`)
+**Consumes:** `MotionSample`, `GpsFix`, `DraftEvent`, thresholds (`@eduway/shared`)
 **Mocks you can rely on:** none needed. Detection only takes inputs; `createFixtureLocationSource` (trip/) gives you a GPS stream if you want one.
 
 Tasks, in order:

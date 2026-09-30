@@ -1,5 +1,5 @@
 // Guards the §10 prompt guidelines so a rewrite of the wording cannot silently drop one.
-import { COACH, EVENT_TYPES } from '@edudriver/shared';
+import { COACH, EVENT_TYPES } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { buildSystemPrompt } from './prompt';

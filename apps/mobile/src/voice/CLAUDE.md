@@ -10,11 +10,11 @@ Plays pre-generated ElevenLabs clips for dangerous moments during the drive, wit
 - Show anything visual for alerts. Voice only.
 - Call ElevenLabs at runtime for live alerts. Clips are bundled for zero latency and offline use.
 - Decide *whether* an event deserves an alert. trip/ decides; voice/ plays and applies cooldown.
-- Hard-code the cooldown. Use `ALERTS` from `@edudriver/shared` (phone use is exempt).
+- Hard-code the cooldown. Use `ALERTS` from `@eduway/shared` (phone use is exempt).
 
 ## Contracts
 - Implements: `AlertPlayer`, `DebriefPlayer` (`src/contracts/voice.ts`).
-- Consumes: `LiveAlertType`, `ALERTS` from `@edudriver/shared`.
+- Consumes: `LiveAlertType`, `ALERTS` from `@eduway/shared`.
 - Public API: `index.ts` only.
 
 ## Files

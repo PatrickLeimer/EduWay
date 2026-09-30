@@ -7,7 +7,7 @@
  * GPS comes from trip/'s location sources. The real one is WS2's; until it
  * lands, use the fixture replay to check the wiring.
  */
-import { MPS_TO_MPH, type DraftEvent, type GpsFix, type MotionSample } from '@edudriver/shared';
+import { MPS_TO_MPH, type DraftEvent, type GpsFix, type MotionSample } from '@eduway/shared';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, ScrollView, Text, View } from 'react-native';

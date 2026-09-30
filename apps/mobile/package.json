@@ -1,5 +1,5 @@
 {
-  "name": "@edudriver/mobile",
+  "name": "@eduway/mobile",
   "version": "1.0.0",
   "private": true,
   "main": "index.ts",
@@ -13,8 +13,8 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json"
   },
   "dependencies": {
-    "@edudriver/fixtures": "*",
-    "@edudriver/shared": "*",
+    "@eduway/fixtures": "*",
+    "@eduway/shared": "*",
     "@expo-google-fonts/lexend": "^0.4.1",
     "expo": "~57.0.25",
     "expo-audio": "~57.0.5",

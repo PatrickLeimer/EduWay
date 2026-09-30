@@ -3,7 +3,7 @@
  * have happened by then, and a downsampled speed timeline. Replay only shows
  * what was recorded; it never re-runs detection. Pure, tested in replay.test.ts.
  */
-import { MPS_TO_MPH, type DrivingEvent, type Trace } from '@edudriver/shared';
+import { MPS_TO_MPH, type DrivingEvent, type Trace } from '@eduway/shared';
 
 import type { MapPoint } from './geo';
 

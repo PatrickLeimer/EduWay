@@ -1,4 +1,4 @@
-import { HARD_BRAKE, type DraftEvent, type GpsFix, type MotionSample } from '@edudriver/shared';
+import { HARD_BRAKE, type DraftEvent, type GpsFix, type MotionSample } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import {

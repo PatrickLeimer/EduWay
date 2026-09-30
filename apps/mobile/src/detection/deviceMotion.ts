@@ -13,7 +13,7 @@
  * - Android can emit before every sensor has reported, so rotationRate may be
  *   null and accelerationIncludingGravity missing. Those readings are dropped.
  */
-import { DEG_TO_RAD, type MotionSample } from '@edudriver/shared';
+import { DEG_TO_RAD, type MotionSample } from '@eduway/shared';
 
 import { vec } from './vector';
 

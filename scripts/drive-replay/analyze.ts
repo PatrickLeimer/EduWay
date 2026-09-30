@@ -21,7 +21,7 @@ import {
   type DraftEvent,
   type EventType,
   type GpsFix,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type { RoadMatch } from '../../apps/mobile/src/contracts';
 import { createMotionDetector } from '../../apps/mobile/src/detection/MotionDetector';
@@ -49,7 +49,7 @@ import { createRoadEventDetector } from '../../apps/mobile/src/road/RoadEventDet
 // Threshold overrides (--set HARD_BRAKE.coach.start=3)
 // ---------------------------------------------------------------------------
 
-/** The tunable objects from @edudriver/shared that --set may change. */
+/** The tunable objects from @eduway/shared that --set may change. */
 export const TUNABLES: Record<string, object> = {
   PIPELINE,
   HARD_BRAKE,

@@ -13,7 +13,7 @@ import {
   type StreetViewCallout,
   type Trip,
   type TripSummary,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { Router } from 'express';
 
 import { buildTripSummary } from '../coach';

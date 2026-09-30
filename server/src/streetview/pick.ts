@@ -8,7 +8,7 @@ import {
   type DrivingEvent,
   type RecurringSpot,
   type Trace,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 /** What the picker needs from the trip's GPS trace (§9). */
 export type PickTrace = Pick<Trace, 'startedAt' | 't' | 'lat' | 'lon' | 'heading' | 'accuracyM'>;

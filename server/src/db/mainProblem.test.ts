@@ -1,4 +1,4 @@
-import { COACH } from '@edudriver/shared';
+import { COACH } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { pickMainProblem, type PatternEvent } from './mainProblem';

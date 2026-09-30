@@ -7,7 +7,7 @@
  * Two opposite lobes whose peaks are within the window make a swerve, reported
  * when the second lobe ends. Harsh when both peaks reach SWERVE.harsh.peakMps2.
  */
-import { DEG_TO_RAD, SWERVE } from '@edudriver/shared';
+import { DEG_TO_RAD, SWERVE } from '@eduway/shared';
 
 import type { Episode } from './hysteresis';
 

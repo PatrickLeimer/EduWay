@@ -1,4 +1,4 @@
-import { GAMIFICATION } from '@edudriver/shared';
+import { GAMIFICATION } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import {

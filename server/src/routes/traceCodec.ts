@@ -5,7 +5,7 @@
  */
 import { gunzipSync } from 'node:zlib';
 
-import { TraceUploadSchema, type GeoLineString, type TraceUpload } from '@edudriver/shared';
+import { TraceUploadSchema, type GeoLineString, type TraceUpload } from '@eduway/shared';
 
 import { HttpError } from './http';
 

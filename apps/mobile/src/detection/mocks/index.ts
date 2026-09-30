@@ -7,7 +7,7 @@
  * - MockPhoneUseMonitor: replays the fixture phone_use event, and also emits one
  *   whenever reportTouch() is called while moving.
  */
-import { createFixtureEventReplayer } from '@edudriver/fixtures';
+import { createFixtureEventReplayer } from '@eduway/fixtures';
 import {
   G,
   MPS_TO_MPH,
@@ -15,7 +15,7 @@ import {
   type DraftEvent,
   type GpsFix,
   type MotionSample,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type { MotionDetector, MotionSource, PhoneUseMonitor } from '../../contracts';
 import { createEmitter } from '../emitter';

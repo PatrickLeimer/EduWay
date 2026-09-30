@@ -8,7 +8,7 @@ import {
   type DrivingEvent,
   type RecurringSpot,
   type StreetViewCallout,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type { StoredStreetView } from '../db';
 

@@ -10,7 +10,7 @@
  * - Horizontal acceleration h = acc − (acc · ĝ)ĝ. |h| is the road force; the
  *   sign of the GPS speed change says accelerating (+) vs braking (−).
  */
-import { PIPELINE, type GpsFix, type MotionSample, type Vec3 } from '@edudriver/shared';
+import { PIPELINE, type GpsFix, type MotionSample, type Vec3 } from '@eduway/shared';
 
 import { dot, len, norm, scale, sub } from './vector';
 

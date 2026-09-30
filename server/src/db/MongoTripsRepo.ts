@@ -13,7 +13,7 @@ import {
   type Trace,
   type Trip,
   type TripListItem,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { ObjectId, type Db } from 'mongodb';
 
 import {

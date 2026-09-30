@@ -3,7 +3,7 @@
  * Decides which bubbles are visible at a point in the debrief audio, so each
  * bubble appears as the coach starts saying it.
  */
-import type { CoachOutput } from '@edudriver/shared';
+import type { CoachOutput } from '@eduway/shared';
 
 /** A bubble shows its "typing…" dots this long before it appears. */
 export const TYPING_LEAD_S = 1.2;

@@ -7,7 +7,7 @@
  *
  * Docs (SDK 57): https://docs.expo.dev/versions/v57.0.0/sdk/devicemotion/
  */
-import { PIPELINE, type MotionSample } from '@edudriver/shared';
+import { PIPELINE, type MotionSample } from '@eduway/shared';
 import { DeviceMotion } from 'expo-sensors';
 import { Platform } from 'react-native';
 

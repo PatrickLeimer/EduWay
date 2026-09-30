@@ -1,5 +1,5 @@
-import { coachOutputFixture, tripFixture } from '@edudriver/fixtures';
-import type { CreateTripRequest, CreateTripResponse, DraftEvent, GpsFix } from '@edudriver/shared';
+import { coachOutputFixture, tripFixture } from '@eduway/fixtures';
+import type { CreateTripRequest, CreateTripResponse, DraftEvent, GpsFix } from '@eduway/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { MotionDetector, RoadEventDetector, RoadMatch, UploadQueueStore } from '../contracts';

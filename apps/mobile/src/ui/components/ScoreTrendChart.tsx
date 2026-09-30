@@ -7,7 +7,7 @@
  * draws what that returns. There is no goal or target line: that would be a new
  * threshold, and those belong in packages/shared/src/thresholds.ts.
  */
-import type { QualifyingTrip } from '@edudriver/shared';
+import type { QualifyingTrip } from '@eduway/shared';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Polyline, Text as SvgText } from 'react-native-svg';

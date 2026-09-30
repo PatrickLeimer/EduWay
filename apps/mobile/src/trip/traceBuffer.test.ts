@@ -1,6 +1,6 @@
 // Placeholder test: proves Vitest runs pure trip logic, and that the recorder's
 // output matches the shared upload contract.
-import { TraceUploadSchema } from '@edudriver/shared';
+import { TraceUploadSchema } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createTraceBuffer } from './traceBuffer';

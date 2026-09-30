@@ -16,7 +16,7 @@ import {
   type StreakKind,
   type Streaks,
   type UserProgress,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 /** What gamification needs to know about one trip. */
 export interface GamificationTrip {

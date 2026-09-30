@@ -3,7 +3,7 @@
  *
  * Thin wrapper over React Native `AppState`; the rules live in phoneUse.ts.
  */
-import type { DraftEvent, GpsFix } from '@edudriver/shared';
+import type { DraftEvent, GpsFix } from '@eduway/shared';
 import { AppState } from 'react-native';
 
 import type { PhoneUseMonitor } from '../contracts';

@@ -3,14 +3,14 @@
  * scoring and coach run with no database. Data is lost on restart.
  * Progress is computed from the stored trips with the same builder as MongoDB.
  */
-import { eventsFixture, traceFixture, tripFixture, tripSummaryFixture } from '@edudriver/fixtures';
+import { eventsFixture, traceFixture, tripFixture, tripSummaryFixture } from '@eduway/fixtures';
 import {
   COACH,
   type DrivingEvent,
   type RecordedEvent,
   type Trace,
   type Trip,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import {
   buildProgress,

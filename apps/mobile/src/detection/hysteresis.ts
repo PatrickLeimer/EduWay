@@ -7,7 +7,7 @@
  * stayed at or above harsh `start` for the harsh `minDurationS`. Episodes are
  * reported on release, so peak, duration and tier are final.
  */
-import type { HysteresisThreshold, Tier } from '@edudriver/shared';
+import type { HysteresisThreshold, Tier } from '@eduway/shared';
 
 export interface Episode {
   /** Epoch ms when the signal first reached coach start. */

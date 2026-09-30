@@ -1,5 +1,5 @@
 /** One recorded event in a list (debrief, replay). Never shown while driving. */
-import type { RecordedEvent } from '@edudriver/shared';
+import type { RecordedEvent } from '@eduway/shared';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { EVENT_LABEL } from '../lib/format';

@@ -3,7 +3,7 @@
  * locked ones showing what it takes. Which badges exist and whether they are
  * earned is decided in lib/badges.ts, straight off GAMIFICATION constants.
  */
-import type { UserProgress } from '@edudriver/shared';
+import type { UserProgress } from '@eduway/shared';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { earnedBadges } from '../lib/badges';

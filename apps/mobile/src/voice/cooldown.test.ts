@@ -1,4 +1,4 @@
-import { ALERTS } from '@edudriver/shared';
+import { ALERTS } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createAlertCooldown } from './cooldown';

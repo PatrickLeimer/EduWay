@@ -2,7 +2,7 @@
  * Map helpers for screens: GeoJSON / trace → map points, and a camera region
  * that fits a route. Pure (no React Native), tested in geo.test.ts.
  */
-import type { GeoLineString, GeoPoint, TraceUpload } from '@edudriver/shared';
+import type { GeoLineString, GeoPoint, TraceUpload } from '@eduway/shared';
 
 export interface MapPoint {
   latitude: number;

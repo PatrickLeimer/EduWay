@@ -13,7 +13,7 @@ import type {
   GpsFix,
   RecordedEvent,
   TraceUpload,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type { Subscribable } from './common';
 import type { RoadMatch } from './road';

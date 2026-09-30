@@ -1,5 +1,5 @@
 {
-  "name": "edudriver",
+  "name": "eduway",
   "version": "1.0.0",
   "private": true,
   "description": "Phone-only driving coach for student drivers. See docs/driving-coach-master.md.",
@@ -17,12 +17,12 @@
     "typecheck": "npm run typecheck --workspaces --if-present && tsc --noEmit -p scripts/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "npm run lint --workspace @edudriver/mobile",
+    "lint": "npm run lint --workspace @eduway/mobile",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "dev:server": "npm run dev --workspace @edudriver/server",
-    "dev:mobile": "npm run start --workspace @edudriver/mobile",
-    "db:setup": "npm run db:setup --workspace @edudriver/server",
+    "dev:server": "npm run dev --workspace @eduway/server",
+    "dev:mobile": "npm run start --workspace @eduway/mobile",
+    "db:setup": "npm run db:setup --workspace @eduway/server",
     "alert-clips": "tsx scripts/alert-clips/generate.ts",
     "drive-replay": "tsx scripts/drive-replay/replay.ts"
   },

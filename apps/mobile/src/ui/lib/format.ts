@@ -2,7 +2,7 @@
  * Display formatting for screens. Pure (no React Native), tested in format.test.ts.
  * Presentation only: no scoring, detection or threshold logic lives here.
  */
-import { MPS_TO_MPH, type EventType, type TripCounts } from '@edudriver/shared';
+import { MPS_TO_MPH, type EventType, type TripCounts } from '@eduway/shared';
 
 export const EVENT_LABEL: Record<EventType, string> = {
   hard_brake: 'Hard brake',

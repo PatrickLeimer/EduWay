@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 import type { Server } from 'node:http';
 import { gzipSync } from 'node:zlib';
 
-import { eventsFixture, traceFixture, tripFixture } from '@edudriver/fixtures';
+import { eventsFixture, traceFixture, tripFixture } from '@eduway/fixtures';
 import {
   AskResponseSchema,
   CreateTripResponseSchema,
@@ -15,7 +15,7 @@ import {
   GetTripResponseSchema,
   ListTripsResponseSchema,
   type CreateTripRequest,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { createApp } from '../app';

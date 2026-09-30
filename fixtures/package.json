@@ -1,16 +1,16 @@
 {
-  "name": "@edudriver/fixtures",
+  "name": "@eduway/fixtures",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Shared JSON test data, parsed against @edudriver/shared schemas on import.",
+  "description": "Shared JSON test data, parsed against @eduway/shared schemas on import.",
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@edudriver/shared": "*",
+    "@eduway/shared": "*",
     "zod": "^4.6.5"
   }
 }

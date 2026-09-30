@@ -6,7 +6,7 @@
  * - GET /streetview/:tripId/panorama: a small page with the Maps JavaScript
  *   Street View panorama, for the app's WebView.
  */
-import { STREET_VIEW, type StreetViewCallout } from '@edudriver/shared';
+import { STREET_VIEW, type StreetViewCallout } from '@eduway/shared';
 import { Router } from 'express';
 
 import { toCallout, type StreetViewService } from '../streetview';

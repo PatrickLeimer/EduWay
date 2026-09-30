@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { LiveAlertTypeSchema } from '@edudriver/shared';
+import { LiveAlertTypeSchema } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { clipIdFor, SPEED_LIMIT_CLIPS_MPH } from './clips';

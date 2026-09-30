@@ -10,14 +10,14 @@
  *   The fixture ends with 35 s stopped, so End Trip unlocks near the end (§4).
  *   Road context (latestRoad) is not simulated per fix; the events carry their own.
  */
-import { eventsFixture, offsetFromTripStartS, traceFixture } from '@edudriver/fixtures';
+import { eventsFixture, offsetFromTripStartS, traceFixture } from '@eduway/fixtures';
 import {
   DEMO_USER_ID,
   LiveAlertTypeSchema,
   TRIP,
   type GpsFix,
   type RecordedEvent,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type { AlertPlayer, ApiClient, TripSession } from '../../contracts';
 import { encodeTrace } from '../../api';

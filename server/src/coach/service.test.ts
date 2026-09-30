@@ -1,4 +1,4 @@
-import { coachOutputFixture, tripSummaryFixture } from '@edudriver/fixtures';
+import { coachOutputFixture, tripSummaryFixture } from '@eduway/fixtures';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createCoachService } from './service';

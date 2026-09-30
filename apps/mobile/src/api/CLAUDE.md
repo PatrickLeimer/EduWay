@@ -7,12 +7,12 @@ Typed client for every backend endpoint in master doc §13, plus the trace encod
 
 ## Must not
 - Contain API keys or secrets. `EXPO_PUBLIC_API_URL` is the only config and it is public.
-- Define request/response shapes locally. They come from `@edudriver/shared` (`api.ts`).
+- Define request/response shapes locally. They come from `@eduway/shared` (`api.ts`).
 - Return unvalidated data. Every response is parsed with its shared schema.
 
 ## Contracts
 - Implements: `ApiClient`, `ApiError` (`src/contracts/api.ts`).
-- Consumes: request/response schemas and `API_ROUTES` from `@edudriver/shared`.
+- Consumes: request/response schemas and `API_ROUTES` from `@eduway/shared`.
 - Public API: `index.ts` only.
 
 ## Files

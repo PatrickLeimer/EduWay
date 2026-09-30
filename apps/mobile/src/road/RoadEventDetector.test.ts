@@ -1,4 +1,4 @@
-import { MPS_TO_MPH, type GpsFix } from '@edudriver/shared';
+import { MPS_TO_MPH, type GpsFix } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import type { RoadCache, RoadMatch, StopSign } from '../contracts';

@@ -1,4 +1,4 @@
-import { HARD_BRAKE } from '@edudriver/shared';
+import { HARD_BRAKE } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createHysteresis, type Episode } from './hysteresis';

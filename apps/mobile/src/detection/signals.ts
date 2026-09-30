@@ -2,7 +2,7 @@
  * §7 steps 2–3: EMA filtering of the Level 1 signals and junk rejection.
  * Pure, no RN/Expo imports.
  */
-import { PIPELINE, type MotionSample } from '@edudriver/shared';
+import { PIPELINE, type MotionSample } from '@eduway/shared';
 
 import { lateralAccel, longitudinalAccel, type GpsKinematics, type MotionFrame } from './level1';
 import { ema, len, scale, sub } from './vector';

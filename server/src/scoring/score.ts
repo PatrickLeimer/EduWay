@@ -13,7 +13,7 @@ import {
   type TraceUpload,
   type TripCounts,
   type TripStats,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 export interface ScoreInput {
   events: RecordedEvent[];

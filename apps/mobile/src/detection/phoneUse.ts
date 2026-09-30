@@ -16,7 +16,7 @@
  *   is used up by that trip, or dropped at the next in-app touch (the link
  *   did not open).
  */
-import { MPS_TO_MPH, PHONE_USE, PIPELINE, type DraftEvent, type GpsFix } from '@edudriver/shared';
+import { MPS_TO_MPH, PHONE_USE, PIPELINE, type DraftEvent, type GpsFix } from '@eduway/shared';
 
 /** React Native's AppStateStatus, without importing react-native. */
 export type AppStateLike = 'active' | 'background' | 'inactive' | 'unknown' | 'extension';

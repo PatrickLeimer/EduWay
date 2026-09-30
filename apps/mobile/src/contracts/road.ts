@@ -5,7 +5,7 @@
  * One Overpass cache provides street names, speed limits, road class and stop
  * signs. It is refreshed ahead of the car, never queried per GPS update.
  */
-import type { DraftEvent, GeoPoint, GpsFix, LimitConfidence } from '@edudriver/shared';
+import type { DraftEvent, GeoPoint, GpsFix, LimitConfidence } from '@eduway/shared';
 
 /** Result of matching one GPS fix to the nearest OSM way (heading breaks ties). */
 export interface RoadMatch {

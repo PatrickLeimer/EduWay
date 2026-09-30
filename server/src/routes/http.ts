@@ -3,7 +3,7 @@
  * shared schema and validates its output before sending, so a contract bug on
  * either side shows up as a clear 400/500 instead of a confusing client crash.
  */
-import type { ErrorResponse } from '@edudriver/shared';
+import type { ErrorResponse } from '@eduway/shared';
 import type { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 

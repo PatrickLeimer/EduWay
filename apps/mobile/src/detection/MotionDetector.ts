@@ -2,7 +2,7 @@
  * Real MotionDetector (WS1): §6 Level 1 signals → §7 events.
  *
  * Pure logic only: no React Native or Expo imports, so it runs under Vitest
- * with fixture samples. Thresholds come from @edudriver/shared (never inline).
+ * with fixture samples. Thresholds come from @eduway/shared (never inline).
  *
  * Events are emitted when they end (peak, duration and tier are final then).
  * Merging (§7 step 4): an event that starts within PIPELINE.mergeWindowS of the
@@ -20,7 +20,7 @@ import {
   type EventType,
   type GpsFix,
   type MotionSample,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import type { MotionDetector, Unsubscribe } from '../contracts';
 

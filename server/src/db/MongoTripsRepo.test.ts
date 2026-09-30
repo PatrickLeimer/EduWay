@@ -3,14 +3,14 @@
 // Uses MONGODB_URI from server/.env and a throwaway "<MONGODB_DB>_test" database, dropped after.
 import { fileURLToPath } from 'node:url';
 
-import { eventsFixture, traceFixture, tripFixture } from '@edudriver/fixtures';
+import { eventsFixture, traceFixture, tripFixture } from '@eduway/fixtures';
 import {
   GetProgressResponseSchema,
   GetTripResponseSchema,
   TraceSchema,
   TripListItemSchema,
   TripSummarySchema,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { config as loadEnv } from 'dotenv';
 import type { Db } from 'mongodb';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';

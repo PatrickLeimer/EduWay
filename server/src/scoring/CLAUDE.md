@@ -7,7 +7,7 @@ Computes the trip score (0-100), per-type counts and stats in code (master doc ย
 
 ## Must not
 - Do I/O. `scoreTrip` is a pure function tested with fixtures.
-- Hard-code weights. Use `SCORING` in `@edudriver/shared` (current values are placeholders; tune as a team).
+- Hard-code weights. Use `SCORING` in `@eduway/shared` (current values are placeholders; tune as a team).
 - Score passenger trips (score is null, ยง4).
 
 ## Contracts

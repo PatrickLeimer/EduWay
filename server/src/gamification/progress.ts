@@ -14,7 +14,7 @@ import {
   type RecurringSpot,
   type TripCounts,
   type UserProgress,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import { computeUserProgress, qualifyingTrips, type GamificationTrip } from './compute';
 

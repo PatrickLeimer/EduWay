@@ -1,7 +1,7 @@
 /**
  * Typed access to the shared fixtures.
  *
- * Each JSON file is parsed with its @edudriver/shared schema on import, so a
+ * Each JSON file is parsed with its @eduway/shared schema on import, so a
  * fixture that drifts from the contract fails loudly (in tests and in mocks)
  * instead of silently feeding bad data to another workstream.
  *
@@ -25,7 +25,7 @@ import {
   type EventType,
   type GetTripResponse,
   type GpsFix,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { z } from 'zod';
 
 import coachOutputJson from './coach-output.json';

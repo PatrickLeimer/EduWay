@@ -3,7 +3,7 @@
  * packages/shared/src/api.ts): JSON → gzip (pako) → base64. Pure JS so it
  * behaves the same in Hermes and in Vitest/Node. The server decodes with zlib.
  */
-import type { TraceUpload } from '@edudriver/shared';
+import type { TraceUpload } from '@eduway/shared';
 import { gzip, ungzip } from 'pako';
 
 const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';

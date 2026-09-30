@@ -7,7 +7,7 @@
  * because UserProgress does not carry per-skill history, and inventing one
  * would mean inventing a threshold.
  */
-import { GAMIFICATION, RANKED_TIERS, type RankTier, type UserProgress } from '@edudriver/shared';
+import { GAMIFICATION, RANKED_TIERS, type RankTier, type UserProgress } from '@eduway/shared';
 
 import { STREAK_RULE, streakText, TIER_NAME } from './gamificationCopy';
 

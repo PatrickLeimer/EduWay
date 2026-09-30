@@ -7,7 +7,7 @@
  * to go straight into the trace, so the replay car flew off the road and the
  * trip distance was wrong. Detectors still get every fix; they filter on their own.
  */
-import { PIPELINE, TRIP, type GpsFix } from '@edudriver/shared';
+import { PIPELINE, TRIP, type GpsFix } from '@eduway/shared';
 
 import { haversineM } from '../road';
 

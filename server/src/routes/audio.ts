@@ -5,7 +5,7 @@
  * chat is voiced once more, stored, and served. Otherwise 404; the app then
  * falls back to reading the chat.
  */
-import type { CoachOutput } from '@edudriver/shared';
+import type { CoachOutput } from '@eduway/shared';
 import { Router, type Request, type Response } from 'express';
 
 import type { AudioStore, TripsRepo } from '../db';

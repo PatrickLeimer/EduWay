@@ -4,7 +4,7 @@
  * Fetching (network) stays here. Parsing and matching are pure and tested
  * against fixtures/overpass.response.json.
  */
-import { ROAD, type GpsFix } from '@edudriver/shared';
+import { ROAD, type GpsFix } from '@eduway/shared';
 
 import type { RoadCache, RoadCacheStatus, RoadMatch, StopSign } from '../contracts';
 import { bindStopHeadings, clearStopHeadings, matchFix, needsRefetch } from './match';

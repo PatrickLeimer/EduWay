@@ -2,7 +2,7 @@
  * Pure way matching and cache-edge checks (master doc §8, §15).
  * Fetching lives in OverpassRoadCache; this file stays free of network and Expo.
  */
-import { ROAD, type GeoPoint, type GpsFix } from '@edudriver/shared';
+import { ROAD, type GeoPoint, type GpsFix } from '@eduway/shared';
 
 import type { RoadMatch, StopSign } from '../contracts';
 import { closestSegment, haversineM, headingDiffDeg } from './geo';

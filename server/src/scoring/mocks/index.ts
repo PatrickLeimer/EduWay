@@ -2,7 +2,7 @@
  * Mock scoring (WS3): the fixture trip's counts, stats and score, whatever the
  * input (score null for passenger trips, like the real rule).
  */
-import { tripFixture } from '@edudriver/fixtures';
+import { tripFixture } from '@eduway/fixtures';
 
 import type { ScoreTrip } from '../score';
 

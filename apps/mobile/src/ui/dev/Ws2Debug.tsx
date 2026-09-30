@@ -6,7 +6,7 @@
 import { useMemo } from 'react';
 import { Platform, Text, View } from 'react-native';
 
-import type { TraceUpload } from '@edudriver/shared';
+import type { TraceUpload } from '@eduway/shared';
 
 import { useMapGps, useTripState } from '../../trip';
 import { Json } from '../Json';

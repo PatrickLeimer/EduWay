@@ -7,7 +7,7 @@
  * Pure: every sensor, detector and file handle is injected, so this runs under
  * Vitest. The Expo wiring lives in expo.ts.
  */
-import type { DraftEvent, GpsFix, MotionSample } from '@edudriver/shared';
+import type { DraftEvent, GpsFix, MotionSample } from '@eduway/shared';
 
 import type {
   MotionDetector,

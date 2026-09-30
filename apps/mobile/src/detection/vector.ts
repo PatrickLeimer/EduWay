@@ -2,7 +2,7 @@
  * Tiny 3-vector helpers used by the detector math in master doc §6 and the §7
  * sketch (norm, dot, sub, scale, len, ema). Pure, no RN/Expo imports.
  */
-import type { Vec3 } from '@edudriver/shared';
+import type { Vec3 } from '@eduway/shared';
 
 export const vec = (x: number, y: number, z: number): Vec3 => ({ x, y, z });
 

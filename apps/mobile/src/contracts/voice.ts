@@ -5,7 +5,7 @@
  * Live alerts use pre-generated clips bundled in the app (zero latency, works
  * offline). Voice only, never visual.
  */
-import type { LiveAlertType } from '@edudriver/shared';
+import type { LiveAlertType } from '@eduway/shared';
 
 export interface AlertContext {
   /** Speeding only: picks the "the limit here is N" clip closest to this. */

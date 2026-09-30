@@ -25,14 +25,14 @@ import {
   streetViewCalloutFixture,
   traceFixture,
   tripFixture,
-} from '@edudriver/fixtures';
+} from '@eduway/fixtures';
 import {
   CreateTripRequestSchema,
   type GetTripResponse,
   type ProgressUpdate,
   type StreetViewCallout,
   type Trip,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 
 import { ApiError, type ApiClient } from '../../contracts';
 

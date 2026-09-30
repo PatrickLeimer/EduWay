@@ -4,7 +4,7 @@
  *
  * Gemini never sees sensor data or the trace, only this summary.
  */
-import type { DrivingEvent, EventType, SummaryEvent, Trip, TripSummary } from '@edudriver/shared';
+import type { DrivingEvent, EventType, SummaryEvent, Trip, TripSummary } from '@eduway/shared';
 
 /** Events whose `peak` is an acceleration in m/s². Speeding's peak duplicates over_mph. */
 const MOTION_TYPES: readonly EventType[] = ['hard_brake', 'hard_accel', 'rough_turn', 'swerve'];

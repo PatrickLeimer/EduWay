@@ -2,7 +2,7 @@
  * Real CoachService (WS4): Gemini then ElevenLabs. Failures degrade instead of
  * failing the trip upload: no coaching → coach null; no voice → audioUrl null.
  */
-import type { CoachOutput } from '@edudriver/shared';
+import type { CoachOutput } from '@eduway/shared';
 
 import { generateCoaching } from './gemini';
 import { synthesizeChat, type SaveDebriefAudio } from './elevenlabs';

@@ -1,4 +1,4 @@
-import type { DraftEvent, GpsFix, MotionSample } from '@edudriver/shared';
+import type { DraftEvent, GpsFix, MotionSample } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import type { MotionDetector, RoadCache, RoadEventDetector, RoadMatch } from '../contracts';

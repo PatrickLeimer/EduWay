@@ -1,5 +1,5 @@
-import { coachOutputFixture, tripSummaryFixture } from '@edudriver/fixtures';
-import { COACH } from '@edudriver/shared';
+import { coachOutputFixture, tripSummaryFixture } from '@eduway/fixtures';
+import { COACH } from '@eduway/shared';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {

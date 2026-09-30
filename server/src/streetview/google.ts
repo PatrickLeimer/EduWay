@@ -6,7 +6,7 @@
  *   WebView. That key is restricted by HTTP referrer to our backend's domain.
  * Keys never reach the app; it only gets our /streetview URLs.
  */
-import { STREET_VIEW } from '@edudriver/shared';
+import { STREET_VIEW } from '@eduway/shared';
 
 export interface StreetViewService {
   /** Free metadata check: outdoor imagery within STREET_VIEW.metadataRadiusM. Errors count as "no". */

@@ -1,4 +1,4 @@
-import { DEG_TO_RAD, SWERVE } from '@edudriver/shared';
+import { DEG_TO_RAD, SWERVE } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import type { Episode } from './hysteresis';

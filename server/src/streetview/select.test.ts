@@ -1,5 +1,5 @@
-import { fixtureEventsWithIds, traceFixture, tripSummaryFixture } from '@edudriver/fixtures';
-import { STREET_VIEW } from '@edudriver/shared';
+import { fixtureEventsWithIds, traceFixture, tripSummaryFixture } from '@eduway/fixtures';
+import { STREET_VIEW } from '@eduway/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { pickStreetView, toCallout } from './select';

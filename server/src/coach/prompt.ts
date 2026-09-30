@@ -6,7 +6,7 @@
  * - FACTS / PRIORITIES / OUTPUT: what it may say. These keep Gemini from
  *   inventing events or doing math; change them only with the master doc.
  *
- * Numbers come from @edudriver/shared (via promptContext) so the prompt never
+ * Numbers come from @eduway/shared (via promptContext) so the prompt never
  * drifts from the detectors.
  */
 import { COACH, EVENT_THRESHOLDS_FOR_PROMPT } from './promptContext';

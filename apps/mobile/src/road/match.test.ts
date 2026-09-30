@@ -1,7 +1,7 @@
-import { overpassFixture } from '@edudriver/fixtures';
+import { overpassFixture } from '@eduway/fixtures';
 import { describe, expect, it } from 'vitest';
 
-import type { GpsFix } from '@edudriver/shared';
+import type { GpsFix } from '@eduway/shared';
 
 import type { StopSign } from '../contracts';
 import { matchFix, needsRefetch, resolveStopHeadingDeg } from './match';

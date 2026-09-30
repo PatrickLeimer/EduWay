@@ -3,7 +3,7 @@
  * threshold tuning and validation. Placeholder UI (plain components only); the
  * logic lives in src/recorder. Full instructions: docs/drive-recording.md.
  */
-import { MPS_TO_MPH } from '@edudriver/shared';
+import { MPS_TO_MPH } from '@eduway/shared';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Button, Text, View } from 'react-native';

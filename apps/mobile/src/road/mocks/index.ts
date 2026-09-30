@@ -8,8 +8,8 @@
  *   step with the GPS stream, and signals the live alert for a harsh posted-limit
  *   speeding event when it arrives.
  */
-import { createFixtureEventReplayer, overpassFixture } from '@edudriver/fixtures';
-import { ROAD, type GpsFix } from '@edudriver/shared';
+import { createFixtureEventReplayer, overpassFixture } from '@eduway/fixtures';
+import { ROAD, type GpsFix } from '@eduway/shared';
 
 import type {
   RoadCache,

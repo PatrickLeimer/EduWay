@@ -1,6 +1,6 @@
 /**
  * Screen 1 (§12): Home / Start drive. Full-screen map with an Uber-style sheet:
- * "Where to?" opens Google Maps directions *before* the drive (EduDriver has no
+ * "Where to?" opens Google Maps directions *before* the drive (EduWay has no
  * turn-by-turn), then the driving lock and passenger options (§4) and Drive.
  */
 import { useState } from 'react';
@@ -54,7 +54,7 @@ export function StartDriveScreen({ modules, navigate, settings }: ScreenProps) {
 
       <FadeIn style={styles.topBar} delay={motion.normal} fromY={-16}>
         <View style={styles.brandRow}>
-          <Text style={styles.brand}>EduDriver</Text>
+          <Text style={styles.brand}>EduWay</Text>
           {settings.demoMode ? <TestDriveBadge /> : null}
         </View>
         <PressableScale

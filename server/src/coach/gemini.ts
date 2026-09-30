@@ -6,7 +6,7 @@
  * The SDK is imported lazily, like elevenlabs.ts: loading it under Vitest is
  * slow and every server test imports this file through service.ts.
  */
-import { COACH, CoachOutputSchema, type CoachOutput, type TripSummary } from '@edudriver/shared';
+import { COACH, CoachOutputSchema, type CoachOutput, type TripSummary } from '@eduway/shared';
 import { z } from 'zod';
 
 import { buildSystemPrompt } from './prompt';

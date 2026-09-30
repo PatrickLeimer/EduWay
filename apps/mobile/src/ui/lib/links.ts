@@ -3,7 +3,7 @@
  * always stay available). Pure, tested in links.test.ts.
  *
  * Directions open the Google Maps app through a public Maps URL (no API key,
- * no Directions API). EduDriver does not do turn-by-turn itself.
+ * no Directions API). EduWay does not do turn-by-turn itself.
  */
 
 /** Emergency number dialed from driving mode. */

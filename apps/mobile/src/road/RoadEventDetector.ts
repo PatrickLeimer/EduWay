@@ -2,13 +2,7 @@
  * Speeding and rolling-stop detector (WS2). Master doc §7, §8.
  * Pure logic: no React Native or Expo imports.
  */
-import {
-  MPS_TO_MPH,
-  ROLLING_STOP,
-  SPEEDING,
-  type DraftEvent,
-  type GpsFix,
-} from '@edudriver/shared';
+import { MPS_TO_MPH, ROLLING_STOP, SPEEDING, type DraftEvent, type GpsFix } from '@eduway/shared';
 
 import type {
   RoadCache,

@@ -10,7 +10,7 @@
  * Motion samples are kept only in short ring buffers inside the detector and
  * discarded once classified. They are never stored or uploaded (§3, §9).
  */
-import type { DraftEvent, GpsFix, MotionSample } from '@edudriver/shared';
+import type { DraftEvent, GpsFix, MotionSample } from '@eduway/shared';
 
 import type { Subscribable } from './common';
 

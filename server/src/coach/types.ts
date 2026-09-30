@@ -5,7 +5,7 @@
  * Routes never call Gemini or ElevenLabs directly. Changing this interface
  * affects both WS3 and WS4: agree on it first.
  */
-import type { CoachOutput, DrivingEvent, Trip, TripSummary } from '@edudriver/shared';
+import type { CoachOutput, DrivingEvent, Trip, TripSummary } from '@eduway/shared';
 
 export interface CoachResult {
   /** Null when Gemini failed; the trip is still saved and returned. */

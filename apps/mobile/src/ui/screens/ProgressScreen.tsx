@@ -3,7 +3,7 @@
  * totals and recurring spots on the map. Numbers come from GET /progress.
  * Route lines come from each trip's routePreview (GET /trips). This screen only draws them.
  */
-import { DEMO_USER_ID, EVENT_TYPES, type TripListItem } from '@edudriver/shared';
+import { DEMO_USER_ID, EVENT_TYPES, type TripListItem } from '@eduway/shared';
 import { useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 

@@ -1,4 +1,4 @@
-import { MPS_TO_MPH, PHONE_USE, PIPELINE, type GpsFix } from '@edudriver/shared';
+import { MPS_TO_MPH, PHONE_USE, PIPELINE, type GpsFix } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createPhoneUseTracker } from './phoneUse';

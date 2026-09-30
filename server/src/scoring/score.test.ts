@@ -1,5 +1,5 @@
-import { eventsFixture, traceFixture, tripFixture } from '@edudriver/fixtures';
-import { SCORING, TripCountsSchema, TripStatsSchema, type RecordedEvent } from '@edudriver/shared';
+import { eventsFixture, traceFixture, tripFixture } from '@eduway/fixtures';
+import { SCORING, TripCountsSchema, TripStatsSchema, type RecordedEvent } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { mockScoreTrip } from './mocks';

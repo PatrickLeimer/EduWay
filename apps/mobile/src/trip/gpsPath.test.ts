@@ -1,4 +1,4 @@
-import type { GpsFix } from '@edudriver/shared';
+import type { GpsFix } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createGpsPath } from './gpsPath';

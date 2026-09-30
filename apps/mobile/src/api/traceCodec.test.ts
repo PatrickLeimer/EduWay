@@ -1,8 +1,8 @@
 // Proves the phone's trace encoding is readable by the server's decoder (Node zlib).
 import { gunzipSync } from 'node:zlib';
 
-import { traceFixture } from '@edudriver/fixtures';
-import { TraceUploadSchema } from '@edudriver/shared';
+import { traceFixture } from '@eduway/fixtures';
+import { TraceUploadSchema } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { base64ToBytes, bytesToBase64, decodeTrace, encodeTrace } from './traceCodec';

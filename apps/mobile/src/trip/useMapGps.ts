@@ -5,7 +5,7 @@
  */
 import { useEffect, useState } from 'react';
 
-import type { GpsFix } from '@edudriver/shared';
+import type { GpsFix } from '@eduway/shared';
 
 import type { TripSession } from '../contracts';
 import { createExpoLocationSource } from './locationSource';

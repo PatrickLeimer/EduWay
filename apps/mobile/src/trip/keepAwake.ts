@@ -5,7 +5,7 @@
  *
  * Docs (SDK 57): https://docs.expo.dev/versions/v57.0.0/sdk/keep-awake/
  */
-const TAG = 'edudriver-trip';
+const TAG = 'eduway-trip';
 
 export interface KeepAwake {
   activate(): Promise<void>;

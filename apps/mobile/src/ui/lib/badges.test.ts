@@ -1,4 +1,4 @@
-import { GAMIFICATION, type UserProgress } from '@edudriver/shared';
+import { GAMIFICATION, type UserProgress } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { earnedBadges, type Badge } from './badges';

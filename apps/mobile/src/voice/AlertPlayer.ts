@@ -6,7 +6,7 @@
  * and the clip choice in clips.ts.
  * Docs (SDK 57): https://docs.expo.dev/versions/v57.0.0/sdk/audio/
  */
-import type { LiveAlertType } from '@edudriver/shared';
+import type { LiveAlertType } from '@eduway/shared';
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer as ExpoPlayer } from 'expo-audio';
 
 import { API_BASE_URL } from '../api';

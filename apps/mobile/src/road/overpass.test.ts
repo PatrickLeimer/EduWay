@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ROAD } from '@edudriver/shared';
+import { ROAD } from '@eduway/shared';
 
 import {
   buildOverpassQuery,

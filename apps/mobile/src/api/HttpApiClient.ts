@@ -14,7 +14,7 @@ import {
   GetTraceResponseSchema,
   GetTripResponseSchema,
   ListTripsResponseSchema,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import type { z } from 'zod';
 
 import { ApiError, type ApiClient } from '../contracts';

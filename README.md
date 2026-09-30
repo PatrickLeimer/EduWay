@@ -1,4 +1,4 @@
-# EduDriver (ShellHacks)
+# EduWay (ShellHacks)
 
 Phone-only driving coach for student drivers: live detection of driving mistakes, instant voice alerts for dangerous ones, and a Gemini + ElevenLabs voice debrief after every trip.
 
@@ -9,10 +9,10 @@ Phone-only driving coach for student drivers: live detection of driving mistakes
 ## Layout
 
 ```
-packages/shared   @edudriver/shared    types, API zod schemas, thresholds (protected contracts)
-fixtures          @edudriver/fixtures  shared JSON test data, schema-checked on import
-apps/mobile       @edudriver/mobile    Expo app (contracts/, wiring.ts, detection/, road/, trip/, api/, voice/, ui/)
-server            @edudriver/server    Express API (routes/, db/, scoring/, coach/)
+packages/shared   @eduway/shared    types, API zod schemas, thresholds (protected contracts)
+fixtures          @eduway/fixtures  shared JSON test data, schema-checked on import
+apps/mobile       @eduway/mobile    Expo app (contracts/, wiring.ts, detection/, road/, trip/, api/, voice/, ui/)
+server            @eduway/server    Express API (routes/, db/, scoring/, coach/)
 scripts/alert-clips                    ElevenLabs clip generator for live alerts
 ```
 
@@ -47,7 +47,7 @@ npx eas-cli@latest update:configure     # adds updates.url to app.json
 npx eas-cli@latest env:set --name EXPO_PUBLIC_API_URL --value https://<deployed-server> --environment preview --visibility plaintext
 ```
 
-Publish (from the repo root): `npm run publish:demo --workspace @edudriver/mobile`. The command prints an expo.dev link; that update page has the Expo Go QR code. `eas update --environment` ignores `apps/mobile/.env`, so public vars must be set with `eas env:set`. Deploying the server for `EXPO_PUBLIC_API_URL`: [docs/render-railway-deployment.md](docs/render-railway-deployment.md).
+Publish (from the repo root): `npm run publish:demo --workspace @eduway/mobile`. The command prints an expo.dev link; that update page has the Expo Go QR code. `eas update --environment` ignores `apps/mobile/.env`, so public vars must be set with `eas env:set`. Deploying the server for `EXPO_PUBLIC_API_URL`: [docs/render-railway-deployment.md](docs/render-railway-deployment.md).
 
 ## Checks (same as CI)
 

@@ -7,7 +7,7 @@
  * `watchPositionAsync` is foreground-only. coords.speed is m/s; heading is
  * degrees from true north and is negative when unknown.
  */
-import { PIPELINE, type GpsFix } from '@edudriver/shared';
+import { PIPELINE, type GpsFix } from '@eduway/shared';
 
 export interface LocationSource {
   /** Resolves once permission is granted and fixes are flowing (~1 Hz). */

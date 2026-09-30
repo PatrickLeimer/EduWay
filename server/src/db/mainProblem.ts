@@ -2,7 +2,7 @@
  * Picks history.main_problem from a user's events. Pure: MongoTripsRepo loads
  * the rows and this decides. Counts distinct trips, not individual events.
  */
-import { COACH, type EventType, type MainProblem } from '@edudriver/shared';
+import { COACH, type EventType, type MainProblem } from '@eduway/shared';
 
 /** Stored when a fix has no street name. Not a place the coach should name. */
 const UNNAMED_STREET = 'an unnamed road';

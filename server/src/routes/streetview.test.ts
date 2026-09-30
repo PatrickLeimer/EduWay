@@ -5,14 +5,14 @@ import type { AddressInfo } from 'node:net';
 import type { Server } from 'node:http';
 import { gzipSync } from 'node:zlib';
 
-import { eventsFixture, traceFixture, tripFixture } from '@edudriver/fixtures';
+import { eventsFixture, traceFixture, tripFixture } from '@eduway/fixtures';
 import {
   CreateTripResponseSchema,
   DEMO_USER_ID,
   GetTripResponseSchema,
   STREET_VIEW,
   type CreateTripRequest,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../app';

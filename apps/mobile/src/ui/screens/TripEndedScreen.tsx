@@ -7,7 +7,7 @@
  * A past drive opened from Past drives gets the same summary first
  * (PastDriveSummaryScreen), reading the trip from GET /trips/:id instead.
  */
-import type { Trip } from '@edudriver/shared';
+import type { Trip } from '@eduway/shared';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, StyleSheet, Text, View } from 'react-native';
 

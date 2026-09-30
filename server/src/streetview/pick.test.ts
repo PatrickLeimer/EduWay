@@ -1,5 +1,5 @@
-import { fixtureEventsWithIds, traceFixture, tripSummaryFixture } from '@edudriver/fixtures';
-import type { DrivingEvent } from '@edudriver/shared';
+import { fixtureEventsWithIds, traceFixture, tripSummaryFixture } from '@eduway/fixtures';
+import type { DrivingEvent } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { headingBefore, rankStreetViewCandidates, type PickTrace } from './pick';

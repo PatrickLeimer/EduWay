@@ -2,7 +2,7 @@
  * WS3 debug screen (owned by WS3). Calls API endpoints and dumps the JSON.
  * Uses whichever ApiClient wiring selected (mock by default).
  */
-import { DEMO_USER_ID } from '@edudriver/shared';
+import { DEMO_USER_ID } from '@eduway/shared';
 import { useState } from 'react';
 import { Button, Text, View } from 'react-native';
 

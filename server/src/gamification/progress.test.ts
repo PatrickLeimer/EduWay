@@ -1,4 +1,4 @@
-import { GetProgressResponseSchema, type TripCounts } from '@edudriver/shared';
+import { GetProgressResponseSchema, type TripCounts } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { buildProgress, type ProgressTrip } from './progress';

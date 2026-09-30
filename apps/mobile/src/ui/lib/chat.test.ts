@@ -1,4 +1,4 @@
-import { coachOutputFixture } from '@edudriver/fixtures';
+import { coachOutputFixture } from '@eduway/fixtures';
 import { describe, expect, it } from 'vitest';
 
 import { chatMessages, chatProgress, chatSchedule, readingDurationS, TYPING_LEAD_S } from './chat';

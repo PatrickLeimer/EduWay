@@ -1,4 +1,4 @@
-import { G, PIPELINE, type MotionSample } from '@edudriver/shared';
+import { G, PIPELINE, type MotionSample } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { motionFrame } from './level1';

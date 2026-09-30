@@ -1,4 +1,4 @@
-import type { QualifyingTrip } from '@edudriver/shared';
+import type { QualifyingTrip } from '@eduway/shared';
 import { describe, expect, it } from 'vitest';
 
 import { allTimeTier, buildTrend } from './trend';

@@ -6,7 +6,7 @@
  * Once the files exist, WS4 adds a static `require()` map in AlertPlayer.ts
  * (Metro needs literal require paths, so it cannot be built from this list).
  */
-import type { LiveAlertType } from '@edudriver/shared';
+import type { LiveAlertType } from '@eduway/shared';
 
 /** Speed limits we pre-generate "Slow down, the limit here is N" clips for. */
 export const SPEED_LIMIT_CLIPS_MPH = [25, 30, 35, 40, 45, 55, 65] as const;

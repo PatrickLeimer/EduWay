@@ -1,10 +1,5 @@
 /** POST /ask: "Ask the coach" (stretch, §10). WS3 route, WS4 answer. */
-import {
-  AskRequestSchema,
-  AskResponseSchema,
-  type DrivingEvent,
-  type Trip,
-} from '@edudriver/shared';
+import { AskRequestSchema, AskResponseSchema, type DrivingEvent, type Trip } from '@eduway/shared';
 import { Router } from 'express';
 
 import type { RouteDeps } from './deps';

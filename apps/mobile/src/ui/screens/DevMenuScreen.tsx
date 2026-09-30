@@ -5,7 +5,7 @@
  * - Live trip: status, GPS, road match and counters, updating every fix.
  * - Links to the WS1–WS4 debug screens and the drive recorder.
  */
-import { DEMO_USER_ID } from '@edudriver/shared';
+import { DEMO_USER_ID } from '@eduway/shared';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 

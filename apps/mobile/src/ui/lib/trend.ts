@@ -5,7 +5,7 @@
  * Display only: it filters, buckets and averages scores the server already
  * sent. No scoring, no thresholds and nothing that changes a number's meaning.
  */
-import type { QualifyingTrip } from '@edudriver/shared';
+import type { QualifyingTrip } from '@eduway/shared';
 
 /** Which tab the chart is showing. */
 export type TrendView = 'weekly' | 'monthly' | 'all-time';

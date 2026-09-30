@@ -3,7 +3,7 @@
  * changes color when the driver is over the limit, because live alerts are
  * voice only, never visual (§7).
  */
-import type { LimitConfidence } from '@edudriver/shared';
+import type { LimitConfidence } from '@eduway/shared';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { colors, font, fonts } from '../theme';

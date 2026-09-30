@@ -19,7 +19,7 @@ import {
   ROUGH_TURN,
   SPEEDING,
   SWERVE,
-} from '@edudriver/shared';
+} from '@eduway/shared';
 import { Directory, File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { AppState, Platform } from 'react-native';
