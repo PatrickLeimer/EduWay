@@ -36,6 +36,15 @@ const EnvSchema = z.object({
   USE_REAL_DB: flag,
   USE_REAL_SCORING: flag,
   USE_REAL_COACH: flag,
+
+  /**
+   * Keep debrief mp3s in MongoDB GridFS (survives Render restarts) and re-voice
+   * lost ones. Needs USE_REAL_DB. Set false to go back to files on disk.
+   */
+  DEBRIEF_AUDIO_IN_DB: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
 });
 
 export type Config = z.infer<typeof EnvSchema>;

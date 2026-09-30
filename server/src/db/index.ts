@@ -5,3 +5,9 @@ export { COLLECTIONS, INDEXES } from './collections';
 export { ensureCollectionsAndIndexes } from './setup';
 export { createMongoTripsRepo } from './MongoTripsRepo';
 export { createInMemoryTripsRepo } from './mocks/InMemoryTripsRepo';
+export {
+  createGridFsAudioStore,
+  createInMemoryAudioStore,
+  DEBRIEF_AUDIO_BUCKET,
+  type AudioStore,
+} from './audioStore';

@@ -8,6 +8,7 @@ import express, { type Express } from 'express';
 import { DEBRIEF_AUDIO_DIR, DEBRIEF_AUDIO_ROUTE } from './coach';
 import {
   askRouter,
+  audioRouter,
   errorHandler,
   progressRouter,
   streetViewRouter,
@@ -28,8 +29,13 @@ export function createApp(deps: RouteDeps): Express {
   app.use(API_ROUTES.ask, askRouter(deps));
   // Street View callout images and panorama page (§12); off without GOOGLE_STREETVIEW_KEY.
   app.use('/streetview', streetViewRouter(deps));
-  // ElevenLabs debrief mp3s written by coach/ (§11); coachAudioUrl points here.
-  app.use(DEBRIEF_AUDIO_ROUTE, express.static(DEBRIEF_AUDIO_DIR));
+  // ElevenLabs debrief mp3s (§11); coachAudioUrl points here. From MongoDB when
+  // deps.audio is set, else the old disk folder (rollback: DEBRIEF_AUDIO_IN_DB=false).
+  if (deps.audio) {
+    app.use(DEBRIEF_AUDIO_ROUTE, audioRouter(deps.repo, deps.audio, DEBRIEF_AUDIO_ROUTE));
+  } else {
+    app.use(DEBRIEF_AUDIO_ROUTE, express.static(DEBRIEF_AUDIO_DIR));
+  }
 
   app.use((_req, res) => {
     res.status(404).json({ error: 'Not found' });

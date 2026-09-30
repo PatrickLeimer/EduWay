@@ -3,12 +3,11 @@
  * `textToSpeechMp3` is shared with scripts/alert-clips so live alerts and the
  * debrief use the same voice and model.
  *
- * Debrief audio: the coaching chat is spoken as one track and saved on the
- * server's disk (DEBRIEF_AUDIO_DIR), served by app.ts at DEBRIEF_AUDIO_ROUTE.
+ * Debrief audio: the coaching chat is spoken as one track and handed to
+ * `save` (wiring stores it in MongoDB GridFS, served by routes/audio.ts at
+ * DEBRIEF_AUDIO_ROUTE); without `save` it is written to DEBRIEF_AUDIO_DIR.
  * The URL returned is relative ("/audio/<tripId>.mp3"); the phone resolves it
  * against its API base URL, so it works on a LAN, a tunnel, or a deployed host.
- * Known limit: a host with an ephemeral disk loses the files on redeploy
- * (GridFS would fix that).
  *
  * The SDK is imported lazily: loading it under Vitest takes minutes, and every
  * server test imports this file through service.ts.
@@ -45,6 +44,9 @@ export async function textToSpeechMp3(text: string, opts: VoiceOptions): Promise
   return Buffer.from(await new Response(audio).arrayBuffer());
 }
 
+/** Stores a debrief mp3 under its file name (e.g. "abc123.mp3"). */
+export type SaveDebriefAudio = (file: string, mp3: Buffer) => Promise<void>;
+
 export interface DebriefAudio {
   /** Relative URL, e.g. "/audio/abc123.mp3". */
   url: string;
@@ -60,7 +62,7 @@ export interface DebriefAudio {
 export async function synthesizeChat(
   messages: string[],
   tripId: string,
-  opts: VoiceOptions & { audioDir?: string },
+  opts: VoiceOptions & { audioDir?: string; save?: SaveDebriefAudio },
 ): Promise<DebriefAudio> {
   const { text, offsets } = joinChat(messages);
   const { ElevenLabsClient } = await import('@elevenlabs/elevenlabs-js');
@@ -71,10 +73,15 @@ export async function synthesizeChat(
     outputFormat: 'mp3_44100_128',
   });
 
-  const dir = opts.audioDir ?? DEBRIEF_AUDIO_DIR;
   const file = `${tripId.replace(/[^A-Za-z0-9_-]/g, '_')}.mp3`;
-  await mkdir(dir, { recursive: true });
-  await writeFile(join(dir, file), Buffer.from(res.audioBase64, 'base64'));
+  const mp3 = Buffer.from(res.audioBase64, 'base64');
+  if (opts.save) {
+    await opts.save(file, mp3);
+  } else {
+    const dir = opts.audioDir ?? DEBRIEF_AUDIO_DIR;
+    await mkdir(dir, { recursive: true });
+    await writeFile(join(dir, file), mp3);
+  }
 
   return {
     url: `${DEBRIEF_AUDIO_ROUTE}/${file}`,
