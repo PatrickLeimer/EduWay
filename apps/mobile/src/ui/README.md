@@ -11,7 +11,7 @@ changing anything here.
 - `components/`: shared UI pieces; `MapCanvas` is the only map.
 - `lib/`: pure display helpers with Vitest tests (no React Native imports).
 - `dev/`: WS1–WS4 debug screens. Each workstream edits only its own.
-- `widget/`: home-screen "Drive" widget. iPhone: `iosDriveWidget.tsx` (expo-widgets; the app pushes theme colors to it in `syncDriveWidget.ts`). Android: `AndroidDriveWidget.tsx` (react-native-android-widget, registered in `index.ts`). Both open `eduway://drive/start`, handled by `trip/useStartDriveLink.ts`. Needs a native build; Expo Go has no widgets but the link works there as `exp://<host>/--/drive/start`.
+- `widget/`: home-screen "Drive" widget showing the clean-drive streak and last score (`lib/widgetStats.ts`). iPhone: `iosDriveWidget.tsx` (expo-widgets; gets theme colors as props). Android: `androidWidget.tsx` (react-native-android-widget; draws from stats saved by `widgetStatsStore.ts`). `useDriveWidgetSync.ts` refreshes it on open and after each drive. Both libraries throw in Expo Go, so they load only after `nativeWidgets.ts` checks. A tap opens `eduway://drive/start` (`trip/useStartDriveLink.ts`); in Expo Go that link is `exp://<host>/--/drive/start`.
 
 ## Rules (root CLAUDE.md)
 - Screens get data from `trip/` and `api/` (plus the `DebriefPlayer` contract for debrief playback) and never from detection/road/voice internals.

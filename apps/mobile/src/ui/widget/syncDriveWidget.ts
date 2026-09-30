@@ -1,31 +1,48 @@
 /**
- * Sends the iPhone widget its look (theme tokens) and link. The widget can't
- * import theme.ts (see iosDriveWidget.tsx), so the app pushes them on launch.
- * No-op on Android (AndroidDriveWidget.tsx renders from the theme directly)
- * and in Expo Go, which has no widget module.
+ * Entry points for the home-screen Drive widget. Both widget libraries throw
+ * when imported in Expo Go, so they are required lazily after the checks in
+ * nativeWidgets.ts; everything here is a no-op in Expo Go.
  */
-import { requireOptionalNativeModule } from 'expo';
-import { Platform } from 'react-native';
-
+/* eslint-disable @typescript-eslint/no-require-imports -- lazy, see above */
 import { DRIVE_LINK_URL } from '../../trip';
+import type { WidgetStats } from '../lib/widgetStats';
 import { colors, font } from '../theme';
+import { hasAndroidWidgets, hasIosWidgets } from './nativeWidgets';
+import { saveWidgetStats } from './widgetStatsStore';
 
-export function syncDriveWidget(): void {
-  if (Platform.OS !== 'ios' || !requireOptionalNativeModule('ExpoWidgets')) return;
+/** Called once from index.ts: lets Android draw the widget from a background task. */
+export function registerDriveWidget(): void {
+  if (!hasAndroidWidgets()) return;
+  const android = require('./androidWidget') as typeof import('./androidWidget');
+  android.registerAndroidDriveWidget();
+}
+
+/** Saves the stats and redraws the widget on this phone. */
+export function syncDriveWidget(stats: WidgetStats): void {
   try {
-    // Lazy: loading expo-widgets without its native module throws.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { DriveWidget } = require('./iosDriveWidget') as typeof import('./iosDriveWidget');
-    DriveWidget.updateSnapshot({
-      url: DRIVE_LINK_URL,
-      title: 'Drive',
-      brand: 'EduWay',
-      background: colors.primary,
-      text: colors.onColor,
-      textMuted: colors.teal100,
-      titleSize: font.title,
-      brandSize: font.small,
-    });
+    if (hasAndroidWidgets()) {
+      saveWidgetStats(stats);
+      const android = require('./androidWidget') as typeof import('./androidWidget');
+      void android.updateAndroidDriveWidget(stats).catch((e: unknown) => {
+        console.warn('[widget] could not redraw the Drive widget:', e);
+      });
+    } else if (hasIosWidgets()) {
+      // The iPhone widget can't import theme.ts, so its look travels with the stats.
+      const ios = require('./iosDriveWidget') as typeof import('./iosDriveWidget');
+      ios.DriveWidget.updateSnapshot({
+        url: DRIVE_LINK_URL,
+        streak: String(stats.streak),
+        streakLabel: stats.streakLabel,
+        lastLine: stats.lastLine,
+        background: colors.primary,
+        text: colors.onColor,
+        textMuted: colors.teal100,
+        ctaSize: font.body,
+        streakSize: font.display,
+        labelSize: font.small,
+        lastSize: font.tiny,
+      });
+    }
   } catch (e) {
     console.warn('[widget] could not update the Drive widget:', e);
   }
