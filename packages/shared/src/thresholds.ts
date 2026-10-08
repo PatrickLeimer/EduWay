@@ -239,6 +239,17 @@ export const COACH = {
   mainProblemTieBreak: MAIN_PROBLEM_TIE_BREAK,
   /** Street View caption (street_view_caption), §12. */
   maxStreetViewCaptionWords: 30,
+  /** Share card comment (share_caption), §12 "Share card". */
+  maxShareCaptionWords: 20,
+} as const;
+
+// ---------------------------------------------------------------------------
+// Share card (§12 "Share card")
+// ---------------------------------------------------------------------------
+
+export const SHARE_CARD = {
+  /** Route trimmed this far from each end so the image does not show home (privacy zone). */
+  privacyTrimM: 200,
 } as const;
 
 // ---------------------------------------------------------------------------

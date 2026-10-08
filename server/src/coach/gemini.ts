@@ -24,6 +24,7 @@ export interface GeminiOptions {
 const GeminiReplySchema = CoachOutputSchema.omit({ chat_audio_starts_s: true }).extend({
   chat: z.array(z.string().min(1)).min(1),
   street_view_caption: z.string().nullable(),
+  share_caption: z.string().nullable(),
 });
 export const COACH_RESPONSE_JSON_SCHEMA = z.toJSONSchema(GeminiReplySchema);
 
@@ -89,9 +90,7 @@ export async function generateCoaching(
             responseJsonSchema: COACH_RESPONSE_JSON_SCHEMA,
           },
         });
-        const coach = parseCoachReply(res.text);
-        // No Street View event → no caption, whatever the model wrote (§12).
-        return summary.street_view_event ? coach : { ...coach, street_view_caption: null };
+        return applySummaryRules(parseCoachReply(res.text), summary);
       } catch (e) {
         lastError = e;
         if (statusOf(e) === 429) outOfQuota.add(model);
@@ -100,6 +99,22 @@ export async function generateCoaching(
     }
   }
   throw lastError;
+}
+
+/** Drops captions the summary gives no basis for, whatever the model wrote. */
+export function applySummaryRules(coach: CoachOutput, summary: TripSummary): CoachOutput {
+  const { history } = summary;
+  const hasHistory =
+    history.last_5_scores.length > 0 ||
+    history.recurring_spots.length > 0 ||
+    history.main_problem !== null;
+  return {
+    ...coach,
+    // No Street View event → no caption (§12).
+    street_view_caption: summary.street_view_event ? coach.street_view_caption : null,
+    // Nothing to have improved on → no share comment (§12 "Share card").
+    share_caption: hasHistory ? coach.share_caption?.trim() || null : null,
+  };
 }
 
 function statusOf(e: unknown): number | null {

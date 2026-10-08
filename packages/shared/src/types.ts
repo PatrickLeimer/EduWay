@@ -224,6 +224,13 @@ export const CoachOutputSchema = z.object({
    * no event was picked. Defaults to null so trips coached before it still parse.
    */
   street_view_caption: z.string().nullable().default(null),
+  /**
+   * One upbeat line for the shareable drive card (§12 "Share card"): a concrete
+   * improvement over the student's history, under ~20 words. Null when there is
+   * no real improvement to point to, and the card then shows no comment.
+   * Defaults to null so trips coached before it still parse.
+   */
+  share_caption: z.string().nullable().default(null),
 });
 export type CoachOutput = z.infer<typeof CoachOutputSchema>;
 
