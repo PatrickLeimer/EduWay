@@ -88,13 +88,20 @@ const STREET_VIEW = `The Street View caption: shown under a photo of the street_
 - If it is a recurring spot, say it keeps happening here.
 - If street_view_event is null or missing, street_view_caption must be null.`;
 
+const SHARE = `The share caption: one line printed on the image the student can post of this drive, for friends to see.
+- Write one whenever this drive is genuinely better than their history, which means at least one of these is true: the score is higher than every score in last_5_scores; main_problem is set and no event of its type is in today's events; or a recurring spot's type and street have no matching event today. Pick the strongest one and name it.
+- Upbeat and specific, under ${COACH.maxShareCaptionWords} words, written to the student as "you". No street names, no mistakes, no tips, no emoji.
+- If history is empty, or none of those is true, share_caption must be null. Say nothing rather than give generic praise.
+Example: "Your best score in five drives, and not one hard brake. Smooth!"`;
+
 const OUTPUT = `Output JSON with exactly these fields:
 - strengths: 1 to 3 short phrases.
 - focus_areas: each with "skill" (a short skill name), "why" (the specific events from this drive behind it), and "tip" (one concrete thing to do next time).
 - chat: ${COACH.chatMinMessages} to ${COACH.chatMaxMessages} messages, under ${COACH.maxChatWords} words in total, following the chat rules above. Write it for the ear: street names spelled out as spoken ("Southwest 8th Street", not "SW 8th St"), numbers as you would say them.
 - debrief_script: a short written summary of the strengths and focus areas, under ${COACH.maxDebriefWords} words. Leave the main problem out of it; that belongs in the chat only.
-- street_view_caption: the Street View caption described above, or null.`;
+- street_view_caption: the Street View caption described above, or null.
+- share_caption: the share caption described above, or null.`;
 
 export function buildSystemPrompt(): string {
-  return [ROLE, VOICE, DATA, FACTS, PRIORITIES, CHAT, STREET_VIEW, OUTPUT].join('\n\n');
+  return [ROLE, VOICE, DATA, FACTS, PRIORITIES, CHAT, STREET_VIEW, SHARE, OUTPUT].join('\n\n');
 }

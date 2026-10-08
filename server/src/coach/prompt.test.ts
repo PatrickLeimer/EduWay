@@ -55,6 +55,14 @@ describe('buildSystemPrompt (§10 guidelines)', () => {
     expect(prompt).toMatch(/Never when it is null/);
   });
 
+  it('writes a share caption only for a real improvement, else null (§12)', () => {
+    expect(prompt).toContain(`under ${COACH.maxShareCaptionWords} words`);
+    expect(prompt).toMatch(/genuinely better than their history/);
+    expect(prompt).toMatch(/higher than every score in last_5_scores/);
+    expect(prompt).toMatch(/share_caption must be null/);
+    expect(prompt).toMatch(/Say nothing rather than give generic praise/);
+  });
+
   it('compares with history and recurring spots', () => {
     expect(prompt).toMatch(/recurring spot/);
     expect(prompt).toMatch(/Call out improvement/);

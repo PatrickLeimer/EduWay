@@ -6,6 +6,7 @@ import {
   COACH_RESPONSE_JSON_SCHEMA,
   GEMINI_FALLBACK_MODELS,
   GEMINI_HTTP,
+  applySummaryRules,
   generateCoaching,
   parseCoachReply,
 } from './gemini';
@@ -117,6 +118,36 @@ describe('generateCoaching Street View caption (§12)', () => {
   it('requires the caption field (null allowed) in the Gemini schema', () => {
     expect(COACH_RESPONSE_JSON_SCHEMA).toMatchObject({
       required: expect.arrayContaining(['street_view_caption']),
+    });
+  });
+});
+
+describe('share caption (§12 "Share card")', () => {
+  const noHistory = {
+    ...tripSummaryFixture,
+    history: { last_5_scores: [], recurring_spots: [], main_problem: null },
+  };
+
+  it('keeps the caption when there is history to improve on', () => {
+    const coach = applySummaryRules(coachOutputFixture, tripSummaryFixture);
+    expect(coach.share_caption).toBe(coachOutputFixture.share_caption);
+  });
+
+  it('drops it on a first drive, whatever the model wrote', () => {
+    expect(applySummaryRules(coachOutputFixture, noHistory).share_caption).toBeNull();
+  });
+
+  it('turns a blank caption into null', () => {
+    const coach = applySummaryRules(
+      { ...coachOutputFixture, share_caption: '  ' },
+      tripSummaryFixture,
+    );
+    expect(coach.share_caption).toBeNull();
+  });
+
+  it('requires the field (null allowed) in the Gemini schema', () => {
+    expect(COACH_RESPONSE_JSON_SCHEMA).toMatchObject({
+      required: expect.arrayContaining(['share_caption']),
     });
   });
 });
