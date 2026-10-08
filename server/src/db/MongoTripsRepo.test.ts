@@ -75,6 +75,7 @@ describe.skipIf(!enabled)('MongoTripsRepo (live MongoDB)', () => {
       focus_areas: [],
       debrief_script: 'Nice.',
       street_view_caption: null,
+      share_caption: null,
     };
     await repo.setCoaching(second._id, coach, 'https://example.com/a.mp3');
     const loaded = await repo.getTrip(second._id);

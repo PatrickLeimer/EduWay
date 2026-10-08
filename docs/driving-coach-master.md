@@ -397,6 +397,15 @@ After a trip, the coaching shows one Street View card for the most important inf
 - Only after a trip, never while driving. Street View images are never stored in MongoDB or on the phone beyond normal display caching (Google's terms); we store only our own data: the picked event, its heading, and the caption.
 - Google keys stay on the server. The debrief's `streetView` callout carries URLs to our backend only.
 - No qualifying event or no imagery: the feature is simply absent for that trip. No error shown to the student.
+
+### Share card
+
+From Replay, the student can share the drive as a PNG (Strava style) through the phone's share sheet.
+
+- The card is drawn by the app, not a map screenshot: the route as a teal line, with distance, duration and score, plus Gemini's `share_caption` when there is one.
+- `share_caption`: one upbeat line, under about 20 words, naming a concrete improvement over the student's history (fewer of an event type, a better score, a clean recurring spot). Null when there is no real improvement; the card then shows no comment. Same fact rules as the rest of §10.
+- Privacy zone: the route is trimmed about 200 m from each end (`SHARE_CARD.privacyTrimM`) so the image does not show where the student lives. No street names on the card.
+- Only after a trip, never while driving. The PNG is written to the app's cache for the share sheet and not kept.
 5. Progress (score trend, skill breakdown, recurring spots, test readiness)
 6. Settings (lock toggle default)
 
