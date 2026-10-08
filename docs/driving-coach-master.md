@@ -405,7 +405,7 @@ From Replay, the student can share the drive as a PNG (Strava style) through the
 - The card is drawn by the app, not a map screenshot: the route as a teal line, with distance, duration and score, plus Gemini's `share_caption` when there is one.
 - `share_caption`: one upbeat line, under about 20 words, naming a concrete improvement over the student's history (fewer of an event type, a better score, a clean recurring spot). Null when there is no real improvement; the card then shows no comment. Same fact rules as the rest of §10.
 - Privacy zone: the route is trimmed about 200 m from each end (`SHARE_CARD.privacyTrimM`) so the image does not show where the student lives. No street names on the card.
-- Only after a trip, never while driving. The PNG is written to the app's cache for the share sheet and not kept.
+- Only after a trip, never while driving. The PNG goes to one file in the app cache for the share sheet, replaced by the next share.
 5. Progress (score trend, skill breakdown, recurring spots, test readiness)
 6. Settings (lock toggle default)
 

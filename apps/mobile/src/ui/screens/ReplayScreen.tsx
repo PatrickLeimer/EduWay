@@ -3,6 +3,7 @@
  * pins that pop in at their timestamps, and a speed timeline with a scrub bar
  * and 1x / 4x / 10x playback. Shows what was recorded; never re-runs detection.
  * Step 1 of the post-trip flow (lib/flow.ts); the only screen with a map.
+ * "Share drive" opens the share card (§12 "Share card").
  *
  * Known gap: the trace stores speed only, not the limit at each second, so the
  * timeline shows speed plus event ticks. A true "speed vs limit" line needs a
@@ -20,6 +21,7 @@ import { MapCanvas } from '../components/MapCanvas';
 import { FadeIn, GrowBar } from '../components/motion';
 import { Muted, OsmCredit } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { ShareDriveSheet } from '../components/ShareDriveSheet';
 import { nextRoute, prevRoute } from '../lib/flow';
 import { clockText } from '../lib/format';
 import { pointFromGeo, pointsFromTrace } from '../lib/geo';
@@ -52,6 +54,7 @@ export function ReplayScreen({
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<ReplaySpeed>(4);
   const [barWidth, setBarWidth] = useState(1);
+  const [sharing, setSharing] = useState(false);
 
   const trace = traceQ.data;
   const trip = tripQ.data?.trip;
@@ -190,7 +193,22 @@ export function ReplayScreen({
           />
         ))}
       </View>
+      <Button
+        title="Share drive"
+        variant="secondary"
+        onPress={() => {
+          setPlaying(false);
+          setSharing(true);
+        }}
+        style={styles.shareBtn}
+      />
       <OsmCredit />
+      <ShareDriveSheet
+        visible={sharing}
+        onClose={() => setSharing(false)}
+        trip={trip}
+        route={route}
+      />
     </Screen>
   );
 }
@@ -222,4 +240,5 @@ const styles = StyleSheet.create({
   controls: { flexDirection: 'row', gap: space.sm, marginTop: space.lg },
   playBtn: { flex: 2 },
   speedBtn: { flex: 1 },
+  shareBtn: { marginTop: space.sm },
 });
