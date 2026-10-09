@@ -163,6 +163,18 @@ Built on React Native's `Animated` API (no library), native driver, cubic ease-o
 | Replay | Speed bars grow left to right; each new event card pops in. |
 | Progress | Score bars grow up, skill rows stagger in. |
 
+### UX patterns (borrowed from big apps)
+
+| Pattern | Where | From |
+|---|---|---|
+| Android back button/gesture = the on-screen back button; never closes the app mid-flow | `BackButton` (`Screen.tsx`), fallback in `Root.tsx` | Google apps |
+| Skeleton placeholders shaped like the coming content instead of a lone spinner | `components/Skeleton.tsx`: Past drives, Progress, Replay, Infractions, Growth | Facebook, YouTube, LinkedIn |
+| Pull to refresh | Past drives, Progress (`Screen` `onRefresh`) | Instagram, Gmail |
+| Empty state with the next action | Past drives: "Start a drive" | Airbnb, Material Design |
+| Whole settings row toggles the switch; read as one switch | `ToggleRow` | iOS Settings |
+| Headers, one-sentence card labels, text-size caps on titles/buttons/scores | `Screen`, `SectionTitle`, `Button`, trip cards | Apple HIG (VoiceOver, Dynamic Type) |
+| Taps work first time with the keyboard open | `Screen` (`keyboardShouldPersistTaps`) | |
+
 ## 5. How to redo the frontend
 
 - **Restyle only:** edit `ui/theme.ts`, then the `StyleSheet`s at the bottom of each component/screen. No logic moves.

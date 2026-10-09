@@ -2,7 +2,7 @@
  * Infractions: step 2 of the post-trip flow (lib/flow.ts). Every event from the
  * drive, in order, with when and where it happened (street from OSM, §8).
  */
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
 import { ConnectionError } from '../components/ConnectionError';
@@ -11,6 +11,7 @@ import { FlowFooter } from '../components/FlowFooter';
 import { FadeIn, staggerDelay } from '../components/motion';
 import { Card, Muted, OsmCredit, TierDot } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { SkeletonScreen } from '../components/Skeleton';
 import { nextRoute, prevRoute } from '../lib/flow';
 import { clockText } from '../lib/format';
 import { timeEvents } from '../lib/replay';
@@ -38,7 +39,7 @@ export function InfractionsScreen({
         {q.error ? (
           <ConnectionError error={q.error} onRetry={q.reload} />
         ) : (
-          <ActivityIndicator color={colors.primary} style={styles.loading} />
+          <SkeletonScreen variant="summary" />
         )}
       </Screen>
     );
@@ -95,7 +96,6 @@ export function InfractionsScreen({
 }
 
 const styles = StyleSheet.create({
-  loading: { marginTop: space.xxl },
   summary: { alignItems: 'center', gap: space.xs, marginBottom: space.lg, marginTop: space.sm },
   bigNumber: { fontSize: 64, fontFamily: fonts.semiBold, color: colors.text, lineHeight: 72 },
   summaryTitle: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },

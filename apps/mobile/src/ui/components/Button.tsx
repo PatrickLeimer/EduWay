@@ -32,6 +32,7 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={title}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
@@ -52,6 +53,8 @@ export function Button({
           >
             <Text
               numberOfLines={1}
+              // Large text settings grow the label, but never past the button.
+              maxFontSizeMultiplier={1.3}
               style={[
                 styles.label,
                 large && styles.labelLarge,
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
   disabled: { backgroundColor: colors.disabled, borderColor: colors.disabled },
   disabledDark: { opacity: 0.5 },
   label: { fontSize: font.body, fontFamily: fonts.semiBold, textAlign: 'center' },
-  labelLarge: { fontFamily: fonts.regular, fontSize: font.driveMin },
+  labelLarge: { fontFamily: fonts.semiBold, fontSize: font.driveMin },
   labelLight: { color: colors.onColor },
   labelTeal: { color: colors.good },
   labelDisabled: { color: colors.textMuted },

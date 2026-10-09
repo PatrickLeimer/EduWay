@@ -1,6 +1,6 @@
 /** Small presentational pieces shared by the light (non-driving) screens. */
 import type { ReactNode } from 'react';
-import { StyleSheet, Switch, Text, View, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text, View, type ViewStyle } from 'react-native';
 
 import { colors, font, fonts, lip as lipWidth, radius, space, stroke } from '../theme';
 
@@ -21,7 +21,11 @@ export function Card({
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
-  return <Text style={styles.section}>{children}</Text>;
+  return (
+    <Text style={styles.section} accessibilityRole="header">
+      {children}
+    </Text>
+  );
 }
 
 export function Muted({ children }: { children: ReactNode }) {
@@ -50,8 +54,18 @@ export function ToggleRow({
   onChange: (v: boolean) => void;
   disabled?: boolean;
 }) {
+  // The whole row flips the switch (iOS Settings style), and screen readers
+  // hear one "switch" with its label and state.
   return (
-    <View style={styles.toggleRow}>
+    <Pressable
+      onPress={() => onChange(!value)}
+      disabled={disabled}
+      accessibilityRole="switch"
+      accessibilityLabel={label}
+      accessibilityHint={hint}
+      accessibilityState={{ checked: value, disabled }}
+      style={({ pressed }) => [styles.toggleRow, pressed && styles.toggleRowPressed]}
+    >
       <View style={styles.toggleText}>
         <Text style={styles.toggleLabel}>{label}</Text>
         {hint ? <Text style={styles.muted}>{hint}</Text> : null}
@@ -62,8 +76,10 @@ export function ToggleRow({
         disabled={disabled}
         trackColor={{ true: colors.primary, false: colors.border }}
         thumbColor={colors.white}
+        importantForAccessibility="no"
+        accessibilityElementsHidden
       />
-    </View>
+    </Pressable>
   );
 }
 
@@ -119,6 +135,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: space.sm,
   },
+  toggleRowPressed: { opacity: 0.7 },
   toggleText: { flex: 1, paddingRight: space.md },
   toggleLabel: { fontSize: font.body, fontFamily: fonts.semiBold, color: colors.text },
   osm: {
