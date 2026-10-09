@@ -36,9 +36,12 @@ import { createGpsPath, type GpsPath } from './gpsPath';
 import { createExpoKeepAwake, type KeepAwake } from './keepAwake';
 import type { LocationSource } from './locationSource';
 import { createTripStateStore, INITIAL_TRIP_STATE } from './stateStore';
+import { createStopTimer } from './stopTimer';
 import { createTraceBuffer, type TraceBuffer } from './traceBuffer';
 
 const M_PER_MI = 1609.34;
+/** How often the stop timer refreshes between GPS fixes (phones send fewer while parked). */
+const STOP_TICK_MS = 1000;
 
 export interface TripSessionDeps {
   location: LocationSource;
@@ -67,6 +70,22 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
   let ending = false;
   /** Whether the open speeding episode's live alert played (§7); its event arrives when the episode ends. */
   let speedingAlerted = false;
+  const stopTimer = createStopTimer();
+  let stopTick: ReturnType<typeof setInterval> | null = null;
+
+  /** Keeps stoppedForS (and so End Trip) moving even when no new fix arrives. */
+  function startStopTick() {
+    stopStopTick();
+    stopTick = setInterval(() => {
+      if (store.get().status !== 'driving') return;
+      store.set({ stoppedForS: stopTimer.stoppedForS(Date.now()) });
+    }, STOP_TICK_MS);
+  }
+
+  function stopStopTick() {
+    if (stopTick) clearInterval(stopTick);
+    stopTick = null;
+  }
 
   /** `alerted` given: the live alert was already decided while the event was open. */
   const record = (draft: DraftEvent, match: RoadMatch | null, alertedAlready?: boolean) => {
@@ -120,14 +139,12 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
     void deps.roadCache.ensureAround(fix);
     const match = deps.roadCache.match(fix);
     const prev = store.get();
-    const dt = prev.latestFix ? Math.max(0, (fix.t - prev.latestFix.t) / 1000) : 0;
-    const isStopped = fix.speedMps != null && fix.speedMps < TRIP.stoppedSpeedMps;
     store.set({
       latestFix: fix,
       latestRoad: match,
       traceLength: trace.length,
       distanceMi: prev.distanceMi + (movedM ?? 0) / M_PER_MI,
-      stoppedForS: isStopped ? prev.stoppedForS + dt : 0,
+      stoppedForS: stopTimer.onFix(fix, Date.now()),
     });
     deps.motionDetector.onGps(fix);
     const road = deps.roadDetector.onGps(fix, match);
@@ -164,6 +181,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
   }
 
   function haltSensors() {
+    stopStopTick();
     deps.location.stop();
     deps.motionSource.stop();
     deps.phoneUse.stop();
@@ -199,6 +217,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
       trace = createTraceBuffer(now);
       path = createGpsPath();
       gpsChain = Promise.resolve();
+      stopTimer.reset();
       store.set({
         ...INITIAL_TRIP_STATE,
         status: 'starting',
@@ -220,6 +239,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
         });
         await deps.motionSource.start((sample) => deps.motionDetector.onMotion(sample));
         store.set({ status: 'driving' });
+        startStopTick();
         await deps.location.start(onFix);
         await gpsChain;
       } catch (e) {
@@ -245,6 +265,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
         await deps.location.start(onFix);
         return null;
       }
+      stopStopTick();
       deps.motionSource.stop();
       deps.phoneUse.stop();
       closeRoadEpisodes();
@@ -291,6 +312,7 @@ export function createTripSession(deps: TripSessionDeps): TripSession {
       ending = false;
       speedingAlerted = false;
       haltSensors();
+      stopTimer.reset();
       deps.motionDetector.reset();
       deps.roadDetector.reset();
       gpsChain = Promise.resolve();

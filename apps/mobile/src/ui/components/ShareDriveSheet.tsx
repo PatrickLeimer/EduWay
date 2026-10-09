@@ -2,10 +2,11 @@
  * Share card (§12 "Share card"): a Strava-style story image of the drive. The
  * route is drawn by us (no map tiles) with a privacy zone trimmed off each end,
  * plus distance, time, score and Gemini's share_caption when there is one.
- * Previewed full screen; "Share" renders it to a 1080x1920 PNG for the share sheet.
+ * Previewed full screen; "Share" captures an off-screen copy drawn at exactly
+ * 1080x1920 pixels and hands that PNG to the share sheet.
  */
 import { useMemo, useRef, useState } from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Modal, PixelRatio, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Polyline, Rect, Text as SvgText } from 'react-native-svg';
 
 import type { Trip } from '@eduway/shared';
@@ -61,15 +62,138 @@ export function ShareDriveSheet({
     if (!svg || busy) return;
     setBusy(true);
     setError(null);
-    svg.toDataURL(
-      (base64) => {
-        sharePng(base64, `eduway-drive-${trip._id}.png`, 'Share your drive')
-          .catch(() => setError("Couldn't open sharing on this device."))
-          .finally(() => setBusy(false));
-      },
-      { width: W, height: H },
-    );
+    svg.toDataURL((base64) => {
+      sharePng(base64, `eduway-drive-${trip._id}.png`, 'Share your drive')
+        .catch(() => setError("Couldn't open sharing on this device."))
+        .finally(() => setBusy(false));
+    });
   };
+
+  const art = (
+    <>
+      <Rect x={0} y={0} width={W} height={H} fill={colors.primary} />
+      {/* The lip: a darker band along the bottom edge. */}
+      <Rect x={0} y={H - 28} width={W} height={28} fill={colors.primaryLip} />
+
+      <SvgText x={90} y={170} fill={colors.onColor} fontSize={64} fontFamily={fonts.semiBold}>
+        EduWay
+      </SvgText>
+      <SvgText x={90} y={235} fill={colors.teal100} fontSize={38} fontFamily={fonts.regular}>
+        {dateText(trip.startedAt)}
+      </SvgText>
+
+      {line ? (
+        <>
+          {/* Route with its own lip: a darker copy just below it. */}
+          <Polyline
+            points={line}
+            fill="none"
+            stroke={colors.teal900}
+            strokeWidth={22}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            transform="translate(0 8)"
+          />
+          <Polyline
+            points={line}
+            fill="none"
+            stroke={colors.onColor}
+            strokeWidth={22}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {ends.map(([x, y], i) => (
+            <Circle
+              key={i}
+              cx={x}
+              cy={y}
+              r={20}
+              fill={colors.teal900}
+              stroke={colors.onColor}
+              strokeWidth={8}
+            />
+          ))}
+        </>
+      ) : (
+        <SvgText
+          x={W / 2}
+          y={ROUTE_BOX.y + ROUTE_BOX.height / 2}
+          textAnchor="middle"
+          fill={colors.teal100}
+          fontSize={44}
+          fontFamily={fonts.regular}
+        >
+          Short drive, route hidden for privacy
+        </SvgText>
+      )}
+
+      {stats.map((s, i) => {
+        const x = 90 + STAT_W(stats.length) * (i + 0.5);
+        return (
+          <G key={s.label}>
+            <SvgText
+              x={x}
+              y={1310}
+              textAnchor="middle"
+              fill={colors.onColor}
+              fontSize={statFontSize(s.value, STAT_W(stats.length))}
+              fontFamily={fonts.semiBold}
+            >
+              {s.value}
+            </SvgText>
+            <SvgText
+              x={x}
+              y={1370}
+              textAnchor="middle"
+              fill={colors.teal100}
+              fontSize={38}
+              fontFamily={fonts.regular}
+            >
+              {s.label}
+            </SvgText>
+          </G>
+        );
+      })}
+
+      {caption.length > 0 ? (
+        <>
+          <Rect
+            x={90}
+            y={1470 + 8}
+            width={W - 180}
+            height={captionH}
+            rx={40}
+            fill={colors.teal700}
+          />
+          <Rect x={90} y={1470} width={W - 180} height={captionH} rx={40} fill={colors.surface} />
+          {caption.map((l, i) => (
+            <SvgText
+              key={i}
+              x={W / 2}
+              y={1470 + 80 + i * 60}
+              textAnchor="middle"
+              fill={colors.teal900}
+              fontSize={44}
+              fontFamily={fonts.semiBold}
+            >
+              {l}
+            </SvgText>
+          ))}
+        </>
+      ) : null}
+
+      <SvgText
+        x={W / 2}
+        y={H - 90}
+        textAnchor="middle"
+        fill={colors.teal100}
+        fontSize={34}
+        fontFamily={fonts.regular}
+      >
+        Practice drive with my EduWay coach
+      </SvgText>
+    </>
+  );
 
   return (
     <Modal
@@ -80,135 +204,23 @@ export function ShareDriveSheet({
     >
       <View style={styles.modal}>
         <View style={styles.preview}>
-          <Svg ref={svgRef} width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
-            <Rect x={0} y={0} width={W} height={H} fill={colors.primary} />
-            {/* The lip: a darker band along the bottom edge. */}
-            <Rect x={0} y={H - 28} width={W} height={28} fill={colors.primaryLip} />
-
-            <SvgText x={90} y={170} fill={colors.onColor} fontSize={64} fontFamily={fonts.semiBold}>
-              EduWay
-            </SvgText>
-            <SvgText x={90} y={235} fill={colors.teal100} fontSize={38} fontFamily={fonts.regular}>
-              {dateText(trip.startedAt)}
-            </SvgText>
-
-            {line ? (
-              <>
-                {/* Route with its own lip: a darker copy just below it. */}
-                <Polyline
-                  points={line}
-                  fill="none"
-                  stroke={colors.teal900}
-                  strokeWidth={22}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  transform="translate(0 8)"
-                />
-                <Polyline
-                  points={line}
-                  fill="none"
-                  stroke={colors.onColor}
-                  strokeWidth={22}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                {ends.map(([x, y], i) => (
-                  <Circle
-                    key={i}
-                    cx={x}
-                    cy={y}
-                    r={20}
-                    fill={colors.teal900}
-                    stroke={colors.onColor}
-                    strokeWidth={8}
-                  />
-                ))}
-              </>
-            ) : (
-              <SvgText
-                x={W / 2}
-                y={ROUTE_BOX.y + ROUTE_BOX.height / 2}
-                textAnchor="middle"
-                fill={colors.teal100}
-                fontSize={44}
-                fontFamily={fonts.regular}
-              >
-                Short drive, route hidden for privacy
-              </SvgText>
-            )}
-
-            {stats.map((s, i) => {
-              const x = 90 + STAT_W(stats.length) * (i + 0.5);
-              return (
-                <G key={s.label}>
-                  <SvgText
-                    x={x}
-                    y={1310}
-                    textAnchor="middle"
-                    fill={colors.onColor}
-                    fontSize={statFontSize(s.value, STAT_W(stats.length))}
-                    fontFamily={fonts.semiBold}
-                  >
-                    {s.value}
-                  </SvgText>
-                  <SvgText
-                    x={x}
-                    y={1370}
-                    textAnchor="middle"
-                    fill={colors.teal100}
-                    fontSize={38}
-                    fontFamily={fonts.regular}
-                  >
-                    {s.label}
-                  </SvgText>
-                </G>
-              );
-            })}
-
-            {caption.length > 0 ? (
-              <>
-                <Rect
-                  x={90}
-                  y={1470 + 8}
-                  width={W - 180}
-                  height={captionH}
-                  rx={40}
-                  fill={colors.teal700}
-                />
-                <Rect
-                  x={90}
-                  y={1470}
-                  width={W - 180}
-                  height={captionH}
-                  rx={40}
-                  fill={colors.surface}
-                />
-                {caption.map((l, i) => (
-                  <SvgText
-                    key={i}
-                    x={W / 2}
-                    y={1470 + 80 + i * 60}
-                    textAnchor="middle"
-                    fill={colors.teal900}
-                    fontSize={44}
-                    fontFamily={fonts.semiBold}
-                  >
-                    {l}
-                  </SvgText>
-                ))}
-              </>
-            ) : null}
-
-            <SvgText
-              x={W / 2}
-              y={H - 90}
-              textAnchor="middle"
-              fill={colors.teal100}
-              fontSize={34}
-              fontFamily={fonts.regular}
-            >
-              Practice drive with my EduWay coach
-            </SvgText>
+          <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
+            {art}
+          </Svg>
+        </View>
+        {/*
+          The copy that becomes the PNG, off screen and exactly 1080x1920 pixels.
+          toDataURL draws at the view's own size, so capturing the small preview
+          gave a small image.
+        */}
+        <View style={styles.capture} pointerEvents="none">
+          <Svg
+            ref={svgRef}
+            width={W / PixelRatio.get()}
+            height={H / PixelRatio.get()}
+            viewBox={`0 0 ${W} ${H}`}
+          >
+            {art}
           </Svg>
         </View>
 
@@ -243,6 +255,8 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: 'center',
   },
+  /** Off screen: laid out and drawable, never seen. */
+  capture: { position: 'absolute', left: -10000, top: 0 },
   actions: { flexDirection: 'row', gap: space.sm },
   action: { flex: 1 },
 });
