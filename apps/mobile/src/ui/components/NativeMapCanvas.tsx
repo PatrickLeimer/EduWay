@@ -5,7 +5,7 @@
  * app). Browser: MapCanvas.web.tsx.
  * OpenStreetMap supplies street and limit text elsewhere; it is not the basemap.
  */
-import { useEffect, useRef } from 'react';
+import { Fragment, useEffect, useImperativeHandle, useRef } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
@@ -28,8 +28,28 @@ export function NativeMapCanvas({
   interactive = true,
   dark = false,
   lite = false,
+  satellite = false,
+  boldRoute = false,
+  onLoaded,
+  snapshotRef,
 }: MapCanvasProps) {
   const map = useRef<MapView | null>(null);
+  useImperativeHandle(
+    snapshotRef,
+    () => ({
+      take: async (width, height) => {
+        if (!map.current) throw new Error('Map not ready');
+        return map.current.takeSnapshot({
+          width,
+          height,
+          format: 'jpg',
+          quality: 0.9,
+          result: 'base64',
+        });
+      },
+    }),
+    [],
+  );
 
   // MapView reads initialRegion only on mount; after that, follow animates the camera.
   const initialRegion =
@@ -62,6 +82,10 @@ export function NativeMapCanvas({
         provider={PROVIDER}
         googleRenderer="LEGACY"
         initialRegion={initialRegion}
+        mapType={satellite ? 'satellite' : 'standard'}
+        // Android reports tiles drawn; Apple's snapshotter waits for its own tiles.
+        onMapLoaded={onLoaded}
+        onMapReady={Platform.OS === 'ios' ? onLoaded : undefined}
         customMapStyle={dark ? mapDarkStyle : undefined}
         userInterfaceStyle={dark ? 'dark' : 'light'}
         liteMode={lite}
@@ -75,7 +99,14 @@ export function NativeMapCanvas({
       >
         {(routes ?? (route && route.length > 1 ? [route] : [])).map((path, i) =>
           path.length > 1 ? (
-            <Polyline key={i} coordinates={path} strokeColor={colors.route} strokeWidth={5} />
+            boldRoute ? (
+              <Fragment key={i}>
+                <Polyline coordinates={path} strokeColor={colors.onColor} strokeWidth={12} />
+                <Polyline coordinates={path} strokeColor={colors.route} strokeWidth={7} />
+              </Fragment>
+            ) : (
+              <Polyline key={i} coordinates={path} strokeColor={colors.route} strokeWidth={5} />
+            )
           ) : null,
         )}
         {pins?.map((p) => (
