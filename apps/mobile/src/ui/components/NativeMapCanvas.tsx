@@ -16,8 +16,6 @@ import type { MapCanvasProps } from './mapTypes';
 const FOLLOW_DELTA = 0.01;
 /** Google on Android; undefined = the platform map (Apple Maps) on iPhone. */
 const PROVIDER = Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined;
-/** Closest thing to topography each platform map offers (see MapCanvasProps.terrain). */
-const TERRAIN_TYPE = Platform.OS === 'android' ? 'terrain' : 'hybrid';
 
 export function NativeMapCanvas({
   style,
@@ -30,7 +28,6 @@ export function NativeMapCanvas({
   interactive = true,
   dark = false,
   lite = false,
-  terrain = false,
 }: MapCanvasProps) {
   const map = useRef<MapView | null>(null);
 
@@ -65,7 +62,6 @@ export function NativeMapCanvas({
         provider={PROVIDER}
         googleRenderer="LEGACY"
         initialRegion={initialRegion}
-        mapType={terrain ? TERRAIN_TYPE : 'standard'}
         customMapStyle={dark ? mapDarkStyle : undefined}
         userInterfaceStyle={dark ? 'dark' : 'light'}
         liteMode={lite}
