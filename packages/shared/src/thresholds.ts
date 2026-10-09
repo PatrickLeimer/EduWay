@@ -170,6 +170,12 @@ export const TRIP = {
   minStoppedToEndS: 30,
   /** "Stopped" means GPS speed below this. TODO(WS2): tune. */
   stoppedSpeedMps: 0.5,
+  /**
+   * Once stopped, the car stays stopped while it is within this distance (plus
+   * the fix's accuracy) of where it stopped, whatever the speed reads. Parked
+   * phones often report no speed or a noisy 1-2 m/s, which used to reset the timer.
+   */
+  stopRadiusM: 25,
   /** Route trace: a fix implying more than this speed from the last kept fix is a GPS jump. */
   maxPlausibleSpeedMps: 70,
   /** Route trace: this many jumps in a row means the last kept fix was the bad one. */
