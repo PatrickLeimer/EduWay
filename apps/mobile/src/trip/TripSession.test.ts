@@ -169,6 +169,31 @@ describe('TripSession', () => {
     expect(session.getState().status).toBe('driving');
   });
 
+  it('unlocks End Trip when a parked phone reports no speed or a noisy one', async () => {
+    const fixes = driveThenPark().map((f, i) =>
+      i < 5 ? f : { ...f, speedMps: i % 2 ? null : 1.6, lat: f.lat + (i % 3) * 0.00002 },
+    );
+    const { session } = harness({ fixes });
+    await session.start({ passenger: false, lockEnabled: true });
+    expect(session.canEnd()).toEqual({ ok: true });
+  });
+
+  it('keeps counting the stop when GPS fixes pause, so End Trip still appears', async () => {
+    vi.useFakeTimers();
+    try {
+      const { session } = harness({
+        fixes: [fix(Date.now() - 6000, 10), fix(Date.now() - 5000, 0), fix(Date.now(), 0)],
+      });
+      await session.start({ passenger: false, lockEnabled: true });
+      expect(session.canEnd().ok).toBe(false);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(session.canEnd()).toEqual({ ok: true });
+      session.reset();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('uploads the trace and alerts on a harsh brake; the debrief waits for the coaching screen', async () => {
     const h = harness({ fixes: driveThenPark() });
     await h.session.start({ passenger: false, lockEnabled: true });

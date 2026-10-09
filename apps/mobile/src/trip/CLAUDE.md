@@ -23,6 +23,7 @@ Runs a drive from Start to End (master doc §4). Owns the single GPS subscriptio
 |---|---|
 | `traceBuffer.ts` | Done: columnar trace recorder |
 | `gpsPath.ts` | Done: drops bad fixes (accuracy, jumps) from the trace; route distance |
+| `stopTimer.ts` | Done: seconds stopped for the 30 s End rule; stays stopped within `TRIP.stopRadiusM` whatever the speed reads, and keeps counting between fixes (tested) |
 | `stateStore.ts` | Done: immutable TripState store |
 | `uploadQueue.ts` | Done: in-memory queue (persistent store is an open decision) |
 | `useTripState.ts` | Done: React binding for screens |
