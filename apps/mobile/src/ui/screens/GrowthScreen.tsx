@@ -5,7 +5,7 @@
  * The server computes every number; this screen only draws them.
  */
 import { DEMO_USER_ID, GAMIFICATION, STREAK_KINDS, type ProgressUpdate } from '@eduway/shared';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
 import { useTripState } from '../../trip';
@@ -15,6 +15,7 @@ import { FlowFooter } from '../components/FlowFooter';
 import { FadeIn } from '../components/motion';
 import { Card, Muted, SectionTitle } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { SkeletonScreen } from '../components/Skeleton';
 import { ScoreTrendChart } from '../components/ScoreTrendChart';
 import { nextRoute, prevRoute } from '../lib/flow';
 import {
@@ -64,7 +65,7 @@ export function GrowthScreen({
         {error ? (
           <ConnectionError error={error} onRetry={reload} />
         ) : (
-          <ActivityIndicator color={colors.primary} style={styles.loading} />
+          <SkeletonScreen variant="summary" />
         )}
       </Screen>
     );
@@ -147,7 +148,6 @@ export function GrowthScreen({
 }
 
 const styles = StyleSheet.create({
-  loading: { marginTop: space.xxl },
   hero: {
     backgroundColor: colors.primary,
     borderBottomWidth: lip.rest,

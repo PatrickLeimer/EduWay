@@ -1,6 +1,6 @@
 /** Shell for the light screens: back button + large title + scrolling content. */
-import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { BackHandler, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { colors, font, fonts, motion, radius, SAFE_BOTTOM, SAFE_TOP, space } from '../theme';
 import { FadeIn, PressableScale } from './motion';
@@ -13,6 +13,9 @@ interface ScreenProps {
   hero?: ReactNode;
   /** Pinned to the bottom, outside the scroll (e.g. the main action). */
   footer?: ReactNode;
+  /** Pull to refresh (lists that change on the server). */
+  onRefresh?: () => void;
+  refreshing?: boolean;
   children: ReactNode;
 }
 
@@ -21,8 +24,22 @@ function Chevron() {
   return <View style={styles.chevron} />;
 }
 
-/** Rounded "‹ Label" pill, Uber/iOS style. Big touch target, springs when pressed. */
+/**
+ * Rounded "‹ Label" pill, Uber/iOS style. Big touch target, springs when pressed.
+ * Android's back button/gesture does the same thing while it is on screen.
+ */
 export function BackButton({ label, onPress }: { label: string; onPress: () => void }) {
+  const latest = useRef(onPress);
+  useEffect(() => {
+    latest.current = onPress;
+  });
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      latest.current();
+      return true;
+    });
+    return () => sub.remove();
+  }, []);
   return (
     <PressableScale
       accessibilityRole="button"
@@ -41,16 +58,41 @@ export function BackButton({ label, onPress }: { label: string; onPress: () => v
   );
 }
 
-export function Screen({ title, onBack, backLabel = 'Back', hero, footer, children }: ScreenProps) {
+export function Screen({
+  title,
+  onBack,
+  backLabel = 'Back',
+  hero,
+  footer,
+  onRefresh,
+  refreshing = false,
+  children,
+}: ScreenProps) {
   return (
     <View style={styles.root}>
       <View style={styles.header}>
         {onBack ? <BackButton label={backLabel} onPress={onBack} /> : null}
         <FadeIn delay={motion.fast / 2} fromY={8}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
+            {title}
+          </Text>
         </FadeIn>
       </View>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        // Taps on buttons work on the first try even with the keyboard open.
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          ) : undefined
+        }
+      >
         {hero ? <FadeIn fromY={0}>{hero}</FadeIn> : null}
         <FadeIn delay={motion.fast} fromY={16} style={styles.content}>
           {children}

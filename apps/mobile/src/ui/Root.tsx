@@ -5,8 +5,8 @@
  * Lexend is loaded here before anything renders.
  */
 import { Lexend_400Regular, Lexend_600SemiBold, useFonts } from '@expo-google-fonts/lexend';
-import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { BackHandler, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useStartDriveLink } from '../trip';
 import { getDemoModules, type AppModules } from '../wiring';
@@ -90,6 +90,21 @@ export function Root({ modules }: { modules: AppModules }) {
     [],
   );
   const { route, kind } = nav;
+
+  // Android back: screens with a back button handle it themselves (BackButton,
+  // registered later, so it runs first). Anywhere else but Home, swallow it so
+  // the app never closes mid-flow (e.g. while a drive is uploading).
+  const routeName = useRef(route.name);
+  useEffect(() => {
+    routeName.current = route.name;
+  });
+  useEffect(() => {
+    const sub = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => routeName.current !== 'start',
+    );
+    return () => sub.remove();
+  }, []);
   const updateSettings = useCallback(
     (patch: Partial<AppSettings>) => setSettings((s) => ({ ...s, ...patch })),
     [],

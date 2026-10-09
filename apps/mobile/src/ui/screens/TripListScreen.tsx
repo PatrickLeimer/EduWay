@@ -4,14 +4,16 @@
  * score and event count. Tapping a card opens its debrief.
  */
 import { DEMO_USER_ID, type TripListItem } from '@eduway/shared';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
+import { Button } from '../components/Button';
 import { ConnectionError } from '../components/ConnectionError';
 import { MapCanvas } from '../components/MapCanvas';
 import { FadeIn, PressableScale, staggerDelay } from '../components/motion';
-import { Muted } from '../components/primitives';
+import { Card, Muted } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { SkeletonScreen } from '../components/Skeleton';
 import { dateText, durationText, milesText, secondsBetween, totalEvents } from '../lib/format';
 import { pointsFromLine } from '../lib/geo';
 import type { ScreenProps } from '../navigation';
@@ -20,9 +22,20 @@ import { colors, edge, font, fonts, motion, radius, space } from '../theme';
 function TripCard({ trip, onPress }: { trip: TripListItem; onPress: () => void }) {
   const route = pointsFromLine(trip.routePreview);
   const events = totalEvents(trip.counts);
+  const duration = durationText(secondsBetween(trip.startedAt, trip.endedAt));
+  const eventsText = events === 0 ? 'no events' : `${events} event${events === 1 ? '' : 's'}`;
+  const scoreText =
+    trip.score == null
+      ? trip.passenger
+        ? 'passenger'
+        : 'not scored'
+      : `score ${Math.round(trip.score)}`;
   return (
     <PressableScale
       accessibilityRole="button"
+      // One sentence for screen readers instead of five separate pieces.
+      accessibilityLabel={`${dateText(trip.startedAt)}, ${milesText(trip.distanceMi)}, ${duration}, ${eventsText}, ${scoreText}`}
+      accessibilityHint="Opens this drive's replay and coaching"
       onPress={onPress}
       pressedScale={0.98}
       style={styles.card}
@@ -33,13 +46,11 @@ function TripCard({ trip, onPress }: { trip: TripListItem; onPress: () => void }
         <View style={styles.info}>
           <Text style={styles.date}>{dateText(trip.startedAt)}</Text>
           <Text style={styles.meta}>
-            {milesText(trip.distanceMi)} ·{' '}
-            {durationText(secondsBetween(trip.startedAt, trip.endedAt))} ·{' '}
-            {events === 0 ? 'no events' : `${events} event${events === 1 ? '' : 's'}`}
+            {milesText(trip.distanceMi)} · {duration} · {eventsText}
           </Text>
         </View>
         <View style={styles.score}>
-          <Text style={styles.scoreValue}>
+          <Text style={styles.scoreValue} maxFontSizeMultiplier={1.3}>
             {trip.score == null ? '--' : Math.round(trip.score)}
           </Text>
           <Text style={styles.scoreLabel}>{trip.passenger ? 'passenger' : 'score'}</Text>
@@ -55,13 +66,30 @@ export function TripListScreen({ modules, navigate }: ScreenProps) {
   );
 
   return (
-    <Screen title="Past drives" onBack={() => navigate({ name: 'start' })} backLabel="Home">
-      {loading && !data ? (
-        <ActivityIndicator color={colors.primary} style={styles.loading} />
-      ) : null}
+    <Screen
+      title="Past drives"
+      onBack={() => navigate({ name: 'start' })}
+      backLabel="Home"
+      onRefresh={reload}
+      refreshing={loading && data !== null}
+    >
+      {loading && !data && !error ? <SkeletonScreen variant="trips" /> : null}
       {error ? <ConnectionError error={error} onRetry={reload} /> : null}
       {data?.trips.length === 0 ? (
-        <Muted>No drives yet. Your first one will show up here.</Muted>
+        // Empty state with the next step, not a dead end.
+        <FadeIn fromScale={0.96} fromY={0}>
+          <Card lip style={styles.empty}>
+            <Text style={styles.emptyTitle}>No drives yet</Text>
+            <Muted>
+              Your drives show up here with a replay, your score and your coach’s notes.
+            </Muted>
+            <Button
+              title="Start a drive"
+              onPress={() => navigate({ name: 'start' })}
+              style={styles.emptyButton}
+            />
+          </Card>
+        </FadeIn>
       ) : null}
       {/* Cards glide up one after another. */}
       {data?.trips.map((t, i) => (
@@ -74,7 +102,9 @@ export function TripListScreen({ modules, navigate }: ScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  loading: { marginTop: space.xxl },
+  empty: { alignItems: 'center', paddingVertical: space.xl, gap: space.xs },
+  emptyTitle: { fontSize: font.title, fontFamily: fonts.semiBold, color: colors.text },
+  emptyButton: { alignSelf: 'stretch', marginTop: space.lg },
   // Edge on the outer view, clipping on the inner one.
   card: {
     backgroundColor: colors.surface,

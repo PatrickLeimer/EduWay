@@ -10,7 +10,7 @@
  * per-fix limit in the trace (contract change, WS2/WS3).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
 import { Button } from '../components/Button';
@@ -21,6 +21,7 @@ import { MapCanvas } from '../components/MapCanvas';
 import { FadeIn, GrowBar } from '../components/motion';
 import { Muted, OsmCredit } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { SkeletonScreen } from '../components/Skeleton';
 import { ShareDriveSheet } from '../components/ShareDriveSheet';
 import { nextRoute, prevRoute } from '../lib/flow';
 import { clockText } from '../lib/format';
@@ -95,7 +96,7 @@ export function ReplayScreen({
             }}
           />
         ) : (
-          <ActivityIndicator color={colors.primary} style={styles.loading} />
+          <SkeletonScreen variant="replay" />
         )}
       </Screen>
     );
@@ -215,7 +216,6 @@ export function ReplayScreen({
 
 const styles = StyleSheet.create({
   map: { height: 320 },
-  loading: { marginTop: space.xxl },
   eventSlot: { minHeight: 64, justifyContent: 'center', marginTop: space.sm },
   timeline: {
     height: 72,

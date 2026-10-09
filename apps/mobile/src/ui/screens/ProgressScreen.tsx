@@ -5,7 +5,7 @@
  */
 import { DEMO_USER_ID, EVENT_TYPES, type TripListItem } from '@eduway/shared';
 import { useMemo } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
 import { ConnectionError } from '../components/ConnectionError';
@@ -13,6 +13,7 @@ import { MapCanvas } from '../components/MapCanvas';
 import { FadeIn, staggerDelay } from '../components/motion';
 import { Card, Muted, OsmCredit, SectionTitle } from '../components/primitives';
 import { Screen } from '../components/Screen';
+import { SkeletonScreen } from '../components/Skeleton';
 import { ScoreTrendChart } from '../components/ScoreTrendChart';
 import { EVENT_LABEL } from '../lib/format';
 import { pointFromGeo, pointsFromLine, type MapPoint } from '../lib/geo';
@@ -25,7 +26,7 @@ function routeLines(trips: TripListItem[]): MapPoint[][] {
 }
 
 export function ProgressScreen({ modules, navigate }: ScreenProps) {
-  const { data, error, reload } = useApiQuery('progress', () =>
+  const { data, error, loading, reload } = useApiQuery('progress', () =>
     Promise.all([modules.api.getProgress(DEMO_USER_ID), modules.api.listTrips(DEMO_USER_ID)]).then(
       ([progress, list]) => ({ progress, trips: list.trips }),
     ),
@@ -39,7 +40,7 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
         {error ? (
           <ConnectionError error={error} onRetry={reload} />
         ) : (
-          <ActivityIndicator color={colors.primary} style={styles.loading} />
+          <SkeletonScreen variant="summary" />
         )}
       </Screen>
     );
@@ -56,7 +57,7 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
   const fitTo = [...routes.flat(), ...spots];
 
   return (
-    <Screen title="Progress" onBack={home} backLabel="Home">
+    <Screen title="Progress" onBack={home} backLabel="Home" onRefresh={reload} refreshing={loading}>
       <Card style={styles.readiness}>
         <Text style={styles.readyTitle}>
           {progress.testReadiness.ready ? 'Looking test-ready' : 'Not test-ready yet'}
@@ -119,7 +120,6 @@ export function ProgressScreen({ modules, navigate }: ScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  loading: { marginTop: space.xxl },
   readiness: { marginTop: space.md },
   readyTitle: {
     fontSize: font.title,
