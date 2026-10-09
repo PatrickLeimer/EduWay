@@ -3,14 +3,15 @@
  * pins that pop in at their timestamps, and a speed timeline with a scrub bar
  * and 1x / 4x / 10x playback. Shows what was recorded; never re-runs detection.
  * Step 1 of the post-trip flow (lib/flow.ts); the only screen with a map.
- * "Share drive" opens the share card (§12 "Share card").
+ * "Share drive" opens the share card (§12 "Share card"). "Terrain" switches the
+ * map to topography (satellite on iPhone, which has no terrain map).
  *
  * Known gap: the trace stores speed only, not the limit at each second, so the
  * timeline shows speed plus event ticks. A true "speed vs limit" line needs a
  * per-fix limit in the trace (contract change, WS2/WS3).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useApiQuery } from '../../api';
 import { Button } from '../components/Button';
@@ -55,6 +56,7 @@ export function ReplayScreen({
   const [speed, setSpeed] = useState<ReplaySpeed>(4);
   const [barWidth, setBarWidth] = useState(1);
   const [sharing, setSharing] = useState(false);
+  const [terrain, setTerrain] = useState(false);
 
   const trace = traceQ.data;
   const trip = tripQ.data?.trip;
@@ -126,7 +128,16 @@ export function ReplayScreen({
       onBack={back}
       backLabel="Summary"
       footer={<FlowFooter step="replay" onPress={next} />}
-      hero={<MapCanvas style={styles.map} route={route} fitTo={route} pins={pins} car={car} />}
+      hero={
+        <MapCanvas
+          style={styles.map}
+          route={route}
+          fitTo={route}
+          pins={pins}
+          car={car}
+          terrain={terrain}
+        />
+      }
     >
       <View style={styles.eventSlot}>
         {recent ? (
@@ -193,15 +204,23 @@ export function ReplayScreen({
           />
         ))}
       </View>
-      <Button
-        title="Share drive"
-        variant="secondary"
-        onPress={() => {
-          setPlaying(false);
-          setSharing(true);
-        }}
-        style={styles.shareBtn}
-      />
+      <View style={styles.extras}>
+        <Button
+          title={Platform.OS === 'android' ? 'Terrain' : 'Satellite'}
+          variant={terrain ? 'primary' : 'secondary'}
+          onPress={() => setTerrain(!terrain)}
+          style={styles.extraBtn}
+        />
+        <Button
+          title="Share drive"
+          variant="secondary"
+          onPress={() => {
+            setPlaying(false);
+            setSharing(true);
+          }}
+          style={styles.extraBtn}
+        />
+      </View>
       <OsmCredit />
       <ShareDriveSheet
         visible={sharing}
@@ -240,5 +259,6 @@ const styles = StyleSheet.create({
   controls: { flexDirection: 'row', gap: space.sm, marginTop: space.lg },
   playBtn: { flex: 2 },
   speedBtn: { flex: 1 },
-  shareBtn: { marginTop: space.sm },
+  extras: { flexDirection: 'row', gap: space.sm, marginTop: space.sm },
+  extraBtn: { flex: 1 },
 });

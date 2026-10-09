@@ -26,6 +26,11 @@ export interface MapCanvasProps {
   interactive?: boolean;
   /** Dark basemap (driving mode). */
   dark?: boolean;
+  /**
+   * Topography: Google's terrain basemap (hill shading, contours) on Android.
+   * Apple Maps on iPhone has no terrain mode, so it shows satellite with labels.
+   */
+  terrain?: boolean;
   /** Static bitmap on Android for long lists (react-native-maps liteMode). */
   lite?: boolean;
 }
